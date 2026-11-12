@@ -38,6 +38,8 @@ tests/replay.rs     determinismo e reprodução bit a bit
 tests/redaction.rs  garantia de que mão e biblioteca alheias não vazam
 tests/stack.rs      pilha, fizzle e abertura roteirizada
 tests/catalog.rs    invariantes do catálogo gerado (id denso, ordenado, único)
+tests/golden.rs     partida congelada em arquivo, com fingerprint fixo
+tests/fixtures/     a partida dourada: registro + fingerprint commitados
 ```
 
 ## O contrato

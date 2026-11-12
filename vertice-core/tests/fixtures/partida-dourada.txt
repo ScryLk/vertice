@@ -1,0 +1,218 @@
+# Partida dourada do Vértice — registro congelado do M1.2.
+#
+# Este arquivo É a partida. Se o motor mudar comportamento, tests/golden.rs
+# falha e aponta para cá. Não edite à mão e não regenere só para ficar verde:
+# a diferença é o bug.
+#
+# Regerar (somente quando a mudança de comportamento for intencional):
+#   cargo test --test golden -- --ignored regerar_partida_dourada
+#
+# Formato, um item por linha:
+#   engine_version <str>       versão do motor no momento do registro
+#   card_set_version <str>     versão do conjunto de cartas
+#   seed <u64>                 semente do embaralhamento
+#   deck0 <ids>                ids separados por espaço
+#   deck1 <ids>
+#   hand0 <ids>                opcional; ausente = mão normal
+#   hand1 <ids>
+#   actions <n>                seguido de exatamente n linhas de ação
+#   fingerprint <u64>          estado final tem que bater com este
+#
+# Ação:
+#   land:<obj>        PlayLand
+#   cast:<obj>        Cast sem alvo
+#   cast:<obj>:p<id>  Cast com alvo jogador
+#   cast:<obj>:o<id>  Cast com alvo objeto
+#   atk:<obj>:p<id>   Attack jogador
+#   atk:<obj>:o<id>   Attack objeto
+#   pass              Pass
+#   end               EndTurn
+
+engine_version 0.1.0
+card_set_version m0.1
+seed 20260119
+deck0 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4
+deck1 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7
+actions 181
+end
+end
+end
+land:187
+end
+end
+end
+end
+cast:104
+end
+end
+cast:163
+end
+end
+cast:129:o163
+pass
+end
+end
+end
+end
+end
+land:65
+end
+end
+cast:70:p1
+pass
+end
+atk:104:o65
+end
+cast:96:o187
+cast:169
+pass
+end
+atk:169:o65
+end
+cast:48:o65
+pass
+land:91
+end
+end
+cast:61:o65
+pass
+cast:49
+end
+cast:143
+end
+end
+cast:181:o169
+cast:33
+pass
+pass
+end
+atk:49:p1
+end
+atk:143:o65
+end
+cast:43
+cast:18:o187
+pass
+land:80
+end
+end
+cast:98
+cast:150
+pass
+cast:44:p1
+pass
+atk:43:o187
+atk:43:o143
+end
+atk:150:o65
+atk:150:p0
+atk:150:o49
+cast:182
+end
+cast:22:o187
+pass
+cast:85
+pass
+end
+atk:182:p0
+end
+cast:45
+cast:69
+end
+land:122
+end
+cast:83:o80
+pass
+cast:99
+atk:69:o122
+atk:45:p1
+atk:69:o187
+atk:69:o122
+atk:69:o182
+end
+cast:180
+end
+cast:76:p1
+pass
+end
+cast:115
+atk:180:o80
+end
+cast:50:o104
+pass
+atk:99:o180
+end
+cast:167
+atk:115:o45
+end
+cast:60
+cast:57:o65
+pass
+end
+atk:167:o80
+cast:128
+land:120
+end
+atk:60:p1
+end
+cast:196:o167
+cast:88
+cast:95
+cast:62
+pass
+atk:128:o65
+end
+cast:37:o60
+pass
+atk:62:o128
+end
+cast:118:o122
+pass
+end
+cast:71
+atk:95:o120
+atk:95:o122
+atk:88:o187
+atk:95:p1
+atk:95:o187
+end
+cast:157:o122
+pass
+end
+cast:24:o65
+pass
+atk:95:o187
+atk:95:o122
+atk:71:p1
+atk:95:p1
+end
+cast:131:p1
+pass
+end
+cast:35:o91
+pass
+cast:36
+atk:95:o187
+atk:95:o122
+atk:95:p1
+atk:95:p1
+end
+cast:178
+end
+cast:8
+atk:95:p1
+atk:95:o178
+atk:36:o122
+end
+cast:166
+pass
+land:159
+cast:130
+end
+cast:92
+atk:8:o130
+end
+cast:193
+cast:162
+end
+fingerprint 14696012446656370742

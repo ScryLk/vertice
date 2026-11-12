@@ -4,43 +4,11 @@
 //! sem medo. Se ficar vermelho, você quebrou compatibilidade — e você
 //! descobre em segundos, não em produção.
 
+mod common;
+
+use common::{deck, scripted_match};
 use vertice_core::cards::CATALOG_LEN;
-use vertice_core::rng::Rng;
 use vertice_core::*;
-
-fn deck(offset: u16) -> Vec<CardId> {
-    let n = CATALOG_LEN as u16;
-    (0..100u16)
-        .map(|i| ((i * 7 + offset) % n) as CardId)
-        .collect()
-}
-
-/// Joga uma partida inteira com escolhas pseudo-aleatórias determinísticas.
-/// Não é IA — é gerador de cobertura.
-fn scripted_match(seed: u64, chaos_seed: u64) -> MatchRecord {
-    let d0 = deck(0);
-    let d1 = deck(3);
-    let mut state = new_game(&d0, &d1, seed).expect("partida válida");
-    let mut rec = MatchRecord::new(d0.clone(), d1.clone(), seed);
-
-    let mut chaos = Rng::new(chaos_seed);
-
-    for _ in 0..600 {
-        let options = legal_actions(&state, state.priority);
-        if options.is_empty() {
-            break;
-        }
-        let pick = options[chaos.range(options.len())];
-        apply(&mut state, pick).expect("ação enumerada é legal");
-        rec.push(pick);
-
-        if state.turn > 60 {
-            break;
-        }
-    }
-
-    rec
-}
 
 #[test]
 fn mesmo_seed_mesmo_estado() {
