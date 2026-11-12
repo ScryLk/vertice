@@ -1,0 +1,23 @@
+# Build
+target/
+**/target/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Launcher
+src-tauri/target/
+
+# Artefatos locais
+*.zip
+*.log
+.DS_Store
+.env
+.env.*
+
+# Editores
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,13 @@
+[package]
+name = "vertice-core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "vertice_core"
+path = "src/lib.rs"
+
+[dependencies]
+# Zero dependências. Isso é intencional: o core não pode ter nada que
+# introduza não-determinismo, e uma árvore de dependências vazia é a forma
+# mais barata de garantir isso.
