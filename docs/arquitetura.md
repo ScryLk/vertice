@@ -95,7 +95,11 @@ Esta é a seção mais importante do documento. Cada mecânica que você mantive
 
 **Reconexão é requisito, não enfeite.** Partida de comandante dura 40 minutos. Cliente cai. O servidor guarda a partida e reidrata o jogador com a view redigida e o log. Faça isso no M1, não no fim.
 
-**O que existe hoje (M1.3, parcial).** Uma task por partida dona do `GameState`, um WebSocket por conexão, e reconexão que reidrata da memória: o estado mora no ator, não na conexão, então cair não significa nada. O servidor recusa ação fora de `legal_actions` e índice atrasado sem mexer no estado. Provado por teste com dois clientes headless, um deles derrubado no meio, comparando `seq`, view e `fingerprint`. **Não existe:** persistência (reiniciar o processo perde as partidas em andamento) e matchmaking (partidas nascem pela `Registry`, não por endpoint).
+**O que existe hoje (M1.3).** Uma task por partida dona do `GameState`, um WebSocket por conexão, e reconexão que reidrata: o estado mora no ator, não na conexão, então cair não significa nada. O servidor recusa ação fora de `legal_actions` e índice atrasado sem mexer no estado. Provado por teste com dois clientes headless, um deles derrubado no meio, comparando `seq`, view e `fingerprint`.
+
+**Persistência é um arquivo por partida.** O registro inteiro é reescrito a cada ação aceita, e persistir acontece **antes** de avisar: o cliente só fica sabendo de uma ação depois que ela está durável. `Registry::open` relê o diretório, rejoga cada registro e devolve um ator vivo — reiniciar o processo não perde nada que um jogador já viu. Um arquivo que não rejoga **impede a subida**, em vez de virar aviso: subir fingindo que está tudo bem esconderia exatamente o que o replay existe para denunciar. Custo conhecido: reescrever o registro é O(n) por ação; quando doer (partidas de mil ações), a troca é para log append-only, sem mudar quem chama.
+
+**Não existe:** matchmaking — partidas nascem pela `Registry`, não por endpoint, e o cliente do M1.4 vai precisar disso.
 
 ---
 

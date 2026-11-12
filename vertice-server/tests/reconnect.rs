@@ -7,167 +7,18 @@
 //! "Abri dois navegadores e funcionou" não é prova, e este arquivo existe
 //! para nunca precisar dessa frase.
 
-use std::net::SocketAddr;
+mod common;
+
 use std::sync::Arc;
-use std::time::Duration;
 
-use futures_util::{SinkExt, StreamExt};
-use tokio::net::TcpListener;
-use tokio_tungstenite::tungstenite::Message;
-use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
-
-use vertice_core::cards::CATALOG_LEN;
-use vertice_core::{CardId, PlayerId};
+use common::{baralho, jogar, passo, receive, send, servir, Client};
 use vertice_server::protocol::*;
-use vertice_server::{router, Registry, PROTOCOL_VERSION};
-
-type Socket = WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>;
-
-fn baralho(offset: u16) -> Vec<CardId> {
-    let n = CATALOG_LEN as u16;
-    (0..100u16)
-        .map(|i| ((i * 7 + offset) % n) as CardId)
-        .collect()
-}
-
-/// Cliente que fala o protocolo como um cliente de verdade falaria: só JSON
-/// na entrada e na saída, sem atalho pelo lado de dentro.
-struct Client {
-    socket: Socket,
-    seq: u64,
-    view: PlayerViewDto,
-}
-
-impl Client {
-    async fn connect(addr: SocketAddr, match_id: &str, seat: PlayerId) -> Client {
-        let (mut socket, _) = connect_async(format!("ws://{addr}/ws/{match_id}"))
-            .await
-            .expect("abre o WebSocket");
-
-        let join = ClientMessage::Join {
-            protocol: PROTOCOL_VERSION,
-            seat,
-        };
-        send(&mut socket, &join).await;
-
-        match receive(&mut socket).await {
-            ServerMessage::Welcome { seq, view, .. } => Client { socket, seq, view },
-            other => panic!("esperava `Welcome`, veio {other:?}"),
-        }
-    }
-
-    async fn send(&mut self, message: &ClientMessage) {
-        send(&mut self.socket, message).await;
-    }
-
-    async fn act(&mut self, action: ActionDto) {
-        let message = ClientMessage::Action {
-            seq: self.seq,
-            action,
-        };
-        self.send(&message).await;
-    }
-
-    async fn next(&mut self) -> ServerMessage {
-        let message = receive(&mut self.socket).await;
-        match &message {
-            ServerMessage::View { seq, view } | ServerMessage::Welcome { seq, view, .. } => {
-                self.seq = *seq;
-                self.view = view.clone();
-            }
-            _ => {}
-        }
-        message
-    }
-}
-
-async fn send(socket: &mut Socket, message: &ClientMessage) {
-    let text = serde_json::to_string(message).expect("serializa");
-    socket
-        .send(Message::Text(text.into()))
-        .await
-        .expect("envia");
-}
-
-/// Quanto esperar por um quadro antes de considerar o servidor travado.
-const ESPERA: Duration = Duration::from_secs(5);
-
-async fn receive(socket: &mut Socket) -> ServerMessage {
-    loop {
-        // Sem timeout, uma regressão no servidor faz o teste *pendurar* — e
-        // teste que pendura esconde o problema atrás de um CI travado, que é
-        // pior que um teste vermelho.
-        let frame = tokio::time::timeout(ESPERA, socket.next())
-            .await
-            .unwrap_or_else(|_| {
-                panic!("o servidor não mandou nada em {ESPERA:?}: travou ou parou de notificar")
-            });
-
-        match frame {
-            Some(Ok(Message::Text(text))) => {
-                return serde_json::from_str(&text).expect("o servidor só manda JSON válido")
-            }
-            Some(Ok(_)) => continue,
-            other => panic!("conexão caiu: {other:?}"),
-        }
-    }
-}
-
-/// Um passo: quem tem a prioridade joga a primeira ação legal e os dois
-/// assentos recebem a view nova.
-async fn passo(actor: &mut Client, other: &mut Client) -> bool {
-    let Some(action) = actor.view.legal_actions.first().copied() else {
-        return false;
-    };
-    actor.act(action).await;
-
-    let mine = actor.next().await;
-    let theirs = other.next().await;
-    assert!(
-        matches!(mine, ServerMessage::View { .. }),
-        "esperava `View` para quem agiu, veio {mine:?}"
-    );
-    assert!(
-        matches!(theirs, ServerMessage::View { .. }),
-        "o outro assento também precisa ser avisado, veio {theirs:?}"
-    );
-    true
-}
-
-async fn jogar(a: &mut Client, b: &mut Client, limite: usize) -> usize {
-    let mut feitos = 0;
-    for _ in 0..limite {
-        let acted = if a.view.priority == 0 {
-            passo(&mut *a, &mut *b).await
-        } else {
-            passo(&mut *b, &mut *a).await
-        };
-        if !acted {
-            break;
-        }
-        feitos += 1;
-    }
-    feitos
-}
-
-async fn subir_servidor() -> (SocketAddr, Arc<Registry>) {
-    let registry = Arc::new(Registry::new());
-    let app = router(registry.clone());
-    let listener = TcpListener::bind("127.0.0.1:0")
-        .await
-        .expect("porta efêmera livre");
-    let addr = listener.local_addr().expect("endereço local");
-
-    tokio::spawn(async move {
-        axum::serve(listener, app).await.expect("servidor de teste");
-    });
-
-    (addr, registry)
-}
+use vertice_server::Registry;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn partida_sobrevive_a_queda_de_um_dos_clientes() {
-    let (addr, registry) = subir_servidor().await;
+    let registry = Arc::new(Registry::new());
+    let addr = servir(registry.clone()).await;
     let id = registry
         .create(baralho(0), baralho(3), 2024)
         .await
@@ -227,7 +78,8 @@ async fn partida_sobrevive_a_queda_de_um_dos_clientes() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn partida_joga_ate_o_fim_e_os_dois_assentos_sabem_quem_venceu() {
-    let (addr, registry) = subir_servidor().await;
+    let registry = Arc::new(Registry::new());
+    let addr = servir(registry.clone()).await;
     let id = registry
         .create(baralho(0), baralho(3), 2024)
         .await
@@ -276,7 +128,8 @@ async fn partida_joga_ate_o_fim_e_os_dois_assentos_sabem_quem_venceu() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn o_servidor_recusa_acao_ilegal_sem_mexer_no_estado() {
-    let (addr, registry) = subir_servidor().await;
+    let registry = Arc::new(Registry::new());
+    let addr = servir(registry.clone()).await;
     let id = registry
         .create(baralho(0), baralho(3), 77)
         .await
@@ -327,9 +180,10 @@ async fn o_servidor_recusa_acao_ilegal_sem_mexer_no_estado() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn partida_inexistente_e_recusada() {
-    let (addr, _registry) = subir_servidor().await;
+    let registry = Arc::new(Registry::new());
+    let addr = servir(registry).await;
 
-    let (mut socket, _) = connect_async(format!("ws://{addr}/ws/nao-existe"))
+    let (mut socket, _) = tokio_tungstenite::connect_async(format!("ws://{addr}/ws/nao-existe"))
         .await
         .expect("abre o WebSocket");
     send(

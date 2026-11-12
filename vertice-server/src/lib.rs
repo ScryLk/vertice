@@ -22,7 +22,9 @@ pub mod actor;
 pub mod http;
 pub mod protocol;
 pub mod registry;
+pub mod store;
 
 pub use http::router;
 pub use protocol::PROTOCOL_VERSION;
 pub use registry::Registry;
+pub use store::Store;

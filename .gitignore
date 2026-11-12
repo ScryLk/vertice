@@ -11,6 +11,8 @@ dist/
 src-tauri/target/
 
 # Artefatos locais
+# Partidas gravadas em runtime.
+data/
 *.zip
 *.log
 .DS_Store

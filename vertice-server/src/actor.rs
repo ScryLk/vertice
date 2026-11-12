@@ -20,10 +20,11 @@
 
 use tokio::sync::{mpsc, oneshot};
 use vertice_core::{
-    apply, legal_actions, new_game, view, CardId, EngineError, GameState, PlayerId,
+    apply, legal_actions, new_game, view, CardId, EngineError, GameState, MatchRecord, PlayerId,
 };
 
 use crate::protocol::{ActionDto, PlayerViewDto, RejectReason, ServerMessage};
+use crate::store::Store;
 
 pub enum Command {
     /// Um cliente entrou ou voltou. Substitui o canal de saída do assento.
@@ -66,17 +67,53 @@ impl Seat {
 }
 
 pub struct Actor {
+    id: String,
     state: GameState,
+    record: MatchRecord,
     seq: u64,
     next_generation: u64,
     seats: [Seat; 2],
+    store: Option<Store>,
 }
 
 impl Actor {
-    pub fn new(deck0: &[CardId], deck1: &[CardId], seed: u64) -> Result<Self, EngineError> {
+    pub fn new(
+        id: String,
+        deck0: &[CardId],
+        deck1: &[CardId],
+        seed: u64,
+        store: Option<Store>,
+    ) -> Result<Self, EngineError> {
         Ok(Actor {
             state: new_game(deck0, deck1, seed)?,
+            record: MatchRecord::new(deck0.to_vec(), deck1.to_vec(), seed),
+            id,
+            store,
             seq: 0,
+            next_generation: 1,
+            seats: [Seat::empty(), Seat::empty()],
+        })
+    }
+
+    /// Retoma uma partida gravada: rejoga o registro e assume o estado.
+    ///
+    /// É a mesma operação que o replay de teste faz. A diferença é que aqui o
+    /// resultado vira um ator vivo, que volta a aceitar ação — e o `seq` volta
+    /// ao número de ações já aplicadas, para o cliente não precisar saber que
+    /// o servidor reiniciou.
+    pub fn restore(
+        id: String,
+        record: MatchRecord,
+        store: Option<Store>,
+    ) -> Result<Self, EngineError> {
+        let state = record.replay()?;
+        let seq = record.actions.len() as u64;
+        Ok(Actor {
+            state,
+            record,
+            id,
+            store,
+            seq,
             next_generation: 1,
             seats: [Seat::empty(), Seat::empty()],
         })
@@ -149,6 +186,13 @@ impl Actor {
         match apply(&mut self.state, action) {
             Ok(()) => {
                 self.seq += 1;
+                self.record.push(action);
+
+                // Persistir **antes** de avisar. O cliente só fica sabendo de
+                // uma ação depois que ela está durável, então reiniciar o
+                // servidor logo em seguida não perde nada que alguém já viu.
+                self.persist().await;
+
                 for viewer in 0..2u8 {
                     let message = ServerMessage::View {
                         seq: self.seq,
@@ -181,5 +225,22 @@ impl Actor {
 
     fn view_for(&self, seat: PlayerId) -> PlayerViewDto {
         PlayerViewDto::from(&view(&self.state, seat))
+    }
+
+    async fn persist(&self) {
+        let Some(store) = &self.store else {
+            return;
+        };
+
+        if let Err(error) = store.save(&self.id, &self.record).await {
+            // Falhar aqui não derruba a partida: ela segue viva em memória, e
+            // recusar a ação já aplicada seria mentir sobre o estado. Mas o
+            // fato de não estar durável precisa ser visível em algum lugar, e
+            // até existir log estruturado esse lugar é o stderr.
+            eprintln!(
+                "[vertice] falha ao persistir a partida {}: {error}",
+                self.id
+            );
+        }
     }
 }
