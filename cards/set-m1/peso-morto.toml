@@ -1,0 +1,5 @@
+slug = "peso-morto"
+name = "Peso Morto"
+cost = 1
+type = "spell"
+effect = { kind = "pump", power = -2, toughness = -2 }

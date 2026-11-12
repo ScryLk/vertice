@@ -1,0 +1,7 @@
+slug = "raiz-antiga"
+name = "Raiz Antiga"
+cost = 3
+type = "creature"
+power = 4
+toughness = 4
+effect = { kind = "none" }

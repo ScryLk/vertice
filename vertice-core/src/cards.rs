@@ -1,13 +1,19 @@
-//! Catálogo de cartas do M0.
+//! Catálogo de cartas.
 //!
-//! Neste marco as cartas são `&'static` — o objetivo é provar o motor, não
-//! o pipeline de conteúdo. No M1 isto vira dado carregado de arquivo
-//! versionado, com a mesma forma.
+//! As cartas são **dado**, não código: `cards/registry.toml` dá o `CardId`
+//! estável e `cards/set-*/*.toml` dá a carta. `vertice-tools generate`
+//! compila os dois para `src/generated/cards.rs`, que é **commitado** — quem
+//! clona o repositório compila sem rodar ferramenta nenhuma, e o motor
+//! continua com zero dependências.
 //!
-//! Regra que vale desde já: **carta publicada não é editada.** Muda-se o
-//! conjunto, não a carta. Replay de partida antiga depende disso.
+//! Regra que vale desde já e para sempre: **carta publicada não é editada.**
+//! Muda-se o conjunto, não a carta. Replay de partida antiga depende disso.
+//!
+//! Aqui ficam só os tipos da DSL. O conteúdo mora no gerado.
 
 use crate::ids::CardId;
+
+pub use crate::generated::cards::CATALOG;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Keyword {
@@ -46,52 +52,20 @@ pub struct CardDef {
     pub effect: Effect,
 }
 
-// Construtor `const` de carta: argumentos posicionais são o formato mais
-// legível para uma tabela de dados, e agrupar em struct só para agradar o
-// lint pioraria a leitura de todas as linhas do catálogo.
-#[allow(clippy::too_many_arguments)]
-const fn def(
-    id: CardId,
-    name: &'static str,
-    cost: u8,
-    kind: CardKind,
-    power: i8,
-    toughness: i8,
-    keywords: &'static [Keyword],
-    effect: Effect,
-) -> CardDef {
-    CardDef {
-        id,
-        name,
-        cost,
-        kind,
-        power,
-        toughness,
-        keywords,
-        effect,
-    }
-}
-
-pub static CATALOG: &[CardDef] = &[
-    def(0, "Várzea de Cruzilha", 0, CardKind::Land, 0, 0, &[], Effect::None),
-    def(1, "Enseada Partida", 0, CardKind::Land, 0, 0, &[], Effect::None),
-    def(2, "Sentinela de Baluarte", 1, CardKind::Creature, 1, 2, &[Keyword::Vigilance], Effect::None),
-    def(3, "Corvo do Arquivo", 2, CardKind::Creature, 2, 1, &[Keyword::Flying], Effect::None),
-    def(4, "Cão de Dívida", 2, CardKind::Creature, 2, 2, &[], Effect::None),
-    def(5, "Brasa Viva", 1, CardKind::Creature, 2, 1, &[], Effect::None),
-    def(6, "Raiz Antiga", 3, CardKind::Creature, 4, 4, &[], Effect::None),
-    def(7, "Chancelária", 3, CardKind::Creature, 2, 3, &[], Effect::None),
-    def(8, "Vespa do Pântano", 2, CardKind::Creature, 1, 1, &[Keyword::Deathtouch], Effect::None),
-    def(9, "Faísca", 1, CardKind::Spell, 0, 0, &[], Effect::DealDamage(2)),
-    def(10, "Censo", 2, CardKind::Spell, 0, 0, &[], Effect::Draw(2)),
-    def(11, "Peso Morto", 1, CardKind::Spell, 0, 0, &[], Effect::Pump(-2, -2)),
-    def(12, "Brasa Dupla", 3, CardKind::Spell, 0, 0, &[], Effect::DealDamage(3)),
-];
-
 pub const CATALOG_LEN: usize = CATALOG.len();
 
+/// Busca por `CardId`.
+///
+/// Antes isto era `CATALOG[id as usize]`: o id *era* a posição, então mexer na
+/// ordem do arquivo trocava uma carta por outra sem avisar e quebrava replay
+/// em silêncio. Agora o id vem do registro e a busca é pela chave — reordenar
+/// o catálogo deixou de ser capaz de mudar o significado de um id.
+///
+/// O catálogo é gerado em ordem crescente de id, o que a busca binária exige;
+/// `tests/catalog.rs` guarda essa invariante.
 pub fn card(id: CardId) -> &'static CardDef {
-    let idx = id as usize;
-    debug_assert!(idx < CATALOG.len(), "CardId fora do catálogo: {id}");
-    &CATALOG[idx]
+    match CATALOG.binary_search_by_key(&id, |def| def.id) {
+        Ok(index) => &CATALOG[index],
+        Err(_) => panic!("CardId fora do catálogo: {id}"),
+    }
 }

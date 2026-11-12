@@ -1,0 +1,8 @@
+# Workspace do Vértice.
+#
+# `vertice-core` é o motor: zero dependências, zero I/O, determinístico.
+# `vertice-tools` é ferramenta de conteúdo: lê TOML, valida e gera código.
+# A separação é o ponto — o motor nunca aprende a ler arquivo.
+[workspace]
+resolver = "2"
+members = ["vertice-core", "vertice-tools"]

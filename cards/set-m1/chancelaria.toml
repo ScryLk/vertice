@@ -1,0 +1,7 @@
+slug = "chancelaria"
+name = "Chancelária"
+cost = 3
+type = "creature"
+power = 2
+toughness = 3
+effect = { kind = "none" }

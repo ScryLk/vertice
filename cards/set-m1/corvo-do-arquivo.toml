@@ -1,0 +1,8 @@
+slug = "corvo-do-arquivo"
+name = "Corvo do Arquivo"
+cost = 2
+type = "creature"
+power = 2
+toughness = 1
+keywords = ["flying"]
+effect = { kind = "none" }

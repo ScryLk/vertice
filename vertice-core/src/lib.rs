@@ -13,6 +13,8 @@
 
 #![forbid(unsafe_code)]
 
+mod generated;
+
 pub mod action;
 pub mod cards;
 pub mod engine;

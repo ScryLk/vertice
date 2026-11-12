@@ -1,0 +1,34 @@
+# Registro de cartas do Vértice. APPEND-ONLY.
+#
+# `slug -> CardId`. Este arquivo é a única fonte de `CardId`: a posição da
+# carta em qualquer lista não significa nada. Anexe sempre no fim, com o
+# próximo id livre — `vertice-tools validate` recusa qualquer outra coisa.
+#
+# Slug nunca sai, id nunca é reutilizado. É o que faz replay de partida velha
+# continuar valendo depois de o conjunto crescer.
+#
+# `next_id` é a marca que sobrevive fora do lock: primeiro id nunca usado.
+# Ele SÓ SOBE. Ao publicar carta nova, some 1 nele e dê o id antigo à carta.
+# Apagar carta não baixa `next_id` — é justamente isso que faz a deleção
+# aparecer como erro em vez de sumir calada.
+next_id = 13
+
+[cards]
+# Terrenos
+varzea-de-cruzilha = 0
+enseada-partida = 1
+
+# Criaturas
+sentinela-de-baluarte = 2
+corvo-do-arquivo = 3
+cao-de-divida = 4
+brasa-viva = 5
+raiz-antiga = 6
+chancelaria = 7
+vespa-do-pantano = 8
+
+# Mágicas
+faisca = 9
+censo = 10
+peso-morto = 11
+brasa-dupla = 12

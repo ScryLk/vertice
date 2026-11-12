@@ -1,0 +1,5 @@
+slug = "enseada-partida"
+name = "Enseada Partida"
+cost = 0
+type = "land"
+effect = { kind = "none" }

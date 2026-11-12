@@ -1,0 +1,8 @@
+slug = "vespa-do-pantano"
+name = "Vespa do Pântano"
+cost = 2
+type = "creature"
+power = 1
+toughness = 1
+keywords = ["deathtouch"]
+effect = { kind = "none" }

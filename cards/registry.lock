@@ -1,0 +1,69 @@
+# Gerado por `vertice-tools generate`. Não edite à mão.
+#
+# APPEND-ONLY: nenhuma entrada é removida nem reescrita. A entrada de
+# uma carta é o que prova que ela não mudou desde que foi publicada.
+
+[[card]]
+slug = "varzea-de-cruzilha"
+id = 0
+sha256 = "18dcce40bb15c9ab8f6d4398dca0d1b5a1fc564ddc2d7b6f7ad0fee035fbe492"
+
+[[card]]
+slug = "enseada-partida"
+id = 1
+sha256 = "b0240830b6226347c69dfc40b9aff2390bfc9ebf230edf50974fed3ba284cd0e"
+
+[[card]]
+slug = "sentinela-de-baluarte"
+id = 2
+sha256 = "90091be1eff606f54697b84e6c9f9cf53f479d09d50fd371c282cf78ad841425"
+
+[[card]]
+slug = "corvo-do-arquivo"
+id = 3
+sha256 = "a6c47826526c45e6796b0d5833355e69137e284b64c76bf224e8728522179e21"
+
+[[card]]
+slug = "cao-de-divida"
+id = 4
+sha256 = "05245c16ea539aa256845e6435a414552fffee6fa5c146156b976d063cc162d7"
+
+[[card]]
+slug = "brasa-viva"
+id = 5
+sha256 = "8a61ebea57955d5a71a7596a612cfb45fb039d02548c99b42d1a228f8ce324cd"
+
+[[card]]
+slug = "raiz-antiga"
+id = 6
+sha256 = "44a10bd428719d273197143c35499768c1a3cf9dcc85bbdd0278289e0356c342"
+
+[[card]]
+slug = "chancelaria"
+id = 7
+sha256 = "cd4e2ce81f8dd20cfc4cc496ee2feb886223351467ba793d31a3d4c54a04b6a1"
+
+[[card]]
+slug = "vespa-do-pantano"
+id = 8
+sha256 = "a6cdb68c36dfe6aa378e3f51553721c9405d247ae57c8eeef60c3446de30e72c"
+
+[[card]]
+slug = "faisca"
+id = 9
+sha256 = "31029d1c42558f4e97b56e1f76ab118f3154b1f27c46bbeff74b19bec74d4eac"
+
+[[card]]
+slug = "censo"
+id = 10
+sha256 = "4e89b2ffbda838dd362121401cf46503fc577de1c99c19e8d6c494a1b82d24da"
+
+[[card]]
+slug = "peso-morto"
+id = 11
+sha256 = "e9875b988570079d6a0e262a288b3d651cdbc9b9fb74664b757118657ca7e888"
+
+[[card]]
+slug = "brasa-dupla"
+id = 12
+sha256 = "e3b412bbe16e65095ba3ffd38c9d35911f6fbd9f4855dc5d2d8959bbfe6853ca"

@@ -17,7 +17,7 @@ oculta — antes de existir arte, rede ou banco.
 ## Comandos
 
 ```bash
-cargo test                      # 10 testes: replay, redação, legalidade
+cargo test                      # 18 testes: replay, redação, legalidade, catálogo
 ./scripts/check-determinism.sh  # falha se o core ganhar não-determinismo
 cargo clippy -- -D warnings
 ```
@@ -27,7 +27,8 @@ cargo clippy -- -D warnings
 ```
 src/ids.rs      PlayerId, CardId, ObjectId (instância, não carta)
 src/rng.rs      xorshift64* com estado serializável — entra no GameState
-src/cards.rs    catálogo &'static do M0 (vira dado versionado no M1)
+src/cards.rs    tipos da DSL (Keyword, CardKind, Effect, CardDef) e card(id)
+src/generated/  CATALOG compilado de cards/ por vertice-tools. Commitado, não gerado no build
 src/state.rs    GameState, zonas, Object, fingerprint
 src/action.rs   Action — valor imutável, Copy, serializável
 src/engine.rs   new_game, legal_actions, apply. Único validador de legalidade
@@ -36,6 +37,7 @@ src/record.rs   MatchRecord + replay
 tests/replay.rs     determinismo e reprodução bit a bit
 tests/redaction.rs  garantia de que mão e biblioteca alheias não vazam
 tests/stack.rs      pilha, fizzle e abertura roteirizada
+tests/catalog.rs    invariantes do catálogo gerado (id denso, ordenado, único)
 ```
 
 ## O contrato

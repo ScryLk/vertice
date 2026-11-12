@@ -1,0 +1,19 @@
+[package]
+name = "vertice-tools"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "vertice_tools"
+path = "src/lib.rs"
+
+[[bin]]
+name = "vertice-tools"
+path = "src/main.rs"
+
+[dependencies]
+# Só esta ferramenta lê TOML. `vertice-core` continua com zero dependências:
+# ele recebe o resultado já como código Rust commitado.
+toml = "0.8"
+# Hash do registro. É o que prova que uma carta publicada não mudou.
+sha2 = "0.10"

@@ -1,0 +1,8 @@
+slug = "sentinela-de-baluarte"
+name = "Sentinela de Baluarte"
+cost = 1
+type = "creature"
+power = 1
+toughness = 2
+keywords = ["vigilance"]
+effect = { kind = "none" }
