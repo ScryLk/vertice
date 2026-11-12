@@ -79,6 +79,8 @@ Esta é a seção mais importante do documento. Cada mecânica que você mantive
 
 **Comece 1v1.** Faça um duelo completo funcionar ponta a ponta antes de tocar em quatro jogadores. Quatro jogadores multiplica interface, rede, IA e casos de regra por três ou quatro. O modo de quatro é o objetivo, não o ponto de partida.
 
+**Fim de partida.** Vida <= 0 encerra o jogo, checado quando a ação **termina de resolver** — nunca no meio. Numa troca de dano, checar a cada golpe faria quem recebe primeiro morrer antes de o próprio golpe acontecer, e a ordem interna do motor passaria a decidir partidas. **Sem empate:** se os dois zerarem na mesma ação, vence quem tinha a prioridade quando a ação foi tomada. É arbitrário de propósito — arbitrário e determinístico é melhor que ambíguo, e a prioridade está na view, então não é informação escondida. `winner` faz parte do `GameState` e do fingerprint, então dois estados que discordam sobre o resultado não são o mesmo estado.
+
 ---
 
 ## 5. Servidor
@@ -93,7 +95,7 @@ Esta é a seção mais importante do documento. Cada mecânica que você mantive
 
 **Reconexão é requisito, não enfeite.** Partida de comandante dura 40 minutos. Cliente cai. O servidor guarda a partida e reidrata o jogador com a view redigida e o log. Faça isso no M1, não no fim.
 
-**O que existe hoje (M1.3, parcial).** Uma task por partida dona do `GameState`, um WebSocket por conexão, e reconexão que reidrata da memória: o estado mora no ator, não na conexão, então cair não significa nada. O servidor recusa ação fora de `legal_actions` e índice atrasado sem mexer no estado. Provado por teste com dois clientes headless, um deles derrubado no meio, comparando `seq`, view e `fingerprint`. **Não existe:** persistência (reiniciar o processo perde as partidas em andamento), matchmaking (partidas nascem pela `Registry`, não por endpoint) e **condição de vitória** — `EngineError::GameOver` é declarado e nunca produzido, então "jogar até o fim" ainda não significa nada. Fechar essa última é decisão de regra, não de transporte.
+**O que existe hoje (M1.3, parcial).** Uma task por partida dona do `GameState`, um WebSocket por conexão, e reconexão que reidrata da memória: o estado mora no ator, não na conexão, então cair não significa nada. O servidor recusa ação fora de `legal_actions` e índice atrasado sem mexer no estado. Provado por teste com dois clientes headless, um deles derrubado no meio, comparando `seq`, view e `fingerprint`. **Não existe:** persistência (reiniciar o processo perde as partidas em andamento) e matchmaking (partidas nascem pela `Registry`, não por endpoint).
 
 ---
 

@@ -77,6 +77,8 @@ pub struct PlayerViewDto {
     pub priority: PlayerId,
     pub stack: Vec<StackViewDto>,
     pub legal_actions: Vec<crate::protocol::ActionDto>,
+    /// Quem venceu. `null` enquanto a partida corre.
+    pub winner: Option<PlayerId>,
 }
 
 impl From<Keyword> for KeywordDto {
@@ -148,6 +150,7 @@ impl From<&PlayerView> for PlayerViewDto {
                 })
                 .collect(),
             legal_actions: view.legal_actions.iter().copied().map(Into::into).collect(),
+            winner: view.winner,
         }
     }
 }

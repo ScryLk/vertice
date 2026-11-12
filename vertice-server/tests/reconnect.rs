@@ -176,10 +176,14 @@ async fn partida_sobrevive_a_queda_de_um_dos_clientes() {
     let mut a = Client::connect(addr, &id, 0).await;
     let mut b = Client::connect(addr, &id, 1).await;
 
-    let andados = jogar(&mut a, &mut b, 60).await;
+    let andados = jogar(&mut a, &mut b, 15).await;
     assert!(
-        andados >= 20,
+        andados >= 10,
         "a partida precisa andar de verdade antes da queda; andou {andados} passos"
+    );
+    assert!(
+        a.view.winner.is_none(),
+        "a queda tem que ser testada com a partida viva, não encerrada"
     );
 
     let fingerprint_antes = registry.fingerprint(&id).await.expect("fingerprint");
@@ -207,14 +211,67 @@ async fn partida_sobrevive_a_queda_de_um_dos_clientes() {
         "o estado do motor não pode ter se mexido enquanto ninguém estava olhando"
     );
 
-    // E a partida continua.
-    let depois = jogar(&mut a, &mut b, 30).await;
+    // E a partida continua de onde parou.
+    let depois = jogar(&mut a, &mut b, 15).await;
     assert!(
-        depois >= 10,
+        depois > 0,
         "a partida tem que continuar depois da reconexão; andou {depois} passos"
     );
     assert!(a.seq > seq_antes, "o índice tem que avançar");
     assert_eq!(a.seq, b.seq, "os dois assentos continuam de acordo");
+    assert_eq!(
+        a.view.winner, b.view.winner,
+        "se a partida acabou nesse meio-tempo, os dois têm que saber igual"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn partida_joga_ate_o_fim_e_os_dois_assentos_sabem_quem_venceu() {
+    let (addr, registry) = subir_servidor().await;
+    let id = registry
+        .create(baralho(0), baralho(3), 2024)
+        .await
+        .expect("cria a partida");
+
+    let mut a = Client::connect(addr, &id, 0).await;
+    let mut b = Client::connect(addr, &id, 1).await;
+
+    let mut passos = 0;
+    while a.view.winner.is_none() && passos < 400 {
+        let acted = if a.view.priority == 0 {
+            passo(&mut a, &mut b).await
+        } else {
+            passo(&mut b, &mut a).await
+        };
+        if !acted {
+            break;
+        }
+        passos += 1;
+    }
+
+    let vencedor = a.view.winner.expect("a partida tem que terminar");
+    assert_eq!(
+        b.view.winner,
+        Some(vencedor),
+        "os dois assentos veem o mesmo resultado"
+    );
+    assert!(
+        a.view.legal_actions.is_empty(),
+        "partida encerrada não oferece ação"
+    );
+    assert!(b.view.legal_actions.is_empty());
+
+    // E o servidor recusa com a razão certa, não com "ação ilegal".
+    let seq = a.seq;
+    a.send(&ClientMessage::Action {
+        seq,
+        action: ActionDto::EndTurn,
+    })
+    .await;
+    match a.next().await {
+        ServerMessage::Rejected { reason, .. } => assert_eq!(reason, RejectReason::GameOver),
+        other => panic!("esperava `Rejected(GameOver)`, veio {other:?}"),
+    }
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

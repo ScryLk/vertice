@@ -82,6 +82,7 @@ pub fn new_game(deck0: &[CardId], deck1: &[CardId], seed: u64) -> Result<GameSta
         stack: Vec::new(),
         rng: Rng::new(seed),
         log: Vec::new(),
+        winner: None,
     };
 
     for pid in 0..2u8 {
@@ -142,6 +143,9 @@ pub fn new_game_with_hands(
 /// `apply` aceita exatamente o que isto devolve.
 pub fn legal_actions(state: &GameState, pid: PlayerId) -> Vec<Action> {
     let mut out = Vec::new();
+    if state.winner.is_some() {
+        return out;
+    }
     if pid != state.priority {
         return out;
     }
@@ -185,7 +189,15 @@ pub fn legal_actions(state: &GameState, pid: PlayerId) -> Vec<Action> {
 }
 
 pub fn apply(state: &mut GameState, action: Action) -> Result<(), EngineError> {
-    if !legal_actions(state, state.priority).contains(&action) {
+    if state.winner.is_some() {
+        return Err(EngineError::GameOver);
+    }
+
+    // Guardada antes de resolver: é a prioridade de quem agiu, não a que
+    // sobrar depois de um `EndTurn`.
+    let priority = state.priority;
+
+    if !legal_actions(state, priority).contains(&action) {
         return Err(EngineError::IllegalAction);
     }
 
@@ -209,7 +221,41 @@ pub fn apply(state: &mut GameState, action: Action) -> Result<(), EngineError> {
         }
     }
 
+    // A ação resolveu por inteiro. Só agora o fim de partida é decidido.
+    //
+    // A prioridade é a de *quando a ação foi tomada*: `EndTurn` troca a
+    // prioridade no meio da resolução, e usar a de depois faria o desempate
+    // depender de a última ação ter virado o turno.
+    check_outcome(state, priority);
+
     Ok(())
+}
+
+/// Fim de partida, checado **quando a ação já resolveu**.
+///
+/// Checar no meio da resolução faria a ordem interna do motor decidir a
+/// partida: numa troca de dano, quem recebesse primeiro morreria antes de o
+/// próprio golpe acontecer. Resolvendo tudo e checando depois, "morreu" e
+/// "morreu primeiro" deixam de ser coisas diferentes.
+///
+/// **Sem empate**, por decisão de regra: se os dois zerarem na mesma ação,
+/// vence quem tem a prioridade. É arbitrário, e arbitrário de propósito —
+/// arbitrário e determinístico é melhor que ambíguo, e a prioridade está na
+/// view, então não é informação escondida.
+fn check_outcome(state: &mut GameState, priority: PlayerId) {
+    if state.winner.is_some() {
+        return;
+    }
+
+    let loser0 = state.player(0).life <= 0;
+    let loser1 = state.player(1).life <= 0;
+
+    state.winner = match (loser0, loser1) {
+        (false, false) => None,
+        (true, false) => Some(1),
+        (false, true) => Some(0),
+        (true, true) => Some(priority),
+    };
 }
 
 // ---------------------------------------------------------------- internos

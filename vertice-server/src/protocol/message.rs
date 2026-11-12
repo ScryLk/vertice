@@ -15,7 +15,12 @@ use vertice_core::PlayerId;
 
 use super::{ActionDto, PlayerViewDto};
 
-pub const PROTOCOL_VERSION: u32 = 1;
+/// Versão do protocolo.
+///
+/// Sobe a cada mudança de forma. A 2 acrescentou `winner` na view: cliente da
+/// 1 não sabe que a partida acabou, então falhar na porta é melhor que ficar
+/// mandando ação para um jogo encerrado.
+pub const PROTOCOL_VERSION: u32 = 2;
 
 /// Do cliente para o servidor.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

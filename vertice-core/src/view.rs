@@ -61,6 +61,8 @@ pub struct PlayerView {
     pub priority: PlayerId,
     pub stack: Vec<StackView>,
     pub legal_actions: Vec<Action>,
+    /// Quem venceu. `Some` = partida encerrada, e `legal_actions` vem vazio.
+    pub winner: Option<PlayerId>,
 }
 
 impl PlayerView {
@@ -133,5 +135,6 @@ pub fn view(state: &GameState, viewer: PlayerId) -> PlayerView {
             })
             .collect(),
         legal_actions: crate::engine::legal_actions(state, viewer),
+        winner: state.winner,
     }
 }

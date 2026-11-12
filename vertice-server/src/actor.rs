@@ -128,6 +128,12 @@ impl Actor {
     }
 
     async fn act(&mut self, seat: PlayerId, seq: u64, action: ActionDto) {
+        // Partida encerrada vem antes de tudo: nem índice nem legalidade
+        // importam, e a razão da recusa tem que ser essa.
+        if self.state.winner.is_some() {
+            return self.reject(seat, RejectReason::GameOver).await;
+        }
+
         // `seq` é o índice que o cliente acredita ser o atual. Divergiu, ele
         // está prevendo em cima de estado que o servidor passou; o certo é
         // pedir reidratação, não aplicar por cima.

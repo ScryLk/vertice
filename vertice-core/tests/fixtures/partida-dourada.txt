@@ -28,7 +28,7 @@
 #   pass              Pass
 #   end               EndTurn
 
-engine_version 0.1.0
+engine_version 0.2.0
 card_set_version m0.1
 seed 20260119
 deck0 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4 11 5 12 6 0 7 1 8 2 9 3 10 4
@@ -215,4 +215,4 @@ end
 cast:193
 cast:162
 end
-fingerprint 14696012446656370742
+fingerprint 5558337681518463447

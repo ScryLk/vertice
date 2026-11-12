@@ -31,7 +31,12 @@ pub use record::{replay, MatchRecord};
 pub use state::{GameState, Object, Phase, Player, Target, Zones};
 pub use view::{view, PlayerView};
 
-pub const ENGINE_VERSION: &str = "0.1.0";
+/// Versão do motor. Sobe quando o *comportamento* muda, mesmo sem mudar API.
+///
+/// 0.2.0 acrescentou fim de partida: vida <= 0 encerra o jogo e `winner`
+/// passa a fazer parte do estado. Um `MatchRecord` da 0.1.0 não significa a
+/// mesma coisa, então a versão tinha que dizer isso.
+pub const ENGINE_VERSION: &str = "0.2.0";
 pub const CARD_SET_VERSION: &str = "m0.1";
 
 /// Vida inicial. Comandante usa 40.

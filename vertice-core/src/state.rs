@@ -100,6 +100,12 @@ pub struct GameState {
     pub stack: Vec<PendingSpell>,
     pub rng: Rng,
     pub log: Vec<Action>,
+    /// Quem venceu. `Some` significa partida encerrada.
+    ///
+    /// Entra no fingerprint: dois estados que discordam sobre o resultado não
+    /// são o mesmo estado, e replay que perdesse essa diferença passaria
+    /// mentindo.
+    pub winner: Option<PlayerId>,
 }
 
 impl GameState {
@@ -147,6 +153,9 @@ impl GameState {
         fnv(&mut h, self.turn as u64);
         fnv(&mut h, self.active as u64);
         fnv(&mut h, self.priority as u64);
+        // `u64::MAX` como sentinela de "ninguém": distingue `None` de
+        // `Some(0)` e `Some(1)`, que são resultados diferentes.
+        fnv(&mut h, self.winner.map_or(u64::MAX, |w| w as u64));
         fnv(&mut h, self.rng.state());
         fnv(&mut h, self.stack.len() as u64);
         for p in &self.stack {

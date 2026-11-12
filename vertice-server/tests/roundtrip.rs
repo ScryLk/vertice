@@ -194,6 +194,23 @@ fn view_do_oponente_leva_contagem_e_nunca_conteudo() {
 }
 
 #[test]
+fn a_view_diz_quem_venceu() {
+    let record = partida(7);
+    let state = record.replay().expect("rejoga");
+    let json = serde_json::to_value(PlayerViewDto::from(&view(&state, 0))).expect("serializa");
+
+    assert!(
+        json.get("winner").is_some(),
+        "sem `winner` o cliente nunca sabe que a partida acabou"
+    );
+    assert_eq!(
+        json["winner"].as_u64(),
+        state.winner.map(u64::from),
+        "`null` enquanto corre, o assento vencedor quando encerra"
+    );
+}
+
+#[test]
 fn envelope_vai_e_volta() {
     let record = partida(7);
     let state = record.replay().expect("rejoga");
