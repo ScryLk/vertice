@@ -29,7 +29,7 @@ Fatia que não passa no portão não está concluída, mesmo que "funcione na m�
 | Marco | Conteúdo | Estado |
 |---|---|---|
 | M0 | motor determinístico, redação, replay | **feito** |
-| M1 | pilha real, carta como dado, servidor autoritativo, cliente feio | em andamento |
+| M1 | pilha real, carta como dado, servidor autoritativo, cliente feio | **feito** (M1.4 com ressalva) |
 | M2 | Pixi, chibi, transição de cena, bot heurístico, duelo offline | pendente |
 | M3 | quatro jogadores, espectador, replay público | pendente |
 | M4 | calendário, casas, ecos, ato I, contas | pendente |
@@ -61,6 +61,8 @@ não faz nada, mas continua tendo sido conjurada e paga.
   cemitério, vida não muda.
 - `MatchRecord` com mãos forçadas reproduz bit a bit.
 
+**Estado: feito.**
+
 ### M1.2 Carta como dado
 
 **Objetivo.** Catálogo sai de `cards.rs` e vira dado versionado, com id
@@ -84,6 +86,10 @@ não em tempo de jogo.
   apenas desencorajado por convenção.
 - Todos os testes de replay continuam verdes.
 
+**Estado: feito.** `next_id` foi acrescentado ao registro porque derivar o
+próximo id do lock deixava apagar carta passar calado — descoberto por
+auditoria, não por teste.
+
 ### M1.3 Servidor autoritativo 1v1
 
 **Objetivo.** Duas conexões jogam a mesma partida; o servidor é a verdade.
@@ -101,6 +107,11 @@ WebSocket headless jogando até o fim. Um deles derruba a conexão no meio,
 reconecta, e a partida continua exatamente de onde estava (mesmo
 `fingerprint`). Esse teste é o marco. "Abri dois navegadores" não é prova.
 
+**Estado: feito.** Protocolo versionado com `seq`, ator por partida, reconexão
+e persistência em arquivo por partida. Entrou junto o **fim de partida** — o
+motor não tinha condição de vitória, então "jogar até o fim" não significava
+nada; hoje vida <= 0 encerra, checado ao fim da ação, sem empate.
+
 ### M1.4 Cliente mínimo, feio de propósito
 
 **Objetivo.** Provar o protocolo na interface, sem investir em arte.
@@ -110,6 +121,13 @@ reconecta, e a partida continua exatamente de onde estava (mesmo
 
 **Saída.** Partida completa em dois navegadores, com queda e retomada. Se
 algo do protocolo doer, dói aqui — quando ainda é barato mudar.
+
+**Estado: entregue, com ressalva.** `POST /matches`, binário do servidor e
+cliente React mínimo. Verificado em navegador: criar, entrar nos dois
+assentos, agir, recarregar e reconectar, e a mão do oponente chegando como
+contagem. **Falta** a partida inteira clicada nos dois assentos — até a
+vitória, ela só está provada em WebSocket headless. É buraco de cobertura de
+renderização, não de comportamento.
 
 ---
 

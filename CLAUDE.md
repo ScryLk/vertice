@@ -61,12 +61,22 @@ semanas depois.
 | `vertice-core/src/rng.rs` | RNG determinístico com estado serializável | `determinism-guard` |
 | `vertice-core/src/view.rs` | redação por jogador — fronteira de segurança | `redaction-auditor` |
 | `vertice-core/src/record.rs` | `MatchRecord`, replay | `determinism-guard` |
-| `vertice-core/src/cards.rs` | catálogo (hoje `&'static`, vira dado no M1) | `card-content` |
+| `vertice-core/src/cards.rs` | tipos da DSL (`CardDef`, `Keyword`, …) e `card(id)` | `card-content` |
+| `vertice-core/src/generated/` | `CATALOG` compilado de `cards/`. **Gerado e commitado** | `card-content` |
 | `vertice-core/tests/replay.rs` | determinismo e reprodução | `determinism-guard` |
 | `vertice-core/tests/redaction.rs` | garantia de não vazamento | `redaction-auditor` |
 | `vertice-core/tests/stack.rs` | pilha, fizzle e abertura roteirizada | `engine-rules` |
-| `vertice-server/` *(M1)* | Axum, ator tokio por partida, reconexão | `server-authority` |
-| `vertice-client/` *(M2)* | React (chrome) + PixiJS (cenário e mesa) | `client-overworld` |
+| `vertice-core/tests/outcome.rs` | fim de partida e desempate por prioridade | `engine-rules` |
+| `vertice-core/tests/catalog.rs` | invariantes do catálogo gerado | `card-content` |
+| `vertice-core/tests/golden.rs` | partida dourada com fingerprint fixo | `determinism-guard` |
+| `cards/registry.toml` | `slug -> CardId` e `next_id`. Append-only | `card-content` |
+| `cards/registry.lock` | hash de cada carta publicada. Gerado | `card-content` |
+| `cards/set-*/` | as cartas em TOML | `card-content` |
+| `vertice-tools/` | `validate` e `generate` do catálogo | `card-content` |
+| `vertice-server/src/protocol/` | DTOs de rede; espelho em `vertice-client/src/protocol.ts` | `server-authority` |
+| `vertice-server/src/actor.rs` | uma task por partida, dona do `GameState` | `server-authority` |
+| `vertice-server/src/{http,registry,store}.rs` | WebSocket, `POST /matches`, persistência | `server-authority` |
+| `vertice-client/` | React mínimo, sem Pixi (Pixi é M2) | `client-overworld` |
 | `docs/biblia-de-historia.md` | cânone: casas, atos, NPCs | `lore-guardian` |
 | `docs/arquitetura.md` | decisões técnicas e o porquê | `lore-guardian` (cuida do porquê) |
 
@@ -87,6 +97,11 @@ Agente novo, comece por esta tabela em vez de varrer o repositório.
 | reproduzir uma partida | `record.rs::replay` |
 | checar igualdade de estado | `state.rs::fingerprint` |
 | ver o catálogo de cartas | `cards.rs::CATALOG` |
+| saber se a partida acabou e quem venceu | `state.rs::GameState.winner` |
+| validar ou gerar o catálogo | `cargo run -p vertice-tools -- validate` / `generate` |
+| criar uma partida no servidor | `vertice-server/src/registry.rs::Registry::create` |
+| saber a forma do protocolo | `vertice-server/src/protocol/` |
+| subir o servidor | `vertice-server/src/main.rs` (`VERTICE_DATA`, `PORT`) |
 
 Fluxo normal de um turno, em ordem:
 `view → legal_actions → apply → (muta GameState) → view`.
@@ -99,13 +114,24 @@ Se um bug não aparece nesse fluxo, ele está em outra camada.
 
 ```bash
 cd vertice-core
-cargo test                      # 10 testes: replay, redação, legalidade
+cargo test                      # 27 testes: replay, redação, pilha, catálogo, desfecho
 ./scripts/check-determinism.sh  # falha se o core ganhar não-determinismo
 cargo clippy --all-targets -- -D warnings
 ```
 
-**Portão de qualidade:** nenhuma mudança no core é concluída sem os três
-comandos acima verdes. Não existe "depois eu rodo".
+Da raiz, para o workspace inteiro (`vertice-core`, `vertice-tools`,
+`vertice-server`):
+
+```bash
+cargo test --workspace
+cargo clippy --workspace --all-targets -- -D warnings
+cargo run -p vertice-tools -- validate   # ids, curva, append-only, hash, geração em dia
+npm --prefix vertice-client run build    # type-check + build do cliente
+```
+
+**Portão de qualidade:** nenhuma mudança no core é concluída sem `cargo test`,
+`check-determinism.sh` e `clippy` verdes. Mudança em `cards/` acrescenta
+`validate`; mudança no cliente acrescenta o build. Não existe "depois eu rodo".
 
 ---
 
@@ -114,7 +140,7 @@ comandos acima verdes. Não existe "depois eu rodo".
 Sete agentes, repartidos por **camada**, não por tarefa. Camada é fronteira
 estável; tarefa muda toda semana e geraria sobreposição.
 
-Ativos agora:
+Ativos agora (todos os sete, desde o M1.4):
 
 | Agente | Papel | Escreve? |
 |---|---|---|
@@ -123,13 +149,8 @@ Ativos agora:
 | `redaction-auditor` | audita vazamento de informação oculta | **não** |
 | `card-content` | catálogo, DSL, curva de custo, texto de carta | sim |
 | `lore-guardian` | cânone, consistência narrativa, segurança de IP | sim (docs) |
-
-A partir do marco indicado:
-
-| Agente | Papel | Quando |
-|---|---|---|
-| `server-authority` | autoridade, atores, reconexão, persistência | M1 |
-| `client-overworld` | React, Pixi, calendário, transição de cena | M2 |
+| `server-authority` | autoridade, atores, reconexão, persistência | sim |
+| `client-overworld` | React agora; Pixi e transição de cena no M2 | sim |
 
 **Por que dois auditores são read-only:** quem conserta tem incentivo para
 achar que consertou. O auditor que não pode editar é obrigado a provar com
@@ -151,6 +172,7 @@ tabela existe para impedir que todo mundo mexa em `engine.rs`.
 | estado errado depois de uma ação (vida, dano, zona) | `engine-rules` | reproduza com `MatchRecord` até a ação |
 | criatura não morre / morre cedo | `engine-rules` | `engine.rs::cleanup` |
 | partida não retoma após queda de conexão | `server-authority` | log da partida + `view` reidratada |
+| protocolo divergiu do motor (campo novo, ação que não chega) | `server-authority` | `tests/roundtrip.rs` e a forma do JSON fixada |
 | tela, input, animação, transição | `client-overworld` | reprodutor de rede com partida gravada |
 | carta com custo fora da curva, texto ambíguo | `card-content` | validador em `vertice-tools` |
 | nome suspeito de IP, conflito com o cânone | `lore-guardian` | `docs/biblia-de-historia.md` |
@@ -229,14 +251,33 @@ replay. Guarda de determinismo funcionando (testado contra violação plantada).
 
 **M1.1 — feito.** Pilha real: a mágica ocupa a pilha e só vai ao cemitério ao
 resolver; alvo que sai do campo antes da resolução faz a mágica fizzlar;
-abertura roteirizada (`new_game_with_hands` + mãos no `MatchRecord`) reproduz
-bit a bit. 14 testes verdes.
+abertura roteirizada reproduz bit a bit.
 
-**Próximo: M1.2** — carta como dado com `CardId` estável (`cards/registry.toml`
-append-only) e validador em `vertice-tools`. O roteiro de fatias está em
-`docs/roadmap.md`; siga por ele em vez de reabrir o plano.
+**M1.2 — feito.** Carta como dado. `cards/registry.toml` é a única fonte de
+`CardId`, com `next_id` vivendo fora do lock para que deleção não passe calada;
+`cards/set-m1/` tem as 13 cartas em TOML; `vertice-tools` valida e gera
+`vertice-core/src/generated/cards.rs`, que é **commitado**. Inserir carta no
+meio, apagar carta, reusar id e editar carta publicada são recusados pelo
+validador, provado por teste.
 
-**Pendências registradas:** `CardId` precisa ser estável e content-addressed
-antes de o catálogo sair de `&'static` — reordenar o arquivo de cartas quebra
-replay silenciosamente. `vertice-core/Cargo.lock` deve ser commitado quando o
-primeiro binário (servidor) entrar no workspace.
+**M1.3 — feito.** Servidor autoritativo: protocolo versionado com `seq`, uma
+task por partida dona do `GameState`, reconexão no mesmo `fingerprint`, e
+persistência em arquivo por partida. Fim de partida: vida <= 0 encerra,
+checado ao fim da ação, sem empate — prioridade desempata.
+
+**M1.4 — entregue, com uma ressalva.** `POST /matches`, binário do servidor e
+cliente React mínimo, verificado em navegador: criar partida, entrar nos dois
+assentos, agir, recarregar e reconectar, e a mão do oponente chegando como
+contagem. **Falta** jogar uma partida inteira clicando nos dois assentos — a
+partida completa até a vitória só está provada em WebSocket headless.
+
+**Próximo: fechar a ressalva do M1.4** e então o M2 (Pixi, chibi, transição de
+cena, bot heurístico, duelo offline). O roteiro está em `docs/roadmap.md`;
+siga por ele em vez de reabrir o plano.
+
+**Pendências registradas:**
+- `CARD_SET_VERSION` continua `"m0.1"` e é etiqueta, não portão: `replay()`
+  nunca o compara. Vira portão quando houver serialização, comparando o hash
+  do conjunto gravado no registro.
+- Não existe CI (`.github`): os portões são manuais.
+- Matchmaking não existe: `POST /matches` cria a mesa e basta para o M1.
