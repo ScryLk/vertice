@@ -1,0 +1,9 @@
+[package]
+name = "vertice-bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Zero dependências além do motor. O bot é um consumidor do core: ele só
+# enxerga `legal_actions`, `apply` e `view`, e nunca decide legalidade.
+vertice-core = { path = "../vertice-core" }

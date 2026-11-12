@@ -30,7 +30,7 @@ Fatia que não passa no portão não está concluída, mesmo que "funcione na m�
 |---|---|---|
 | M0 | motor determinístico, redação, replay | **feito** |
 | M1 | pilha real, carta como dado, servidor autoritativo, cliente feio | **feito** |
-| M2 | Pixi, chibi, transição de cena, bot heurístico, duelo offline | pendente |
+| M2 | Pixi, chibi, transição de cena, bot heurístico, duelo offline | em andamento (bot feito) |
 | M3 | quatro jogadores, espectador, replay público | pendente |
 | M4 | calendário, casas, ecos, ato I, contas | pendente |
 | M5 | Tauri, Steam, cosmético, loja | pendente |

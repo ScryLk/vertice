@@ -135,6 +135,10 @@ Você precisa de IA boa o bastante pra sustentar uma campanha inteira de escola.
 
 **Fase 2: busca.** Monte Carlo com poucas simulações, rodando no core determinístico, quando o motor já estiver estável. Isso só funciona se o core for rápido e puro — outra razão pra manter o core limpo.
 
+**A fase 1 existe desde o M2.** `vertice-bot` avalia a posição por pesos (vida, mão, mana, corpo) e escolhe a ação legal que deixa a melhor posição — um passo à frente, sem busca. Os níveis `Calouro` e `Formando` diferem **só** na frequência de erro deliberado, porque o jogador tem que sentir a diferença e não ser informado dela.
+
+**O que a medição do bot já mostrou.** Medir força de bot é fácil de errar: o assento 0 sai na frente, e *o quanto* isso pesa depende do embaralhamento — em duas faixas de seed o mesmo confronto deu 10x2 para o assento 0 e 4x8 para o assento 1. Por isso todo placar em `vertice-bot/tests/bot.rs` roda nas duas orientações com a **mesma** seed, e há um teste de controle exigindo placar exatamente equilibrado quando as duas políticas são iguais. Sem esse controle, os números mediriam viés de assento e não força de jogo. Se um dia a vantagem de sair primeiro se mostrar sistemática, ela é decisão de regra, e precisa de amostra grande antes de virar uma.
+
 **Não use LLM pra jogar.** Custa, atrasa, e é inconsistente. LLM serve pra escrever sabor e diálogo, não pra pilotar deck.
 
 Dificuldade por faixa: o NPC calouro joga mal de propósito em decisões específicas (não usa a melhor jogada sempre), e o formando joga sério. Transparência: o jogador tem que sentir a diferença, não ser informado dela.

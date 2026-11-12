@@ -77,6 +77,8 @@ semanas depois.
 | `vertice-server/src/actor.rs` | uma task por partida, dona do `GameState` | `server-authority` |
 | `vertice-server/src/{http,registry,store}.rs` | WebSocket, `POST /matches`, persistência | `server-authority` |
 | `vertice-client/` | React mínimo, sem Pixi (Pixi é M2) | `client-overworld` |
+| `vertice-bot/src/eval.rs` | pesos da avaliação de tabuleiro | `engine-rules` |
+| `vertice-bot/src/lib.rs` | `choose_action` e níveis de dificuldade | `engine-rules` |
 | `docs/biblia-de-historia.md` | cânone: casas, atos, NPCs | `lore-guardian` |
 | `docs/arquitetura.md` | decisões técnicas e o porquê | `lore-guardian` (cuida do porquê) |
 
@@ -102,6 +104,8 @@ Agente novo, comece por esta tabela em vez de varrer o repositório.
 | criar uma partida no servidor | `vertice-server/src/registry.rs::Registry::create` |
 | saber a forma do protocolo | `vertice-server/src/protocol/` |
 | subir o servidor | `vertice-server/src/main.rs` (`VERTICE_DATA`, `PORT`) |
+| fazer o bot escolher uma jogada | `vertice-bot/src/lib.rs::choose_action` |
+| ajustar o que o bot valoriza | `vertice-bot/src/eval.rs` |
 
 Fluxo normal de um turno, em ordem:
 `view → legal_actions → apply → (muta GameState) → view`.
@@ -174,6 +178,7 @@ tabela existe para impedir que todo mundo mexa em `engine.rs`.
 | criatura não morre / morre cedo | `engine-rules` | `engine.rs::cleanup` |
 | partida não retoma após queda de conexão | `server-authority` | log da partida + `view` reidratada |
 | protocolo divergiu do motor (campo novo, ação que não chega) | `server-authority` | `tests/roundtrip.rs` e a forma do JSON fixada |
+| bot escolhe jogada estranha ou joga mal | `engine-rules` | `vertice-bot/tests/bot.rs` (placar espelhado) |
 | tela, input, animação, transição | `client-overworld` | reprodutor de rede com partida gravada |
 | carta com custo fora da curva, texto ambíguo | `card-content` | validador em `vertice-tools` |
 | nome suspeito de IP, conflito com o cânone | `lore-guardian` | `docs/biblia-de-historia.md` |
@@ -273,9 +278,15 @@ coberto por teste de renderização com visões fixas: cada tipo de ação vira
 botão, o clique manda a ação exata, e fim de partida remove os botões. O teste
 headless prova a partida; o de renderização prova a tela.
 
-**Próximo: M2** (Pixi, chibi, transição de cena, bot heurístico, duelo
-offline). O roteiro está em `docs/roadmap.md`; siga por ele em vez de reabrir
-o plano.
+**M2 — em andamento, pelo bot.** `vertice-bot` existe e escolhe jogada a um
+passo: aplica cada ação legal num clone e avalia a posição resultante. Níveis
+`Calouro` e `Formando` diferem só na frequência de erro deliberado. Medido com
+placar espelhado (as duas orientações na mesma seed, para o viés de assento
+cancelar): formando 22×2 no calouro e 24×0 no aleatório, em 24 partidas cada.
+Falta do M2: Pixi, chibi, transição de cena e duelo offline por WASM.
+
+**Próximo:** o resto do M2. O roteiro está em `docs/roadmap.md`; siga por ele
+em vez de reabrir o plano.
 
 **Pendências registradas:**
 - `CARD_SET_VERSION` continua `"m0.1"` e é etiqueta, não portão: `replay()`
