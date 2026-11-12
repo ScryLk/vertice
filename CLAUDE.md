@@ -126,12 +126,13 @@ Da raiz, para o workspace inteiro (`vertice-core`, `vertice-tools`,
 cargo test --workspace
 cargo clippy --workspace --all-targets -- -D warnings
 cargo run -p vertice-tools -- validate   # ids, curva, append-only, hash, geração em dia
+npm --prefix vertice-client test         # renderização do cliente (Vitest)
 npm --prefix vertice-client run build    # type-check + build do cliente
 ```
 
 **Portão de qualidade:** nenhuma mudança no core é concluída sem `cargo test`,
 `check-determinism.sh` e `clippy` verdes. Mudança em `cards/` acrescenta
-`validate`; mudança no cliente acrescenta o build. Não existe "depois eu rodo".
+`validate`; mudança no cliente acrescenta `test` e o build. Não existe "depois eu rodo".
 
 ---
 
@@ -265,15 +266,16 @@ task por partida dona do `GameState`, reconexão no mesmo `fingerprint`, e
 persistência em arquivo por partida. Fim de partida: vida <= 0 encerra,
 checado ao fim da ação, sem empate — prioridade desempata.
 
-**M1.4 — entregue, com uma ressalva.** `POST /matches`, binário do servidor e
-cliente React mínimo, verificado em navegador: criar partida, entrar nos dois
-assentos, agir, recarregar e reconectar, e a mão do oponente chegando como
-contagem. **Falta** jogar uma partida inteira clicando nos dois assentos — a
-partida completa até a vitória só está provada em WebSocket headless.
+**M1.4 — feito.** `POST /matches`, binário do servidor e cliente React mínimo.
+Verificado em navegador — criar partida, entrar nos dois assentos, agir,
+recarregar e reconectar, e a mão do oponente chegando como contagem — e
+coberto por teste de renderização com visões fixas: cada tipo de ação vira
+botão, o clique manda a ação exata, e fim de partida remove os botões. O teste
+headless prova a partida; o de renderização prova a tela.
 
-**Próximo: fechar a ressalva do M1.4** e então o M2 (Pixi, chibi, transição de
-cena, bot heurístico, duelo offline). O roteiro está em `docs/roadmap.md`;
-siga por ele em vez de reabrir o plano.
+**Próximo: M2** (Pixi, chibi, transição de cena, bot heurístico, duelo
+offline). O roteiro está em `docs/roadmap.md`; siga por ele em vez de reabrir
+o plano.
 
 **Pendências registradas:**
 - `CARD_SET_VERSION` continua `"m0.1"` e é etiqueta, não portão: `replay()`

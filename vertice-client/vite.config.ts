@@ -6,6 +6,11 @@ import { defineConfig } from 'vite';
 // Em produção os dois saem da mesma origem, e a configuração some.
 export default defineConfig({
   plugins: [react()],
+  // O mesmo arquivo serve o dev server e o Vitest: os dois passam pelo
+  // plugin do React, e configurar duas vezes é uma chance a mais de divergir.
+  test: {
+    environment: 'jsdom',
+  },
   server: {
     port: 5173,
     proxy: {

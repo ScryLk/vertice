@@ -25,6 +25,9 @@ npm --prefix vertice-client run dev
 Abra http://localhost:5173, crie uma partida e abra os dois assentos em abas
 diferentes.
 
+Testes: `npm --prefix vertice-client test` (Vitest + Testing Library, visões
+fixas, sem servidor).
+
 O Vite faz proxy de `/matches` e `/ws` para `127.0.0.1:8080`, então **não
 existe CORS no servidor**: em desenvolvimento o navegador fala com o Vite, e
 em produção os dois saem da mesma origem.

@@ -29,7 +29,7 @@ Fatia que não passa no portão não está concluída, mesmo que "funcione na m�
 | Marco | Conteúdo | Estado |
 |---|---|---|
 | M0 | motor determinístico, redação, replay | **feito** |
-| M1 | pilha real, carta como dado, servidor autoritativo, cliente feio | **feito** (M1.4 com ressalva) |
+| M1 | pilha real, carta como dado, servidor autoritativo, cliente feio | **feito** |
 | M2 | Pixi, chibi, transição de cena, bot heurístico, duelo offline | pendente |
 | M3 | quatro jogadores, espectador, replay público | pendente |
 | M4 | calendário, casas, ecos, ato I, contas | pendente |
@@ -122,12 +122,11 @@ nada; hoje vida <= 0 encerra, checado ao fim da ação, sem empate.
 **Saída.** Partida completa em dois navegadores, com queda e retomada. Se
 algo do protocolo doer, dói aqui — quando ainda é barato mudar.
 
-**Estado: entregue, com ressalva.** `POST /matches`, binário do servidor e
-cliente React mínimo. Verificado em navegador: criar, entrar nos dois
-assentos, agir, recarregar e reconectar, e a mão do oponente chegando como
-contagem. **Falta** a partida inteira clicada nos dois assentos — até a
-vitória, ela só está provada em WebSocket headless. É buraco de cobertura de
-renderização, não de comportamento.
+**Estado: feito.** `POST /matches`, binário do servidor e cliente React
+mínimo, verificado em navegador e coberto por teste de renderização com
+visões fixas. O teste headless prova a partida até a vitória; o de
+renderização prova a tela — cada tipo de ação vira botão, o clique manda a
+ação exata, e fim de partida remove os botões.
 
 ---
 
