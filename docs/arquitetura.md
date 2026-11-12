@@ -53,6 +53,8 @@ Três propriedades que precisam ser verdade desde o dia um:
 
 **Autoridade.** O cliente nunca decide. Ele pode rodar o motor em WASM pra prever e animar, mas a verdade é do servidor. Se divergir, o servidor vence e o cliente resincroniza.
 
+**Entrada hostil morre na porta.** `CardId` chega de fora — baralho do cliente, `MatchRecord` lido do banco. `new_game` recusa com `BadDeck` qualquer id fora do catálogo. `card()` continua entrando em pânico com id desconhecido, e isso é deliberado: id inválido no meio da partida é bug, não erro de entrada. A checagem existe na porta justamente para que esse pânico deixe de ser alcançável por dado de fora — uma partida que explode derruba a task que a hospeda, não a requisição que trouxe o baralho ruim.
+
 O log de ações é a unidade de verdade. Partida salva = `{versao_motor, versao_cartas, seed, jogadores, acoes[]}`. Nada mais precisa ser guardado pra reproduzir.
 
 ---

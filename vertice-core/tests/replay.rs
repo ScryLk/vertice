@@ -117,3 +117,26 @@ fn deck_fora_do_tamanho_e_recusado() {
         Err(EngineError::BadDeck)
     );
 }
+
+#[test]
+fn carta_inexistente_no_baralho_e_recusada() {
+    // O baralho vem do cliente, e o servidor é autoritativo. Um `CardId` que
+    // não existe no catálogo tem que morrer na porta, como `BadDeck`, e não
+    // explodir dentro de `card()` no meio da partida — onde o erro chega sem
+    // contexto e derruba a task da partida em vez de recusar a entrada.
+    let mut invalido = deck(0);
+    invalido[0] = CATALOG_LEN as u16;
+    assert_eq!(
+        new_game(&invalido, &deck(3), 1),
+        Err(EngineError::BadDeck),
+        "id fora do catálogo tinha que ser recusado por new_game"
+    );
+
+    let mut invalido_oponente = deck(3);
+    invalido_oponente[57] = u16::MAX;
+    assert_eq!(
+        new_game(&deck(0), &invalido_oponente, 1),
+        Err(EngineError::BadDeck),
+        "a validação tem que cobrir os dois baralhos"
+    );
+}

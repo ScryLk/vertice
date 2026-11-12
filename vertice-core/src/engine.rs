@@ -37,6 +37,14 @@ pub fn new_game(deck0: &[CardId], deck1: &[CardId], seed: u64) -> Result<GameSta
         return Err(EngineError::BadDeck);
     }
 
+    // O baralho vem do cliente e o servidor é autoritativo. Um `CardId` fora
+    // do catálogo é entrada inválida, não bug interno: recusar aqui é o que
+    // impede `card()` de entrar em pânico no meio de uma partida — e uma
+    // partida que explode derruba a task que a hospeda, não a requisição.
+    if deck0.iter().chain(deck1).any(|&cid| !crate::cards::exists(cid)) {
+        return Err(EngineError::BadDeck);
+    }
+
     let mut objects = std::collections::BTreeMap::new();
     let mut next: u32 = 0;
     let mut players = Vec::with_capacity(2);

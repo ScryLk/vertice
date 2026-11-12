@@ -69,3 +69,14 @@ pub fn card(id: CardId) -> &'static CardDef {
         Err(_) => panic!("CardId fora do catálogo: {id}"),
     }
 }
+
+/// A carta existe no catálogo?
+///
+/// O motor recebe `CardId` de fora — baralho do cliente, `MatchRecord` lido
+/// do banco. `card()` entra em pânico com id desconhecido, e isso é
+/// deliberado: id inválido no meio da partida é bug, não erro de entrada.
+/// Esta checagem existe para que a entrada seja recusada na porta, e o
+/// pânico deixe de ser alcançável por dado de fora.
+pub(crate) fn exists(id: CardId) -> bool {
+    CATALOG.binary_search_by_key(&id, |def| def.id).is_ok()
+}

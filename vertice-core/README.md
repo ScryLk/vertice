@@ -17,7 +17,7 @@ oculta — antes de existir arte, rede ou banco.
 ## Comandos
 
 ```bash
-cargo test                      # 18 testes: replay, redação, legalidade, catálogo
+cargo test                      # replay, redação, legalidade, catálogo
 ./scripts/check-determinism.sh  # falha se o core ganhar não-determinismo
 cargo clippy -- -D warnings
 ```
