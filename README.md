@@ -14,6 +14,7 @@ docs/arquitetura.md          decisões técnicas e o porquê de cada uma
 vertice-core/                motor de regras (Rust, determinístico, sem I/O)
 vertice-tools/               validador de carta e gerador de catálogo (CLI)
 vertice-server/              servidor autoritativo 1v1: protocolo, ator por partida, WebSocket
+vertice-client/              cliente mínimo em React (sem Pixi, feio de propósito)
 cards/                       registro de id estável + cartas em TOML
 CLAUDE.md                    convenções do projeto e repartição de agentes
 ```

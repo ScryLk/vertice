@@ -99,7 +99,9 @@ Esta é a seção mais importante do documento. Cada mecânica que você mantive
 
 **Persistência é um arquivo por partida.** O registro inteiro é reescrito a cada ação aceita, e persistir acontece **antes** de avisar: o cliente só fica sabendo de uma ação depois que ela está durável. `Registry::open` relê o diretório, rejoga cada registro e devolve um ator vivo — reiniciar o processo não perde nada que um jogador já viu. Um arquivo que não rejoga **impede a subida**, em vez de virar aviso: subir fingindo que está tudo bem esconderia exatamente o que o replay existe para denunciar. Custo conhecido: reescrever o registro é O(n) por ação; quando doer (partidas de mil ações), a troca é para log append-only, sem mudar quem chama.
 
-**Não existe:** matchmaking — partidas nascem pela `Registry`, não por endpoint, e o cliente do M1.4 vai precisar disso.
+**Não existe:** matchmaking — `POST /matches` cria a mesa e é o suficiente para o M1; fila e pareamento vêm quando houver jogador.
+
+**O cliente do M1.4 é feio de propósito.** React sem Pixi, botões gerados de `legal_actions`, sem animação e sem transição: o que está na tela é o protocolo, e enfeite esconderia o que precisa doer. O Vite faz proxy de `/matches` e `/ws` para o servidor Rust, então **não existe CORS no servidor** — em desenvolvimento o navegador fala com o Vite, em produção os dois saem da mesma origem. Quem decide o que é legal é o servidor; o cliente só desenha os botões que recebeu.
 
 ---
 

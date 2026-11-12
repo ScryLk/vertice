@@ -1,0 +1,174 @@
+/* Feio de propósito. Sem arte, sem animação, sem transição: o que está na
+   tela é o protocolo, e qualquer enfeite aqui esconderia o que precisa doer. */
+
+:root {
+  --fundo: #14161a;
+  --texto: #d7dae0;
+  --apagado: #7c828d;
+  --borda: #2a2f38;
+  --meu: #1d2a22;
+  --dele: #2a1d20;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.mesa {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--borda);
+  padding-bottom: 8px;
+  color: var(--apagado);
+}
+
+.estado {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.estado-conectado {
+  color: #6fbf8b;
+}
+.estado-caido,
+.estado-conectando {
+  color: #d8a657;
+}
+.estado-encerrado {
+  color: #cf6b6b;
+}
+
+.aviso {
+  border-left: 3px solid #d8a657;
+  padding: 6px 10px;
+  margin: 0;
+  background: #201c14;
+}
+
+.fim {
+  font-size: 18px;
+  text-align: center;
+  padding: 10px;
+  border: 1px solid var(--borda);
+  margin: 0;
+}
+
+.lado {
+  border: 1px solid var(--borda);
+  padding: 10px;
+}
+
+.oponente {
+  background: var(--dele);
+}
+.voce {
+  background: var(--meu);
+}
+
+.lado h2 {
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--apagado);
+  margin: 0 0 8px;
+}
+
+.zona h3,
+.pilha h3,
+.acoes h3 {
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--apagado);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 10px 0 4px;
+}
+
+.cartas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.carta {
+  border: 1px solid var(--borda);
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  min-width: 130px;
+}
+
+.carta.virada {
+  opacity: 0.6;
+}
+
+.carta .nome {
+  font-weight: bold;
+}
+.carta .corpo {
+  color: var(--apagado);
+}
+.carta .marcas {
+  font-size: 11px;
+  color: var(--apagado);
+}
+
+.vazio {
+  color: var(--apagado);
+  margin: 4px 0;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+button {
+  font: inherit;
+  color: var(--texto);
+  background: #232830;
+  border: 1px solid var(--borda);
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #2e3540;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.lobby code {
+  background: #232830;
+  padding: 1px 5px;
+}
+
+.explicacao {
+  color: var(--apagado);
+}
+
+a {
+  color: #7fa8d8;
+}
