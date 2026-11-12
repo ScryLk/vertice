@@ -23,7 +23,7 @@ pub mod state;
 pub mod view;
 
 pub use action::Action;
-pub use engine::{apply, legal_actions, new_game, EngineError};
+pub use engine::{apply, legal_actions, new_game, new_game_with_hands, EngineError};
 pub use ids::{CardId, ObjectId, PlayerId};
 pub use record::{replay, MatchRecord};
 pub use state::{GameState, Object, Phase, Player, Target, Zones};

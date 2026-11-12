@@ -64,6 +64,7 @@ semanas depois.
 | `vertice-core/src/cards.rs` | catálogo (hoje `&'static`, vira dado no M1) | `card-content` |
 | `vertice-core/tests/replay.rs` | determinismo e reprodução | `determinism-guard` |
 | `vertice-core/tests/redaction.rs` | garantia de não vazamento | `redaction-auditor` |
+| `vertice-core/tests/stack.rs` | pilha, fizzle e abertura roteirizada | `engine-rules` |
 | `vertice-server/` *(M1)* | Axum, ator tokio por partida, reconexão | `server-authority` |
 | `vertice-client/` *(M2)* | React (chrome) + PixiJS (cenário e mesa) | `client-overworld` |
 | `docs/biblia-de-historia.md` | cânone: casas, atos, NPCs | `lore-guardian` |
@@ -78,6 +79,7 @@ Agente novo, comece por esta tabela em vez de varrer o repositório.
 | Preciso… | Vá para |
 |---|---|
 | criar uma partida | `engine.rs::new_game` |
+| criar partida com mão fixa (teste, campanha) | `engine.rs::new_game_with_hands` |
 | saber o que é legal agora | `engine.rs::legal_actions` |
 | aplicar uma ação | `engine.rs::apply` |
 | entender o formato do estado | `state.rs::GameState` |
@@ -223,13 +225,16 @@ técnica, sem gíria datada.
 ## 11. Estado atual
 
 **M0 — feito.** `vertice-core` com estado, ações, resolução, redação e
-replay. 10 testes verdes. Guarda de determinismo funcionando (testado contra
-violação plantada).
+replay. Guarda de determinismo funcionando (testado contra violação plantada).
 
-**M1 — próximo.** Zona de pilha real; carta como dado versionado com
-validador (`vertice-tools`); `vertice-server` com um ator tokio por partida e
-reconexão. Critério de saída: dois navegadores jogam, um cai, volta, e a
-partida continua de onde estava.
+**M1.1 — feito.** Pilha real: a mágica ocupa a pilha e só vai ao cemitério ao
+resolver; alvo que sai do campo antes da resolução faz a mágica fizzlar;
+abertura roteirizada (`new_game_with_hands` + mãos no `MatchRecord`) reproduz
+bit a bit. 14 testes verdes.
+
+**Próximo: M1.2** — carta como dado com `CardId` estável (`cards/registry.toml`
+append-only) e validador em `vertice-tools`. O roteiro de fatias está em
+`docs/roadmap.md`; siga por ele em vez de reabrir o plano.
 
 **Pendências registradas:** `CardId` precisa ser estável e content-addressed
 antes de o catálogo sair de `&'static` — reordenar o arquivo de cartas quebra

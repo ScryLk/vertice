@@ -35,6 +35,7 @@ src/view.rs     redação por jogador. A fronteira de segurança
 src/record.rs   MatchRecord + replay
 tests/replay.rs     determinismo e reprodução bit a bit
 tests/redaction.rs  garantia de que mão e biblioteca alheias não vazam
+tests/stack.rs      pilha, fizzle e abertura roteirizada
 ```
 
 ## O contrato
@@ -48,7 +49,7 @@ partida  =   (engine_version, card_set_version, seed, decks, actions[])
 `apply()` só aceita o que `legal_actions()` devolve. Não existe segundo
 caminho de validação, e não deve existir.
 
-## Simplificações conscientes do M0
+## Simplificações conscientes do motor
 
 Todas reversíveis, todas documentadas no topo de `engine.rs`:
 
@@ -56,7 +57,7 @@ Todas reversíveis, todas documentadas no topo de `engine.rs`:
 - Sem etapa de bloqueio: atacar criatura é troca de dano direta.
 - Pilha de no máximo 2 (uma mágica + uma resposta) — a "janela de reação única".
 - Criaturas não usam a pilha; só mágicas abrem janela.
-- Mágica vai ao cemitério ao ser conjurada (falta zona de pilha real — TODO M1).
+- Mágica ocupa a pilha e só vai ao cemitério ao resolver; alvo inválido faz fizzlar.
 
 ## O que este marco NÃO tem
 

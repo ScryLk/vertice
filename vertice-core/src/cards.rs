@@ -46,6 +46,10 @@ pub struct CardDef {
     pub effect: Effect,
 }
 
+// Construtor `const` de carta: argumentos posicionais são o formato mais
+// legível para uma tabela de dados, e agrupar em struct só para agradar o
+// lint pioraria a leitura de todas as linhas do catálogo.
+#[allow(clippy::too_many_arguments)]
 const fn def(
     id: CardId,
     name: &'static str,

@@ -149,6 +149,10 @@ impl GameState {
         fnv(&mut h, self.priority as u64);
         fnv(&mut h, self.rng.state());
         fnv(&mut h, self.stack.len() as u64);
+        for p in &self.stack {
+            fnv(&mut h, p.object.0 as u64);
+            fnv(&mut h, p.controller as u64);
+        }
         for p in &self.players {
             fnv(&mut h, p.life as u64);
             fnv(&mut h, p.mana as u64);

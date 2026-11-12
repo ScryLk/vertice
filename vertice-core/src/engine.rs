@@ -1,6 +1,6 @@
 //! Regras de transição de estado.
 //!
-//! Simplificações conscientes do M0, todas reversíveis:
+//! Simplificações conscientes do motor, todas reversíveis:
 //!
 //! - **Mana automática.** O pool do turno é igual ao número de terrenos no
 //!   início do turno. Terrenos não viram. No motor real isso vira
@@ -9,8 +9,10 @@
 //! - **Pilha de no máximo 2.** Uma mágica + uma resposta. É a "janela de
 //!   reação única" do documento de regras, implementada literalmente.
 //! - **Criaturas não usam a pilha.** Só mágicas abrem janela de resposta.
-//! - **Mágica vai pro cemitério ao ser conjurada.** Falta uma zona de pilha
-//!   de verdade; anotado como TODO de M1.
+//! - **A mágica ocupa a pilha de verdade (M1.1).** Ela sai da mão, fica na
+//!   pilha e só vai ao cemitério quando resolve. Se o alvo deixar o campo
+//!   antes disso, ela **fizzla**: não faz nada, mas continua tendo sido
+//!   conjurada e paga.
 //!
 //! Nenhuma dessas simplificações pode violar as invariantes do crate:
 //! determinismo, redação e autoridade.
@@ -81,6 +83,50 @@ pub fn new_game(deck0: &[CardId], deck1: &[CardId], seed: u64) -> Result<GameSta
 
     // Primeiro turno não compra.
     begin_turn(&mut state, 0, false);
+    Ok(state)
+}
+
+/// Cria uma partida com **mãos iniciais forçadas**, retirando essas cartas da
+/// biblioteca já embaralhada.
+///
+/// Existe para dois usos legítimos: teste de regra e duelo roteirizado da
+/// campanha (NPC com abertura fixa). Como a biblioteca é embaralhada pela
+/// seed e a retirada é determinística, `new_game_with_hands` com os mesmos
+/// argumentos produz exatamente o mesmo estado — é o que permite o
+/// `MatchRecord` guardar as mãos e o replay continuar fiel.
+///
+/// Erro `BadDeck` se a carta pedida não estiver no baralho.
+pub fn new_game_with_hands(
+    deck0: &[CardId],
+    deck1: &[CardId],
+    seed: u64,
+    hand0: &[CardId],
+    hand1: &[CardId],
+) -> Result<GameState, EngineError> {
+    let mut state = new_game(deck0, deck1, seed)?;
+
+    for (pid, wanted) in [(0u8, hand0), (1u8, hand1)] {
+        // Devolve a mão sorteada para a biblioteca e extrai exatamente o que
+        // foi pedido. A ordem final é determinística porque parte do
+        // embaralhamento da seed e não reembaralha.
+        let drawn = std::mem::take(&mut state.player_mut(pid).zones.hand);
+        state.player_mut(pid).zones.library.extend(drawn);
+
+        for &cid in wanted {
+            let pos = state
+                .player(pid)
+                .zones
+                .library
+                .iter()
+                .rposition(|oid| state.object(*oid).card == cid)
+                .ok_or(EngineError::BadDeck)?;
+            let oid = state.player_mut(pid).zones.library.remove(pos);
+            state.player_mut(pid).zones.hand.push(oid);
+        }
+    }
+
+    // O turno já foi aberto em `new_game`; a mana veio de campo vazio (zero),
+    // que continua sendo o correto aqui.
     Ok(state)
 }
 
@@ -176,21 +222,16 @@ fn cast(state: &mut GameState, object: ObjectId, target: Option<Target>) -> Resu
             state.player_mut(pid).zones.battlefield.push(object);
         }
         CardKind::Spell => {
-            // TODO(M1): zona de pilha real. No M0 a carta sai da mão e
-            // espera no cemitério.
-            state.player_mut(pid).zones.graveyard.push(object);
+            // A carta vai para a pilha, não para o cemitério: ela ainda pode
+            // ser respondida e só sai de lá quando resolve.
             state.stack.push(PendingSpell {
                 controller: pid,
                 object,
                 effect: def.effect,
                 target,
             });
-            if state.stack.len() >= 2 {
-                // Janela de reação única já foi usada: resolve na hora.
-                // Impossível por construção (legal_actions barra), mas
-                // deixamos a lei escrita.
-                return Ok(());
-            }
+            // A prioridade sempre volta para o oponente. Quando a pilha já
+            // está cheia, `legal_actions` só oferece `Pass` a ele.
             state.priority = state.opponent_of(pid);
             state.phase = Phase::Reaction;
         }
@@ -215,6 +256,18 @@ fn pass(state: &mut GameState) -> Result<(), EngineError> {
 }
 
 fn resolve(state: &mut GameState, pending: PendingSpell) {
+    // A mágica deixa a pilha para o cemitério do controlador em qualquer
+    // desfecho: resolveu ou fizzlou. Ela já foi paga e já foi conjurada.
+    state
+        .player_mut(pending.controller)
+        .zones
+        .graveyard
+        .push(pending.object);
+
+    if fizzles(state, pending.target) {
+        return;
+    }
+
     match pending.effect {
         Effect::None => {}
         Effect::Draw(n) => draw(state, pending.controller, n as usize),
@@ -360,6 +413,24 @@ fn cleanup(state: &mut GameState) {
         state.object_mut(id).deathtouch_damage = false;
         state.object_mut(id).tapped = false;
     }
+}
+
+/// Alvo que deixou o campo de batalha antes da resolução.
+///
+/// Mágica que fizzla não faz nada — mas não é anulada: já foi conjurada, já
+/// foi paga, e a carta vai ao cemitério do mesmo jeito.
+fn fizzles(state: &GameState, target: Option<Target>) -> bool {
+    match target {
+        Some(Target::Object(id)) => !is_on_battlefield(state, id),
+        _ => false,
+    }
+}
+
+fn is_on_battlefield(state: &GameState, id: ObjectId) -> bool {
+    state
+        .players
+        .iter()
+        .any(|p| p.zones.battlefield.contains(&id))
 }
 
 fn needs_target(effect: Effect) -> bool {
