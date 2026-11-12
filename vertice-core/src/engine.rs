@@ -315,7 +315,7 @@ fn attack(state: &mut GameState, attacker: ObjectId, target: Target) -> Result<(
             // Voar: quem não voa não acerta quem voa.
             let a_fly = def.keywords.contains(&Keyword::Flying);
             let d_fly = ddef.keywords.contains(&Keyword::Flying);
-            if !(a_fly && !d_fly) {
+            if !a_fly || d_fly {
                 add_damage(state, attacker, d_power, d_deathtouch);
             }
 
