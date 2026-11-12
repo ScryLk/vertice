@@ -22,11 +22,10 @@ pub const PROTOCOL_VERSION: u32 = 1;
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ClientMessage {
     /// Primeira mensagem da conexão.
-    Join {
-        protocol: u32,
-        match_id: String,
-        seat: PlayerId,
-    },
+    ///
+    /// A partida vem na URL (`/ws/{match_id}`), não aqui: um identificador em
+    /// dois lugares é um identificador que uma hora discorda de si mesmo.
+    Join { protocol: u32, seat: PlayerId },
     /// Uma ação, com o índice que o cliente espera ver confirmado.
     Action { seq: u64, action: ActionDto },
     /// "Perdi o fio": o cliente pede a view de novo, sem tentar adivinhar.

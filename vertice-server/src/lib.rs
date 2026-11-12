@@ -1,12 +1,14 @@
 //! Servidor autoritativo do Vértice.
 //!
 //! O motor (`vertice-core`) é a verdade. Este crate não decide regra nenhuma:
-//! ele transporta `Action` para dentro, `PlayerView` para fora, e guarda o
-//! `MatchRecord` para a partida sobreviver a uma queda de conexão.
+//! transporta `Action` para dentro, `PlayerView` para fora, e mantém a
+//! partida viva enquanto alguém estiver conectado.
 //!
-//! Por enquanto existe só o **protocolo** — a tradução entre os tipos do
-//! motor e a forma que atravessa a rede. A camada de transporte (Axum,
-//! WebSocket, uma task por partida) entra em cima dele, sem tocá-lo.
+//! Três camadas, e cada uma só conhece a de baixo:
+//!
+//! - [`protocol`] — tradução entre os tipos do motor e a forma de fio.
+//! - [`actor`] — uma task por partida, dona do `GameState`. É a autoridade.
+//! - [`http`] — WebSocket. Burra de propósito: lê quadros e repassa.
 //!
 //! Duas invariantes que valem aqui como valem no core:
 //!
@@ -16,6 +18,11 @@
 //!   próprio assento. A redação acontece no motor; o servidor não a refaz e
 //!   não a desfaz.
 
+pub mod actor;
+pub mod http;
 pub mod protocol;
+pub mod registry;
 
+pub use http::router;
 pub use protocol::PROTOCOL_VERSION;
+pub use registry::Registry;

@@ -13,7 +13,7 @@ docs/biblia-de-historia.md   cânone: mundo, casas, atos, elenco
 docs/arquitetura.md          decisões técnicas e o porquê de cada uma
 vertice-core/                motor de regras (Rust, determinístico, sem I/O)
 vertice-tools/               validador de carta e gerador de catálogo (CLI)
-vertice-server/              protocolo de rede e, em seguida, o servidor autoritativo
+vertice-server/              servidor autoritativo 1v1: protocolo, ator por partida, WebSocket
 cards/                       registro de id estável + cartas em TOML
 CLAUDE.md                    convenções do projeto e repartição de agentes
 ```
