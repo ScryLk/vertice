@@ -57,6 +57,10 @@ Três propriedades que precisam ser verdade desde o dia um:
 
 O log de ações é a unidade de verdade. Partida salva = `{versao_motor, versao_cartas, seed, jogadores, acoes[]}`. Nada mais precisa ser guardado pra reproduzir.
 
+**O protocolo é escrito à mão, de propósito (M1.3).** `vertice-server` traduz os tipos do motor para `serde` num `match` exaustivo; o motor não ganha `serde`, nem `#[derive(Serialize)]`, nem nada. O preço é duplicar a forma em dois lugares. O pagamento é que o compilador quebra a tradução quando `Action` ou `PlayerView` ganham uma variante — ninguém descobre isso em produção. Toda mensagem leva `type`; as de jogo levam `seq`; o `Join` declara `protocol` e versão diferente é recusa imediata, não negociação. A `PlayerView` é **mão única** (carrega `&'static str` do catálogo, e do outro lado só existe texto), enquanto o `MatchRecord` é **reversível** — é ele que reconexão e replay rejogam.
+
+**Versão de registro é dado, não constante.** `MatchRecord.engine_version` e `card_set_version` são `String`, não `&'static str`: um registro lido do banco carrega a versão de *quando foi jogado*. Com `&'static str` o campo só conseguia reportar a constante de compilação — era etiqueta, não dado.
+
 ---
 
 ## 4. O que cortar das regras

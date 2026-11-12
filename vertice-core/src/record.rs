@@ -15,8 +15,14 @@ use crate::state::GameState;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MatchRecord {
-    pub engine_version: &'static str,
-    pub card_set_version: &'static str,
+    /// Versão do motor que produziu a partida.
+    ///
+    /// `String` e não `&'static str`: um registro lido do banco carrega a
+    /// versão *de quando foi jogado*, não a de hoje. Com `&'static str` o
+    /// campo só conseguia reportar a constante de compilação — era etiqueta,
+    /// não dado.
+    pub engine_version: String,
+    pub card_set_version: String,
     pub seed: u64,
     pub deck0: Vec<CardId>,
     pub deck1: Vec<CardId>,
@@ -33,8 +39,8 @@ pub struct MatchRecord {
 impl MatchRecord {
     pub fn new(deck0: Vec<CardId>, deck1: Vec<CardId>, seed: u64) -> Self {
         Self {
-            engine_version: crate::ENGINE_VERSION,
-            card_set_version: crate::CARD_SET_VERSION,
+            engine_version: crate::ENGINE_VERSION.to_string(),
+            card_set_version: crate::CARD_SET_VERSION.to_string(),
             seed,
             deck0,
             deck1,
@@ -53,8 +59,8 @@ impl MatchRecord {
         hand1: Vec<CardId>,
     ) -> Self {
         Self {
-            engine_version: crate::ENGINE_VERSION,
-            card_set_version: crate::CARD_SET_VERSION,
+            engine_version: crate::ENGINE_VERSION.to_string(),
+            card_set_version: crate::CARD_SET_VERSION.to_string(),
             seed,
             deck0,
             deck1,

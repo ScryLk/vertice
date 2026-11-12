@@ -2,7 +2,10 @@
 #
 # `vertice-core` é o motor: zero dependências, zero I/O, determinístico.
 # `vertice-tools` é ferramenta de conteúdo: lê TOML, valida e gera código.
-# A separação é o ponto — o motor nunca aprende a ler arquivo.
+# `vertice-server` é a camada de rede: tem dependências, e é por isso que o
+# core não tem nenhuma.
+#
+# A seta aponta sempre para dentro: server → core. Nunca o contrário.
 [workspace]
 resolver = "2"
-members = ["vertice-core", "vertice-tools"]
+members = ["vertice-core", "vertice-tools", "vertice-server"]
