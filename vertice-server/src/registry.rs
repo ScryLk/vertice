@@ -86,12 +86,31 @@ impl Registry {
     ) -> Result<String, EngineError> {
         let id = format!("partida-{}", self.counter.fetch_add(1, Ordering::Relaxed));
         let actor = Actor::new(id.clone(), &deck0, &deck1, seed, self.store.clone())?;
-
-        let (sender, commands) = mpsc::channel(64);
-        actor.spawn(commands);
-        self.matches.write().await.insert(id.clone(), sender);
+        self.register(id.clone(), actor).await;
 
         Ok(id)
+    }
+
+    /// Cria uma partida com o baralho provisório. É o que o endpoint HTTP usa.
+    ///
+    /// Sem `seed`, ela vem do número da partida: diferente a cada mesa, e
+    /// registrada no `MatchRecord`, então o replay continua exato.
+    pub async fn create_default(&self, seed: Option<u64>) -> Result<String, EngineError> {
+        let number = self.counter.fetch_add(1, Ordering::Relaxed);
+        let seed = seed.unwrap_or(number);
+        let id = format!("partida-{number}");
+
+        let deck0 = deck_provisorio(0);
+        let deck1 = deck_provisorio(3);
+        let actor = Actor::new(id.clone(), &deck0, &deck1, seed, self.store.clone())?;
+        self.register(id.clone(), actor).await;
+        Ok(id)
+    }
+
+    async fn register(&self, id: String, actor: Actor) {
+        let (sender, commands) = mpsc::channel(64);
+        actor.spawn(commands);
+        self.matches.write().await.insert(id, sender);
     }
 
     pub async fn handle(&self, match_id: &str) -> Option<mpsc::Sender<Command>> {
@@ -106,4 +125,17 @@ impl Registry {
         sender.send(Command::Fingerprint { reply }).await.ok()?;
         answer.await.ok()
     }
+}
+
+/// Baralho provisório: 100 cartas ciclando o catálogo.
+///
+/// **Placeholder declarado.** Deck de verdade vem de deck building, que é M2.
+/// Aqui basta um baralho válido para exercitar o protocolo na interface — e
+/// ciclar o catálogo garante que toda carta do conjunto apareça em algum
+/// momento da partida, o que é exatamente o que falta no M1.
+pub fn deck_provisorio(offset: u16) -> Vec<CardId> {
+    let catalogo = vertice_core::cards::CATALOG_LEN as u16;
+    (0..vertice_core::DECK_SIZE as u16)
+        .map(|i| i.wrapping_mul(7).wrapping_add(offset) % catalogo)
+        .collect()
 }

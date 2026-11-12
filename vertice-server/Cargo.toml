@@ -17,6 +17,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "net",
 futures-util = "0.3"
 
 [dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
 # Cliente WebSocket headless do teste de reconexão. Ele fala o protocolo como
 # um cliente de verdade falaria — nada de atalho pelo lado de dentro.
 tokio-tungstenite = "0.30"

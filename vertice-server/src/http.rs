@@ -8,10 +8,12 @@ use std::sync::Arc;
 
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::{Path, State};
+use axum::http::StatusCode;
 use axum::response::Response;
-use axum::routing::get;
-use axum::Router;
+use axum::routing::{get, post};
+use axum::{Json, Router};
 use futures_util::{Sink, SinkExt, StreamExt};
+use serde::{Deserialize, Serialize};
 use tokio::sync::{mpsc, oneshot};
 use vertice_core::PlayerId;
 
@@ -23,8 +25,45 @@ pub type SharedRegistry = Arc<Registry>;
 
 pub fn router(registry: SharedRegistry) -> Router {
     Router::new()
+        .route("/matches", post(create_match))
         .route("/ws/{match_id}", get(upgrade))
         .with_state(registry)
+}
+
+/// Pedido de criação de partida.
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct CreateMatchRequest {
+    /// Semente do embaralhamento. Ausente = derivada do número da partida.
+    ///
+    /// Vem do cliente de propósito: é a única coisa que ele pode escolher, e
+    /// fica registrada no `MatchRecord`, então o replay continua exato.
+    #[serde(default)]
+    pub seed: Option<u64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateMatchResponse {
+    pub match_id: String,
+    pub protocol: u32,
+}
+
+/// `POST /matches` — cria a mesa.
+///
+/// Exige corpo JSON (`{}` serve). Matchmaking de verdade é outro problema;
+/// isto existe para um cliente conseguir entrar num jogo.
+async fn create_match(
+    State(registry): State<SharedRegistry>,
+    Json(request): Json<CreateMatchRequest>,
+) -> Result<Json<CreateMatchResponse>, (StatusCode, String)> {
+    let match_id = registry
+        .create_default(request.seed)
+        .await
+        .map_err(|error| (StatusCode::BAD_REQUEST, format!("{error:?}")))?;
+
+    Ok(Json(CreateMatchResponse {
+        match_id,
+        protocol: PROTOCOL_VERSION,
+    }))
 }
 
 async fn upgrade(
