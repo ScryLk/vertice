@@ -1,0 +1,9 @@
+slug = "aprendiz-marcado"
+name = "Aprendiz Marcado"
+cost = 3
+type = "creature"
+power = 1
+toughness = 1
+keywords = ["deathtouch"]
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 2 }

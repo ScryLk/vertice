@@ -402,3 +402,63 @@ sha256 = "67d49aebedb4d3b7bd45e28a296552f3ee29c6f9c25d518668479a241a53d165"
 slug = "herdeiro-do-acervo"
 id = 79
 sha256 = "20e409aa8030fee9479995d220ea0d3ad23f17fb3cab194d8d2f8d406e2f6d89"
+
+[[card]]
+slug = "vigia-incandescente"
+id = 80
+sha256 = "1e077446e84833e627da32ceff896730c739c8acd2ed17ac294d70a9bf291862"
+
+[[card]]
+slug = "arqueiro-do-patio"
+id = 81
+sha256 = "e3f47538821b6f2761995d8958c806ac86b3ad952861830ec9c11a977e35bffe"
+
+[[card]]
+slug = "brasa-de-vigilia"
+id = 82
+sha256 = "4a201a4ad0426187a8bb4643bc9f5fa9efcac61d856f7a1d61cac48724826417"
+
+[[card]]
+slug = "executor-de-protocolo"
+id = 83
+sha256 = "9d432efa492423c2c93aeb0977d352dbd1646690fac7131c3929716f6cd4a088"
+
+[[card]]
+slug = "instrutor-de-campo"
+id = 84
+sha256 = "93db5d9c84a58c1c16caf2baf6d36094197d8bea2e28b615fc5a0e83f4b9b303"
+
+[[card]]
+slug = "porta-estandarte"
+id = 85
+sha256 = "81a4ffa3ee4d8a873081bd71ad9452fb36f9dba06f0e6003894e7c113fe3c232"
+
+[[card]]
+slug = "cao-de-guerra-do-arquivo"
+id = 86
+sha256 = "979da4d3dd7642649f3e49f814905e30c4e2765cfab6f6671bccc3a2edd67343"
+
+[[card]]
+slug = "carrasco-de-baluarte"
+id = 87
+sha256 = "5f7832d7684ba03549a70bf787c384cbd79cf82b5cff6225cf0720847fd35aa9"
+
+[[card]]
+slug = "aprendiz-marcado"
+id = 88
+sha256 = "d5b38d7ca7a283bcaf7ebd233e0133848c4f7923f268910b30938fe5487fba08"
+
+[[card]]
+slug = "mestra-de-esgrima"
+id = 89
+sha256 = "a8bfc9bd9563410cf2614c0630a3d65d5d946c878371612d105fe3b084fb9525"
+
+[[card]]
+slug = "tocador-de-alarme"
+id = 90
+sha256 = "6990aef291ffe02f892210b744d80dbc4c0e2b289bac997f395bbb339cf3b368"
+
+[[card]]
+slug = "arauto-do-poco"
+id = 91
+sha256 = "99d29ce5f0ba616e91d16daf18b384c594bfe0e95979f7a9c9788bdd73e76bce"

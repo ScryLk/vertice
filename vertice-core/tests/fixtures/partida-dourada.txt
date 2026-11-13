@@ -28,12 +28,12 @@
 #   pass              Pass
 #   end               EndTurn
 
-engine_version 0.4.0
-card_set_version m2.3
+engine_version 0.5.0
+card_set_version m2.4
 seed 20260119
-deck0 0 7 14 21 28 35 42 49 56 63 70 77 4 11 18 25 32 39 46 53 60 67 74 1 8 15 22 29 36 43 50 57 64 71 78 5 12 19 26 33 40 47 54 61 68 75 2 9 16 23 30 37 44 51 58 65 72 79 6 13 20 27 34 41 48 55 62 69 76 3 10 17 24 31 38 45 52 59 66 73 0 7 14 21 28 35 42 49 56 63 70 77 4 11 18 25 32 39 46 53
-deck1 3 10 17 24 31 38 45 52 59 66 73 0 7 14 21 28 35 42 49 56 63 70 77 4 11 18 25 32 39 46 53 60 67 74 1 8 15 22 29 36 43 50 57 64 71 78 5 12 19 26 33 40 47 54 61 68 75 2 9 16 23 30 37 44 51 58 65 72 79 6 13 20 27 34 41 48 55 62 69 76 3 10 17 24 31 38 45 52 59 66 73 0 7 14 21 28 35 42 49 56
-actions 99
+deck0 0 7 14 21 28 35 42 49 56 63 70 77 84 91 6 13 20 27 34 41 48 55 62 69 76 83 90 5 12 19 26 33 40 47 54 61 68 75 82 89 4 11 18 25 32 39 46 53 60 67 74 81 88 3 10 17 24 31 38 45 52 59 66 73 80 87 2 9 16 23 30 37 44 51 58 65 72 79 86 1 8 15 22 29 36 43 50 57 64 71 78 85 0 7 14 21 28 35 42 49
+deck1 3 10 17 24 31 38 45 52 59 66 73 80 87 2 9 16 23 30 37 44 51 58 65 72 79 86 1 8 15 22 29 36 43 50 57 64 71 78 85 0 7 14 21 28 35 42 49 56 63 70 77 84 91 6 13 20 27 34 41 48 55 62 69 76 83 90 5 12 19 26 33 40 47 54 61 68 75 82 89 4 11 18 25 32 39 46 53 60 67 74 81 88 3 10 17 24 31 38 45 52
+actions 111
 end
 end
 end
@@ -48,89 +48,101 @@ end
 end
 end
 end
-land:48
 end
 end
 end
 end
-cast:98:o48
+end
+end
+end
+end
+end
+end
+end
+end
+end
+end
+end
+end
+end
+end
+end
+land:115
+end
+end
+end
+land:79
+end
+cast:166
+end
+end
+atk:166:o79
+cast:181
+end
+cast:24
 pass
-end
-land:193
-end
-cast:14
-end
-cast:129:o14
-pass
-end
-end
-cast:175:o193
-pass
-end
-atk:14:p1
-cast:71
 end
 cast:163
 pass
+atk:181:p0
 end
-cast:18:o48
+cast:72
 pass
 end
-cast:179
+cast:180:o79
+pass
+atk:181:o79
+land:128
+atk:181:p0
+atk:181:o79
+end
+cast:22
 pass
 end
-atk:14:p1
+cast:192
+atk:181:p0
+atk:181:o79
+atk:181:p0
+atk:181:o79
+atk:181:p0
+atk:181:p0
+atk:181:p0
+atk:181:p0
+atk:181:o79
+atk:181:o79
 end
 end
-land:80
-atk:14:p1
-atk:14:p1
+end
+cast:32:o166
+pass
 end
 cast:182
-end
-atk:71:p1
-atk:14:o193
-cast:49
-atk:14:o182
-end
-end
-cast:43
-pass
+atk:181:p0
+atk:181:o79
+atk:181:p0
+atk:192:p0
 end
 end
-atk:49:p1
-cast:24
-atk:14:p1
-atk:14:o193
-atk:14:p1
-atk:14:o193
-atk:14:p1
-atk:14:p1
-atk:14:p1
-atk:14:p1
-atk:14:o193
-atk:14:o193
+cast:129
+atk:181:p0
 end
 end
-atk:24:p1
-end
-end
-atk:14:o193
-cast:72
-end
+cast:179
+atk:129:p0
 end
 cast:95
 end
+atk:181:o95
+cast:193
+pass
+atk:179:p0
 end
-cast:44
-atk:14:o193
-atk:14:p1
+end
+cast:159:o179
+pass
 end
 end
-cast:83
-cast:60
-atk:72:o193
-atk:14:p1
-atk:14:o193
-atk:95:p1
-fingerprint 14940594399278074870
+cast:101
+pass
+end
+fingerprint 16742629294728923321

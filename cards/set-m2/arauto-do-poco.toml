@@ -1,0 +1,9 @@
+slug = "arauto-do-poco"
+name = "Arauto do Poço"
+cost = 4
+type = "creature"
+power = 2
+toughness = 2
+
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 4 }

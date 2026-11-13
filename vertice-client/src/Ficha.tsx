@@ -59,8 +59,14 @@ function textoDoGatilho(effect: EffectDto, quando: 'Ao entrar' | 'Ao morrer'): s
       return `${quando}, ganhe ${effect.amount} de vida.`;
     case 'lose_life':
       return `${quando}, o oponente perde ${effect.amount} de vida.`;
+    case 'deal_damage':
+      return `${quando}, cause ${effect.amount} de dano a um alvo.`;
+    case 'pump':
+      return `${quando}, uma criatura recebe ${effect.power >= 0 ? '+' : ''}${effect.power}/${
+        effect.toughness >= 0 ? '+' : ''
+      }${effect.toughness}.`;
     default:
-      // O validador só deixa passar gatilho sem alvo. Se um dia chegar outro
+      // O validador só deixa passar estes no gatilho. Se um dia chegar outro
       // aqui, a ficha cala em vez de mentir.
       return null;
   }

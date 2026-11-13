@@ -1,0 +1,9 @@
+slug = "carrasco-de-baluarte"
+name = "Carrasco de Baluarte"
+cost = 5
+type = "creature"
+power = 3
+toughness = 3
+
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 4 }

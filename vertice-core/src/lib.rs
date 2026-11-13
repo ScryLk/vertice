@@ -44,8 +44,14 @@ pub use view::{view, PlayerView};
 ///
 /// 0.4.0 acrescentou gatilho de morte (`CardDef.on_die`) e o efeito `lose_life`.
 /// Mesmo raciocínio: nenhum campo novo no estado, comportamento novo.
-pub const ENGINE_VERSION: &str = "0.4.0";
-pub const CARD_SET_VERSION: &str = "m2.3";
+///
+/// 0.5.0 fez `on_enter` aceitar efeito com alvo. O `Action::Cast` de criatura
+/// passou a carregar `target` — o mesmo campo que a mágica já usava e que para
+/// criatura era sempre `None`. Um `MatchRecord` antigo continua válido porque
+/// nenhuma ação antiga usava esse slot, mas a mesma ação agora significa outra
+/// coisa, e é isso que a versão precisa dizer.
+pub const ENGINE_VERSION: &str = "0.5.0";
+pub const CARD_SET_VERSION: &str = "m2.4";
 
 /// Vida inicial. Comandante usa 40.
 pub const STARTING_LIFE: i32 = 40;

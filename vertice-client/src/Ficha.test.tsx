@@ -125,6 +125,22 @@ describe('Ficha', () => {
     );
   });
 
+  it('gatilho de entrada com alvo vira texto', () => {
+    const texto = (over: Partial<CardDefDto>) => {
+      const { container } = render(<Ficha carta={carta(over)} />);
+      const t = container.querySelector('.ficha-gatilho-entrada')?.textContent;
+      cleanup();
+      return t;
+    };
+
+    expect(texto({ on_enter: { kind: 'deal_damage', amount: 2 } })).toBe(
+      'Ao entrar, cause 2 de dano a um alvo.',
+    );
+    expect(texto({ on_enter: { kind: 'pump', power: -2, toughness: -2 } })).toBe(
+      'Ao entrar, uma criatura recebe -2/-2.',
+    );
+  });
+
   it('o gatilho de morte vira texto', () => {
     const { container } = render(
       <Ficha carta={carta({ on_die: { kind: 'lose_life', amount: 2 } })} />,

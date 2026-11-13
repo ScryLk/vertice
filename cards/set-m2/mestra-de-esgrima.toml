@@ -1,0 +1,9 @@
+slug = "mestra-de-esgrima"
+name = "Mestra de Esgrima"
+cost = 4
+type = "creature"
+power = 2
+toughness = 3
+
+effect = { kind = "none" }
+on_enter = { kind = "pump", power = -2, toughness = -2 }

@@ -1,0 +1,9 @@
+slug = "instrutor-de-campo"
+name = "Instrutor de Campo"
+cost = 3
+type = "creature"
+power = 2
+toughness = 2
+
+effect = { kind = "none" }
+on_enter = { kind = "pump", power = 2, toughness = 2 }

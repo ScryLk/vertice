@@ -1,0 +1,9 @@
+slug = "cao-de-guerra-do-arquivo"
+name = "Cão de Guerra do Arquivo"
+cost = 4
+type = "creature"
+power = 2
+toughness = 1
+keywords = ["flying"]
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 2 }

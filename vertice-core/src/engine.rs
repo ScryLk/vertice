@@ -16,10 +16,16 @@
 //! - **Gatilho de entrada resolve na hora (M2.1).** A criatura entra, o
 //!   efeito de `on_enter` é aplicado ali mesmo, e só depois a ação termina.
 //!   Não abre janela de resposta: o oponente não tem como reagir *antes* de
-//!   o gatilho acontecer. É consequência de o gatilho ser, por construção,
-//!   sem alvo — sem alvo não há escolha, e sem escolha não há o que a janela
-//!   protegeria. No motor real o gatilho iria para a pilha como qualquer
-//!   outra coisa.
+//!   o gatilho acontecer. No motor real o gatilho iria para a pilha como
+//!   qualquer outra coisa.
+//! - **O alvo do gatilho vem na própria conjuração (M2.3).** Criatura com
+//!   `on_enter` que pede alvo é conjurada com `Action::Cast { target: Some }`
+//!   — o mesmo campo que a mágica já usava e que para criatura era sempre
+//!   `None`. É a escolha do controlador e é feita **antes** de o gatilho
+//!   disparar, que é onde ela acontece de verdade. Consequência: não precisa
+//!   de ação nova, de protocolo novo nem de janela. `on_die` com alvo segue
+//!   cortado, e por um motivo concreto: a morte é causada pela ação de outra
+//!   pessoa, e não existe ação do controlador para carregar a escolha.
 //! - **Gatilho de morte dispara dentro do `cleanup` (M2.2).** A criatura vai
 //!   ao cemitério e o efeito é aplicado na hora, na ordem determinística em
 //!   que `cleanup` encontra os mortos — que é a ordem do campo, nunca a de
@@ -30,7 +36,7 @@
 //! determinismo, redação e autoridade.
 
 use crate::action::Action;
-use crate::cards::{card, CardKind, Effect, Keyword};
+use crate::cards::{card, CardDef, CardKind, Effect, Keyword};
 use crate::ids::{CardId, ObjectId, PlayerId};
 use crate::state::{GameState, Object, Phase, PendingSpell, Player, Target, Zones};
 use crate::rng::Rng;
@@ -288,7 +294,9 @@ fn cast(state: &mut GameState, object: ObjectId, target: Option<Target>) -> Resu
             state.player_mut(pid).zones.battlefield.push(object);
             // A criatura já entrou: o gatilho de entrada dispara agora, e não
             // depois — o estado que ele observa é o de "já no campo".
-            fire_on_enter(state, object);
+            // `target` só chega preenchido quando o gatilho de entrada pede
+            // alvo — é a escolha do controlador, feita na própria conjuração.
+            fire_on_enter(state, object, target);
         }
         CardKind::Spell => {
             // A carta vai para a pilha, não para o cemitério: ela ainda pode
@@ -346,26 +354,39 @@ fn resolve(state: &mut GameState, pending: PendingSpell) {
             let opponent = state.opponent_of(pending.controller);
             state.player_mut(opponent).life -= i32::from(n);
         }
-        Effect::DealDamage(n) => match pending.target {
-            Some(Target::Player(tp)) => {
-                state.player_mut(tp).life -= n as i32;
-            }
-            Some(Target::Object(tid)) => {
-                add_damage(state, tid, n, false);
-                cleanup(state);
-            }
-            None => {}
-        },
-        Effect::Pump(dp, dt) => {
-            if let Some(Target::Object(tid)) = pending.target {
-                {
-                    let o = state.object_mut(tid);
-                    o.buff_power += dp;
-                    o.buff_toughness += dt;
-                }
-                cleanup(state);
+        // O resto exige alvo, e o alvo foi escolhido na conjuração.
+        _ => {
+            if let Some(target) = pending.target {
+                apply_to_target(state, pending.effect, target);
             }
         }
+    }
+}
+
+/// Efeitos que agem sobre um alvo escolhido.
+///
+/// Compartilhado entre mágica e gatilho de entrada de propósito: o efeito é o
+/// mesmo, e duas cópias divergiriam na primeira vez que alguém mexesse numa
+/// delas. A diferença entre os dois é **quando** o alvo é escolhido, não o que
+/// acontece com ele.
+fn apply_to_target(state: &mut GameState, effect: Effect, target: Target) {
+    match (effect, target) {
+        (Effect::DealDamage(n), Target::Player(tp)) => {
+            state.player_mut(tp).life -= i32::from(n);
+        }
+        (Effect::DealDamage(n), Target::Object(tid)) => {
+            add_damage(state, tid, n, false);
+            cleanup(state);
+        }
+        (Effect::Pump(dp, dt), Target::Object(tid)) => {
+            {
+                let o = state.object_mut(tid);
+                o.buff_power += dp;
+                o.buff_toughness += dt;
+            }
+            cleanup(state);
+        }
+        _ => {}
     }
 }
 
@@ -380,13 +401,23 @@ fn resolve(state: &mut GameState, pending: PendingSpell) {
 ///
 /// Efeito com alvo não chega aqui: o validador recusa. O braço `_` existe para
 /// que a DSL possa ganhar um efeito novo sem que este `match` minta.
-fn fire_on_enter(state: &mut GameState, object: ObjectId) {
+fn fire_on_enter(state: &mut GameState, object: ObjectId, target: Option<Target>) {
     let def = card(state.object(object).card);
     let Some(effect) = def.on_enter else {
         return;
     };
     let controller = state.object(object).controller;
-    apply_untargeted(state, controller, effect);
+
+    if effect.needs_target() {
+        // O alvo veio na mesma ação que trouxe a criatura. É a única janela em
+        // que o controlador age, e é por isso que este gatilho não precisa de
+        // pilha: a escolha acontece antes de ele disparar, não durante.
+        if let Some(target) = target {
+            apply_to_target(state, effect, target);
+        }
+    } else {
+        apply_untargeted(state, controller, effect);
+    }
 }
 
 /// Gatilho de morte. Chamado por `cleanup` **depois** de a criatura sair do
@@ -579,22 +610,37 @@ fn candidate_casts(state: &GameState, pid: PlayerId) -> Vec<Action> {
         if def.kind == CardKind::Land || mana < def.cost {
             continue;
         }
-        if def.effect.needs_target() {
-            for target in effect_targets(state, def.effect) {
-                out.push(Action::Cast {
-                    object: oid,
-                    target: Some(target),
-                });
+        match targeted_effect(def) {
+            Some(effect) => {
+                for target in effect_targets(state, effect) {
+                    out.push(Action::Cast {
+                        object: oid,
+                        target: Some(target),
+                    });
+                }
             }
-        } else {
-            out.push(Action::Cast {
+            None => out.push(Action::Cast {
                 object: oid,
                 target: None,
-            });
+            }),
         }
     }
 
     out
+}
+
+/// O efeito que vai pedir alvo nesta conjuração, se houver.
+///
+/// Mágica pede alvo pelo próprio efeito; criatura pede pelo gatilho de
+/// entrada. É o único ponto em que os dois se confundem, e a confusão é
+/// deliberada: quem escolhe o alvo é o controlador, na hora de conjurar, e
+/// depois disso não há mais escolha a fazer.
+fn targeted_effect(def: &CardDef) -> Option<Effect> {
+    if def.effect.needs_target() {
+        Some(def.effect)
+    } else {
+        def.on_enter.filter(|trigger| trigger.needs_target())
+    }
 }
 
 fn effect_targets(state: &GameState, effect: Effect) -> Vec<Target> {

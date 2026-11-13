@@ -162,7 +162,13 @@ vai. Carta com os dois desenha o anel completo, e a metade que falta diz qual
 dos dois ela tem. Nenhuma colisão nova, porque metade se lê pela **posição**, e
 posição não disputa raio com nada.
 
-**Revisar de novo quando a DSL ganhar gatilho com alvo** — aí o sigilo precisa
-dizer que o efeito pede escolha, e isso é um eixo novo, não uma metade. Os
-outros candidatos (destruir, criar ficha, contador) trazem tipos de efeito que
-o sigilo ainda não sabe desenhar.
+**Aceitou gatilho com alvo sem mudar nada (M2.3).** O sigilo já desenhava o
+efeito do gatilho na marca central, e dano e pump já tinham glifo próprio — a
+regra "a marca central é função do que a carta faz" cobriu um eixo novo de
+graça. É o primeiro caso em que o sistema não precisou de conserto, e vale
+registrar: quando o glifo é **derivado** do dado e não desenhado à mão, eixo
+novo às vezes já está coberto.
+
+**Revisar de novo quando a DSL ganhar primitivas com forma própria** —
+destruir, criar ficha, contador. Aí entram tipos de efeito que o sigilo ainda
+não sabe desenhar, e o sistema vai precisar de conserto de verdade.

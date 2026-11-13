@@ -1,0 +1,9 @@
+slug = "brasa-de-vigilia"
+name = "Brasa de Vigília"
+cost = 2
+type = "creature"
+power = 1
+toughness = 1
+
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 4 }

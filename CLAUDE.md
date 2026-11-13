@@ -366,6 +366,19 @@ publicação e não pode ganhar rótulo sem reescrever o lock das cartas que já
 usam. Sem o rótulo em `on_die`, "ao entrar, compre 1" e "ao morrer, compre 1"
 produziriam a mesma string canônica — há teste e mutação provando.
 
+**M2.3 — gatilho de entrada com alvo, e o pool em 92.** `on_enter` passou a
+aceitar efeito que pede alvo. **O alvo vem na própria conjuração**:
+`Action::Cast { target: Some }` para criatura, o mesmo campo que a mágica já
+usava e que para criatura era sempre `None`. Consequência de projeto: nenhuma
+ação nova, nenhum campo novo no protocolo, nenhuma interação nova na tela — e a
+escolha acontece antes de o gatilho disparar, que é onde ela acontece. 12 cartas
+novas, ids 80..91, `next_id = 92`, `CARD_SET_VERSION = "m2.4"`,
+`ENGINE_VERSION = "0.5.0"`.
+
+`on_die` com alvo **continua cortado**, e agora por um motivo sozinho: a criatura
+morre pela ação de outra pessoa, e não existe ação do controlador para carregar
+a escolha. Abrir isso é gatilho na pilha — a fatia que falta.
+
 Falta do M2: **chibi e a transição a partir do overworld** — as duas dependem
 de arte que não é procedural, e a segunda depende de uma cena que só existe no
 M4. Ilustração de comandante e transição de cena continuam sendo o orçamento

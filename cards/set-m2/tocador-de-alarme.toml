@@ -1,0 +1,9 @@
+slug = "tocador-de-alarme"
+name = "Tocador de Alarme"
+cost = 3
+type = "creature"
+power = 1
+toughness = 2
+keywords = ["vigilance"]
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 2 }

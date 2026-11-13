@@ -319,10 +319,10 @@ on_enter = { kind = "draw", amount = 1 }
 }
 
 #[test]
-fn gatilho_com_efeito_de_alvo_e_recusado() {
-    // O corte da fatia: gatilho com alvo exigiria escolha no meio da
-    // resolução. Recusar no validador é o que impede a carta de existir para
-    // depois o motor ignorá-la em silêncio.
+fn gatilho_de_entrada_aceita_efeito_com_alvo() {
+    // Desde o M2.3 o alvo do gatilho de entrada é escolhido na própria
+    // conjuração, então esta carta é legal — e ela é o caso mais comum de
+    // gatilho que existe.
     let com_alvo = r#"
 slug = "brasa-vigiada"
 name = "Brasa Vigiada"
@@ -334,7 +334,10 @@ effect = { kind = "none" }
 on_enter = { kind = "deal_damage", amount = 2 }
 "#;
     let erros = errors(&registry(1, &[("brasa-vigiada", 0)]), "", &[com_alvo]);
-    assert!(contains(&erros, "exige alvo"), "veio: {erros:#?}");
+    assert!(
+        !contains(&erros, "exige alvo"),
+        "gatilho de entrada com alvo é legal desde o M2.3: {erros:#?}"
+    );
 }
 
 #[test]

@@ -1,0 +1,9 @@
+slug = "executor-de-protocolo"
+name = "Executor de Protocolo"
+cost = 4
+type = "creature"
+power = 3
+toughness = 2
+
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 4 }

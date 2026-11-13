@@ -320,18 +320,131 @@ fn oponente_perde_vida_como_magica() {
 }
 
 #[test]
-fn catalogo_so_marca_gatilho_sem_alvo() {
+fn gatilho_de_entrada_com_alvo_atinge_o_alvo_escolhido() {
+    let land = id("Várzea de Cruzilha");
+    let arqueiro = id("Arqueiro do Pátio"); // custo 2, "ao entrar, cause 2 a um alvo"
+
+    let mut ctx = Ctx::new(vec![land, land, arqueiro], vec![land, land], 17);
+
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    assert_eq!(ctx.state.player(0).mana, 2);
+
+    let oid = hand_object(&ctx.state, 0, arqueiro);
+    ctx.act(Action::Cast {
+        object: oid,
+        target: Some(Target::Player(1)),
+    });
+
+    assert!(on_battlefield(&ctx.state, 0, arqueiro));
+    assert_eq!(
+        ctx.state.player(1).life,
+        STARTING_LIFE - 2,
+        "o alvo escolhido na conjuração é quem recebe o gatilho"
+    );
+}
+
+#[test]
+fn gatilho_com_alvo_recusa_conjuracao_sem_alvo() {
+    let land = id("Várzea de Cruzilha");
+    let arqueiro = id("Arqueiro do Pátio");
+
+    let mut ctx = Ctx::new(vec![land, land, arqueiro], vec![land, land], 18);
+
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+
+    let oid = hand_object(&ctx.state, 0, arqueiro);
+    assert_eq!(
+        apply(
+            &mut ctx.state,
+            Action::Cast {
+                object: oid,
+                target: None,
+            }
+        ),
+        Err(EngineError::IllegalAction),
+        "gatilho com alvo não pode ser conjurado sem escolher o alvo"
+    );
+}
+
+#[test]
+fn gatilho_de_entrada_pode_matar_e_acordar_o_gatilho_de_morte() {
+    // A cascata inteira numa ação só: a criatura entra, o gatilho dela mata
+    // outra criatura, e a morte dispara o gatilho de morte. Se a ordem interna
+    // do motor estivesse errada, a vida não subiria.
+    let land = id("Várzea de Cruzilha");
+    let zelador = id("Zelador de Cinzas"); // 1/1, custo 2, "ao morrer, ganhe 3"
+    let arqueiro = id("Arqueiro do Pátio"); // custo 2, "ao entrar, cause 2 a um alvo"
+
+    let mut ctx = Ctx::new(
+        vec![land, land, land, land, zelador, arqueiro],
+        vec![land],
+        19,
+    );
+
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    assert_eq!(ctx.state.player(0).mana, 4);
+
+    let z_oid = hand_object(&ctx.state, 0, zelador);
+    ctx.act(Action::Cast {
+        object: z_oid,
+        target: None,
+    });
+    assert!(on_battlefield(&ctx.state, 0, zelador));
+
+    let a_oid = hand_object(&ctx.state, 0, arqueiro);
+    ctx.act(Action::Cast {
+        object: a_oid,
+        target: Some(Target::Object(z_oid)),
+    });
+
+    assert!(
+        ctx.state.player(0).zones.graveyard.contains(&z_oid),
+        "o gatilho de entrada tinha que matar o Zelador (1/1 contra 2 de dano)"
+    );
+    assert_eq!(
+        ctx.state.player(0).life,
+        STARTING_LIFE + 3,
+        "e a morte dele tinha que disparar o gatilho de morte"
+    );
+}
+
+#[test]
+fn catalogo_nao_pede_alvo_onde_o_motor_nao_sabe_escolher() {
     // O validador é o portão, mas ele roda em outra crate. Aqui é a garantia
-    // que o motor precisa: todo gatilho publicado é resolvível sem escolha.
+    // que o motor precisa: gatilho de morte é sempre sem alvo, porque não
+    // existe ação do controlador para carregar a escolha.
     for def in CATALOG {
-        for (campo, gatilho) in [("on_enter", def.on_enter), ("on_die", def.on_die)] {
-            let Some(effect) = gatilho else { continue };
+        if let Some(effect) = def.on_die {
             assert!(
                 !effect.needs_target(),
-                "`{}` tem `{campo}` com alvo, que o motor não sabe resolver",
+                "`{}` tem gatilho de morte com alvo, que o motor não sabe resolver",
                 def.name
             );
-            assert_ne!(effect, Effect::None, "`{}` tem `{campo}` vazio", def.name);
+            assert_ne!(effect, Effect::None, "`{}` tem `on_die` vazio", def.name);
+        }
+        if let Some(effect) = def.on_enter {
+            assert_ne!(effect, Effect::None, "`{}` tem `on_enter` vazio", def.name);
         }
     }
 }

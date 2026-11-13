@@ -1,0 +1,9 @@
+slug = "arqueiro-do-patio"
+name = "Arqueiro do Pátio"
+cost = 2
+type = "creature"
+power = 1
+toughness = 2
+
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 2 }

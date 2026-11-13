@@ -299,21 +299,25 @@ pub fn validate(card: &Card) -> Vec<String> {
             if card.cost == 0 {
                 errors.push(at("criatura de custo 0".into()));
             }
-            for (campo, gatilho) in [("on_enter", card.on_enter), ("on_die", card.on_die)] {
+            // `on_enter` aceita efeito com alvo: o alvo é escolhido na própria
+            // conjuração. `on_die` não — e o motivo é o que a mensagem diz.
+            for (campo, gatilho, permite_alvo) in [
+                ("on_enter", card.on_enter, true),
+                ("on_die", card.on_die, false),
+            ] {
                 match gatilho {
                     None => {}
                     Some(Effect::None) => errors.push(at(format!(
                         "`{campo}` sem efeito: o campo só existe quando há efeito"
                     ))),
-                    // O corte da fatia, escrito onde alguém vai esbarrar nele:
-                    // escolher alvo no meio de um gatilho exige que o gatilho
-                    // use a pilha, e gatilho usar a pilha é a fatia seguinte.
-                    Some(effect) if effect.needs_target() => errors.push(at(format!(
-                        "`{campo}` com efeito que exige alvo (`{}`): sem alvo não há escolha, \
-                         e é isso que permite o gatilho resolver na hora. Gatilho com alvo é \
-                         fatia própria",
-                        effect.token()
-                    ))),
+                    Some(effect) if effect.needs_target() && !permite_alvo => {
+                        errors.push(at(format!(
+                            "`{campo}` com efeito que exige alvo (`{}`): a criatura morre por \
+                             ação de outra pessoa, e não existe ação do controlador para \
+                             carregar a escolha. Gatilho de morte resolve sem alvo",
+                            effect.token()
+                        )))
+                    }
                     Some(_) => {}
                 }
             }

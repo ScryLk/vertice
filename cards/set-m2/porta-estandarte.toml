@@ -1,0 +1,9 @@
+slug = "porta-estandarte"
+name = "Porta-Estandarte"
+cost = 3
+type = "creature"
+power = 1
+toughness = 3
+
+effect = { kind = "none" }
+on_enter = { kind = "pump", power = 3, toughness = 3 }
