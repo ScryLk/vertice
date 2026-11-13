@@ -1,0 +1,9 @@
+slug = "lamina-do-patio"
+name = "Lâmina do Pátio"
+cost = 3
+type = "creature"
+power = 2
+toughness = 1
+keywords = ["deathtouch"]
+effect = { kind = "none" }
+on_die = { kind = "lose_life", amount = 2 }

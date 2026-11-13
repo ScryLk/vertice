@@ -194,22 +194,144 @@ fn vida_ganha_como_magica_passa_pela_pilha() {
 }
 
 #[test]
+fn criatura_com_gatilho_de_morte_compra_ao_morrer() {
+    let land = id("Várzea de Cruzilha");
+    let sinaleiro = id("Sinaleiro do Arquivo"); // 2/2, "ao morrer, compre 1"
+    let faisca = id("Faísca"); // 2 de dano a qualquer alvo
+
+    // Quatro terrenos para ter 4 de mana no sétimo turno: 3 pela criatura,
+    // 1 pela mágica que a mata.
+    let mut ctx = Ctx::new(
+        vec![land, land, land, land, sinaleiro, faisca],
+        vec![land],
+        14,
+    );
+
+    // Mana vem dos terrenos que já estão no campo quando o turno abre, então
+    // o quarto terreno só vira mana no turno seguinte: quatro terrenos ao fim
+    // do T7 dão 4 de mana no T9.
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    assert_eq!(ctx.state.player(0).mana, 4);
+
+    let s_oid = hand_object(&ctx.state, 0, sinaleiro);
+    ctx.act(Action::Cast {
+        object: s_oid,
+        target: None,
+    });
+    assert!(on_battlefield(&ctx.state, 0, sinaleiro));
+
+    let biblioteca_antes = ctx.state.player(0).zones.library.len();
+    let f_oid = hand_object(&ctx.state, 0, faisca);
+    ctx.act(Action::Cast {
+        object: f_oid,
+        target: Some(Target::Object(s_oid)),
+    });
+    ctx.act(Action::Pass); // jogador 1 passa: a Faísca resolve
+
+    assert!(
+        ctx.state.player(0).zones.graveyard.contains(&s_oid),
+        "a criatura tinha que ter morrido com 2 de dano"
+    );
+    assert_eq!(
+        ctx.state.player(0).zones.library.len(),
+        biblioteca_antes - 1,
+        "o gatilho de morte tinha que ter comprado uma carta"
+    );
+    assert_eq!(
+        ctx.state.player(0).life, STARTING_LIFE,
+        "este gatilho compra, não mexe em vida"
+    );
+}
+
+#[test]
+fn gatilho_de_morte_nao_dispara_so_por_entrar() {
+    let land = id("Várzea de Cruzilha");
+    let sinaleiro = id("Sinaleiro do Arquivo");
+
+    let mut ctx = Ctx::new(vec![land, land, land, sinaleiro], vec![land, land], 15);
+
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    assert_eq!(ctx.state.player(0).mana, 3);
+
+    let oid = hand_object(&ctx.state, 0, sinaleiro);
+    let biblioteca_antes = ctx.state.player(0).zones.library.len();
+    ctx.act(Action::Cast {
+        object: oid,
+        target: None,
+    });
+
+    // Entrar não é morrer. Sem esta checagem, um `fire_on_die` no lugar
+    // errado passaria despercebido, porque a criatura viva também mudaria
+    // alguma coisa em algum teste.
+    assert_eq!(
+        ctx.state.player(0).zones.library.len(),
+        biblioteca_antes,
+        "o gatilho de morte não pode disparar na entrada"
+    );
+}
+
+#[test]
+fn oponente_perde_vida_como_magica() {
+    let land = id("Várzea de Cruzilha");
+    let cobranca = id("Cobrança de Baluarte"); // custo 1, oponente perde 2
+
+    let mut ctx = Ctx::new(vec![land, cobranca], vec![land, land], 16);
+
+    ctx.play_land(0);
+    ctx.end_turn();
+    ctx.end_turn();
+    assert_eq!(ctx.state.player(0).mana, 1);
+
+    let oid = hand_object(&ctx.state, 0, cobranca);
+    ctx.act(Action::Cast {
+        object: oid,
+        target: None,
+    });
+
+    // Sem alvo, mas continua sendo mágica: ocupa a pilha.
+    assert_eq!(ctx.state.stack.len(), 1);
+    assert_eq!(ctx.state.player(1).life, STARTING_LIFE);
+
+    ctx.act(Action::Pass);
+    assert_eq!(ctx.state.player(1).life, STARTING_LIFE - 2);
+    assert_eq!(
+        ctx.state.player(0).life, STARTING_LIFE,
+        "quem perde vida é o oponente, não o controlador"
+    );
+}
+
+#[test]
 fn catalogo_so_marca_gatilho_sem_alvo() {
     // O validador é o portão, mas ele roda em outra crate. Aqui é a garantia
     // que o motor precisa: todo gatilho publicado é resolvível sem escolha.
     for def in CATALOG {
-        if let Some(trigger) = def.on_enter {
+        for (campo, gatilho) in [("on_enter", def.on_enter), ("on_die", def.on_die)] {
+            let Some(effect) = gatilho else { continue };
             assert!(
-                !trigger.needs_target(),
-                "`{}` tem gatilho com alvo, que o motor não sabe resolver",
+                !effect.needs_target(),
+                "`{}` tem `{campo}` com alvo, que o motor não sabe resolver",
                 def.name
             );
-            assert_ne!(
-                trigger,
-                Effect::None,
-                "`{}` tem gatilho vazio",
-                def.name
-            );
+            assert_ne!(effect, Effect::None, "`{}` tem `{campo}` vazio", def.name);
         }
     }
 }

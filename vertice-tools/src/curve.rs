@@ -70,7 +70,8 @@ pub fn reference(card: &Card) -> Option<i32> {
             // sairia pelo preço de criatura sem, e o validador estaria
             // certificando uma carta barata demais — o pior tipo de erro, o
             // que passa no portão.
-            let gatilho = card.on_enter.and_then(effect_cost).unwrap_or(0);
+            let gatilho = card.on_enter.and_then(effect_cost).unwrap_or(0)
+                + card.on_die.and_then(effect_cost).unwrap_or(0);
             Some(corpo + palavras + gatilho)
         }
         Kind::Spell => effect_cost(card.effect),
@@ -96,6 +97,8 @@ fn effect_cost(effect: Effect) -> Option<i32> {
         // tem menos cartas de vida pura para calibrar. Fica a régua do dano
         // até haver medida melhor — e é o primeiro número a revisar.
         Effect::GainLife(amount) => Some(ceil_half(i32::from(amount))),
+        // Perder vida espelha ganhar vida: mesma régua, sinal trocado.
+        Effect::LoseLife(amount) => Some(ceil_half(i32::from(amount))),
     }
 }
 

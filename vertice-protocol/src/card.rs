@@ -27,6 +27,7 @@ pub enum EffectDto {
     Draw { amount: u8 },
     Pump { power: i8, toughness: i8 },
     GainLife { amount: u8 },
+    LoseLife { amount: u8 },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -43,6 +44,8 @@ pub struct CardDefDto {
     /// tem, então o campo é sempre enviado para que o cliente não precise
     /// distinguir "ausente" de "não manda este campo".
     pub on_enter: Option<EffectDto>,
+    /// Gatilho de morte. `null` quando a carta não tem.
+    pub on_die: Option<EffectDto>,
 }
 
 impl From<&CardDef> for CardDefDto {
@@ -61,6 +64,7 @@ impl From<&CardDef> for CardDefDto {
             keywords: def.keywords.iter().copied().map(KeywordDto::from).collect(),
             effect: effect_dto(def.effect),
             on_enter: def.on_enter.map(effect_dto),
+            on_die: def.on_die.map(effect_dto),
         }
     }
 }
@@ -74,5 +78,6 @@ fn effect_dto(effect: Effect) -> EffectDto {
         Effect::Draw(amount) => EffectDto::Draw { amount },
         Effect::Pump(power, toughness) => EffectDto::Pump { power, toughness },
         Effect::GainLife(amount) => EffectDto::GainLife { amount },
+        Effect::LoseLife(amount) => EffectDto::LoseLife { amount },
     }
 }

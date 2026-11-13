@@ -24,6 +24,7 @@ function carta(over: Partial<CardDefDto> = {}): CardDefDto {
     keywords: [],
     effect: { kind: 'none' },
     on_enter: null,
+    on_die: null,
     ...over,
   };
 }
@@ -121,6 +122,43 @@ describe('Ficha', () => {
     expect(glifo({})).not.toBe(glifo({ on_enter: { kind: 'draw', amount: 1 } }));
     expect(glifo({ on_enter: { kind: 'draw', amount: 1 } })).not.toBe(
       glifo({ on_enter: { kind: 'gain_life', amount: 1 } }),
+    );
+  });
+
+  it('o gatilho de morte vira texto', () => {
+    const { container } = render(
+      <Ficha carta={carta({ on_die: { kind: 'lose_life', amount: 2 } })} />,
+    );
+    expect(container.querySelector('.ficha-gatilho-morte')?.textContent).toBe(
+      'Ao morrer, o oponente perde 2 de vida.',
+    );
+  });
+
+  it('o sigilo distingue entrar de morrer de não ter gatilho', () => {
+    // Mesma lição de sempre, agora com dois eixos no mesmo lugar: se entrar e
+    // morrer desenhassem a mesma marca, "ao entrar, compre 1" e "ao morrer,
+    // compre 1" seriam a mesma ficha.
+    const glifo = (over: Partial<CardDefDto>) => {
+      const { container } = render(<Ficha carta={carta(over)} />);
+      const svg = container.querySelector('.sigilo')?.innerHTML;
+      cleanup();
+      return svg;
+    };
+    const gatilho = { kind: 'draw' as const, amount: 1 };
+
+    expect(glifo({ on_enter: gatilho })).not.toBe(glifo({ on_die: gatilho }));
+    expect(glifo({})).not.toBe(glifo({ on_die: gatilho }));
+    expect(glifo({ on_enter: gatilho })).not.toBe(
+      glifo({ on_enter: gatilho, on_die: gatilho }),
+    );
+  });
+
+  it('perder vida vira texto', () => {
+    const { container } = render(
+      <Ficha carta={carta({ kind: 'spell', effect: { kind: 'lose_life', amount: 4 } })} />,
+    );
+    expect(container.querySelector('.ficha-efeito')?.textContent).toBe(
+      'O oponente perde 4 de vida.',
     );
   });
 

@@ -1,0 +1,8 @@
+slug = "herdeiro-do-acervo"
+name = "Herdeiro do Acervo"
+cost = 3
+type = "creature"
+power = 1
+toughness = 2
+effect = { kind = "none" }
+on_die = { kind = "draw", amount = 2 }

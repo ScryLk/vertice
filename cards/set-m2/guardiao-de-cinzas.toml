@@ -1,0 +1,8 @@
+slug = "guardiao-de-cinzas"
+name = "Guardião de Cinzas"
+cost = 4
+type = "creature"
+power = 3
+toughness = 3
+effect = { kind = "none" }
+on_die = { kind = "gain_life", amount = 4 }

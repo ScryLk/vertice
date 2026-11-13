@@ -36,6 +36,8 @@ function textoDoEfeito(effect: EffectDto): string | null {
       return `Compre ${effect.amount} ${effect.amount === 1 ? 'carta' : 'cartas'}.`;
     case 'gain_life':
       return `Ganha ${effect.amount} de vida.`;
+    case 'lose_life':
+      return `O oponente perde ${effect.amount} de vida.`;
     case 'pump':
       return `${effect.power >= 0 ? '+' : ''}${effect.power}/${effect.toughness >= 0 ? '+' : ''}${effect.toughness}.`;
   }
@@ -49,12 +51,14 @@ function textoDoEfeito(effect: EffectDto): string | null {
  * produziria "Ao entrar, Compre 1 carta". Duas funções pequenas e certas valem
  * mais que uma genérica e torta.
  */
-function textoDoGatilho(effect: EffectDto): string | null {
+function textoDoGatilho(effect: EffectDto, quando: 'Ao entrar' | 'Ao morrer'): string | null {
   switch (effect.kind) {
     case 'draw':
-      return `Ao entrar, compre ${effect.amount} ${effect.amount === 1 ? 'carta' : 'cartas'}.`;
+      return `${quando}, compre ${effect.amount} ${effect.amount === 1 ? 'carta' : 'cartas'}.`;
     case 'gain_life':
-      return `Ao entrar, ganhe ${effect.amount} de vida.`;
+      return `${quando}, ganhe ${effect.amount} de vida.`;
+    case 'lose_life':
+      return `${quando}, o oponente perde ${effect.amount} de vida.`;
     default:
       // O validador só deixa passar gatilho sem alvo. Se um dia chegar outro
       // aqui, a ficha cala em vez de mentir.
@@ -79,7 +83,9 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
   // mesmo corpo e gatilhos diferentes sairiam com o mesmo glifo, que é
   // exatamente o defeito que já apareceu com −1/−1 e −3/−3.
   const marca: EffectDto =
-    carta.effect.kind !== 'none' ? carta.effect : (carta.on_enter ?? carta.effect);
+    carta.effect.kind !== 'none'
+      ? carta.effect
+      : (carta.on_enter ?? carta.on_die ?? carta.effect);
   const magnitude = marca.kind === 'pump' ? Math.abs(marca.power) : 0;
   const forcaDoPump = Math.min(26, 8 + magnitude * 5);
   const moldura =
@@ -153,11 +159,18 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
         />
       )}
 
+      {/*
+        Gatilhos: meio anel em cima para quando entra, meio anel embaixo para
+        quando morre. A leitura é a do próprio campo de batalha — em cima é
+        onde a criatura fica, embaixo é para onde ela vai. Uma carta com os
+        dois gatilhos desenha o anel inteiro, e a metade que falta diz qual
+        dos dois ela tem. Sólido porque tracejado já significa palavra-chave.
+      */}
       {carta.on_enter && (
-        // Gatilho de entrada: anel contínuo por fora de tudo. Contínuo porque
-        // o tracejado já significa palavra-chave — a diferença de estilo é o
-        // que distingue os dois anéis sem cor.
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2" />
+        <path d="M2 50 A48 48 0 0 1 98 50" fill="none" stroke="currentColor" strokeWidth="2" />
+      )}
+      {carta.on_die && (
+        <path d="M98 50 A48 48 0 0 1 2 50" fill="none" stroke="currentColor" strokeWidth="2" />
       )}
 
       {carta.keywords.map((palavra, indice) => (
@@ -182,7 +195,8 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
 
 export function Ficha({ carta, escala = 1 }: { carta: CardDefDto; escala?: number }) {
   const efeito = textoDoEfeito(carta.effect);
-  const gatilho = carta.on_enter ? textoDoGatilho(carta.on_enter) : null;
+  const aoEntrar = carta.on_enter ? textoDoGatilho(carta.on_enter, 'Ao entrar') : null;
+  const aoMorrer = carta.on_die ? textoDoGatilho(carta.on_die, 'Ao morrer') : null;
   const palavras = carta.keywords.map((palavra) => NOME_DA_PALAVRA[palavra]);
   const ehCriatura = carta.kind === 'creature';
 
@@ -208,7 +222,8 @@ export function Ficha({ carta, escala = 1 }: { carta: CardDefDto; escala?: numbe
       </p>
 
       {efeito && <p className="ficha-efeito">{efeito}</p>}
-      {gatilho && <p className="ficha-efeito ficha-gatilho">{gatilho}</p>}
+      {aoEntrar && <p className="ficha-efeito ficha-gatilho ficha-gatilho-entrada">{aoEntrar}</p>}
+      {aoMorrer && <p className="ficha-efeito ficha-gatilho ficha-gatilho-morte">{aoMorrer}</p>}
 
       <footer className="ficha-rodape">
         <span className="selo" aria-hidden="true">

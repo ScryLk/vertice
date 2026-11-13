@@ -353,6 +353,19 @@ alavanca mais fraca que existe.**
 A curva de custo também foi recalibrada: a base da criatura virou
 `⌈(P+T)/2⌉` e o `+1` fixo por palavra-chave virou peso por palavra (`arquitetura.md` §6).
 
+**M2.2 — gatilho de morte, e o pool em 80.** `CardDef.on_die` e o efeito
+`lose_life`. 14 cartas novas, ids 66..79, `next_id = 80`,
+`CARD_SET_VERSION = "m2.3"`, `ENGINE_VERSION = "0.4.0"`. Mesmo modelo do M2.1 e
+mesmo corte — sem alvo, resolve na hora —, agora dentro do `cleanup` e na ordem
+do campo. **É o que dá sentido a trocar criatura**: sem gatilho de morte, atacar
+em troca é sempre perder, e o duelo vira corrida de dano.
+
+`on_die` vai **rotulado** no `content_hash` e `on_enter` não, e a assimetria é
+dívida herdada de propósito: o slot de `on_enter` está no formato desde a
+publicação e não pode ganhar rótulo sem reescrever o lock das cartas que já o
+usam. Sem o rótulo em `on_die`, "ao entrar, compre 1" e "ao morrer, compre 1"
+produziriam a mesma string canônica — há teste e mutação provando.
+
 Falta do M2: **chibi e a transição a partir do overworld** — as duas dependem
 de arte que não é procedural, e a segunda depende de uma cena que só existe no
 M4. Ilustração de comandante e transição de cena continuam sendo o orçamento

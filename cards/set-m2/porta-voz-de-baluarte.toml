@@ -1,0 +1,9 @@
+slug = "porta-voz-de-baluarte"
+name = "Porta-Voz de Baluarte"
+cost = 3
+type = "creature"
+power = 2
+toughness = 2
+keywords = ["vigilance"]
+effect = { kind = "none" }
+on_die = { kind = "lose_life", amount = 2 }

@@ -370,6 +370,55 @@ fn acrescentar_gatilho_a_carta_publicada_e_recusado() {
 }
 
 #[test]
+fn gatilho_de_morte_com_efeito_de_alvo_e_recusado() {
+    let com_alvo = r#"
+slug = "carrasco"
+name = "Carrasco"
+cost = 4
+type = "creature"
+power = 3
+toughness = 3
+effect = { kind = "none" }
+on_die = { kind = "pump", power = 2, toughness = 2 }
+"#;
+    let erros = errors(&registry(1, &[("carrasco", 0)]), "", &[com_alvo]);
+    assert!(contains(&erros, "exige alvo"), "veio: {erros:#?}");
+}
+
+#[test]
+fn trocar_gatilho_de_entrada_por_gatilho_de_morte_e_recusado() {
+    // O caso que obrigou `on_die` a ir **rotulado** no hash. Sem o rótulo, uma
+    // carta com "ao entrar, compre 1" e uma com "ao morrer, compre 1"
+    // produziriam a mesma string canônica: publicar a primeira e trocar pela
+    // segunda passaria batido, e a carta mudaria de comportamento sem que
+    // ninguém soubesse.
+    let com_morte = COM_GATILHO.replace("on_enter =", "on_die =");
+    let erros = errors(
+        &registry(1, &[("vigia", 0)]),
+        &lock_for(&[(0, COM_GATILHO)]),
+        &[&com_morte],
+    );
+    assert!(
+        contains(&erros, "carta publicada alterada"),
+        "veio: {erros:#?}"
+    );
+}
+
+#[test]
+fn gatilho_de_morte_em_magica_e_recusado() {
+    let magica = r#"
+slug = "eco-morte"
+name = "Eco de Morte"
+cost = 2
+type = "spell"
+effect = { kind = "draw", amount = 2 }
+on_die = { kind = "draw", amount = 1 }
+"#;
+    let erros = errors(&registry(1, &[("eco-morte", 0)]), "", &[magica]);
+    assert!(contains(&erros, "mágica com gatilho"), "veio: {erros:#?}");
+}
+
+#[test]
 fn carta_sem_gatilho_publica_normalmente() {
     // A contraprova: o hash condicional não pode ter quebrado o caminho comum.
     let erros = errors(

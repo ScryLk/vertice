@@ -1,0 +1,8 @@
+slug = "portador-do-selo"
+name = "Portador do Selo"
+cost = 3
+type = "creature"
+power = 1
+toughness = 3
+effect = { kind = "none" }
+on_die = { kind = "draw", amount = 1 }

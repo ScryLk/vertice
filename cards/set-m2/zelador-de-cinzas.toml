@@ -1,0 +1,8 @@
+slug = "zelador-de-cinzas"
+name = "Zelador de Cinzas"
+cost = 2
+type = "creature"
+power = 1
+toughness = 1
+effect = { kind = "none" }
+on_die = { kind = "gain_life", amount = 3 }

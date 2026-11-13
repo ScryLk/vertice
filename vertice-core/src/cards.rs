@@ -39,6 +39,13 @@ pub enum Effect {
     Draw(u8),
     Pump(i8, i8),
     GainLife(u8),
+    /// O oponente do controlador perde N de vida.
+    ///
+    /// Sem alvo, e é por isso que existe: "cada oponente perde 2" não é o
+    /// mesmo que "causa 2 de dano a qualquer alvo", porque o segundo obriga a
+    /// escolher. Num gatilho, que não abre janela de resposta, a diferença é a
+    /// carta existir ou não.
+    LoseLife(u8),
 }
 
 impl Effect {
@@ -71,6 +78,14 @@ pub struct CardDef {
     /// escolha não há o que a janela de resposta proteger. Gatilho com alvo é
     /// fatia própria, e depende de gatilho usar a pilha.
     pub on_enter: Option<Effect>,
+    /// Efeito que dispara quando a criatura **morre** — isto é, quando
+    /// `cleanup` a move do campo para o cemitério. Sair do campo por outro
+    /// caminho não é morrer.
+    ///
+    /// Mesmo corte do `on_enter`: só efeito sem alvo. A diferença é o momento,
+    /// e é ela que dá sentido a trocar criatura — sem gatilho de morte,
+    /// atacar em troca é sempre perder.
+    pub on_die: Option<Effect>,
 }
 
 pub const CATALOG_LEN: usize = CATALOG.len();

@@ -73,10 +73,13 @@ Gerado do dado, determinístico, sem desenho por carta:
 | traços radiais | custo, um por mana |
 | marca central | efeito — ponto (nenhum), barras (dano), círculos (compra), traço (pump), losango (vida) |
 | anel pontilhado | palavra-chave, um anel por palavra |
-| anel sólido por fora | gatilho de entrada |
+| meio anel em cima | gatilho de entrada |
+| meio anel embaixo | gatilho de morte |
 
 Quando a carta é criatura com gatilho, a **marca central desenha o efeito do
-gatilho**, porque é isso que a carta faz: criatura não tem efeito próprio.
+gatilho**, porque é isso que a carta faz: criatura não tem efeito próprio. Carta
+com os dois gatilhos desenha o anel inteiro — e a metade que falta diz qual dos
+dois ela tem. Em cima é onde a criatura fica; embaixo é para onde ela vai.
 
 Carta nova ganha sigilo sozinha. O custo marginal de uma carta é **zero**.
 
@@ -152,7 +155,14 @@ a marca de vida virou **losango** em vez de anel, para não disputar a mesma
 forma com ele. Com teste cobrindo que criaturas de mesmo corpo e gatilhos
 diferentes não saem iguais.
 
-**Revisar de novo quando o pool passar de ~80**, ou quando a DSL ganhar
-primitivas novas — nesse momento entram tipos de efeito que o sigilo ainda não
-sabe desenhar. Gatilho com alvo e gatilho de morte são os próximos candidatos,
-e o segundo vai precisar de um anel que diga *quando*, não só *se*.
+**Revisado com 80 cartas, ao ganhar o gatilho de morte.** O anel inteiro virou
+duas metades: em cima o que acontece quando a criatura entra, embaixo o que
+acontece quando ela morre — em cima é onde ela fica, embaixo é para onde ela
+vai. Carta com os dois desenha o anel completo, e a metade que falta diz qual
+dos dois ela tem. Nenhuma colisão nova, porque metade se lê pela **posição**, e
+posição não disputa raio com nada.
+
+**Revisar de novo quando a DSL ganhar gatilho com alvo** — aí o sigilo precisa
+dizer que o efeito pede escolha, e isso é um eixo novo, não uma metade. Os
+outros candidatos (destruir, criar ficha, contador) trazem tipos de efeito que
+o sigilo ainda não sabe desenhar.

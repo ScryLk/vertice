@@ -41,8 +41,11 @@ pub use view::{view, PlayerView};
 /// **nenhum** campo novo — o gatilho é dado da carta e resolve dentro da
 /// conjuração —, mas a mesma sequência de ações deixa de levar ao mesmo
 /// estado, que é precisamente o que a versão precisa dizer.
-pub const ENGINE_VERSION: &str = "0.3.0";
-pub const CARD_SET_VERSION: &str = "m2.2";
+///
+/// 0.4.0 acrescentou gatilho de morte (`CardDef.on_die`) e o efeito `lose_life`.
+/// Mesmo raciocínio: nenhum campo novo no estado, comportamento novo.
+pub const ENGINE_VERSION: &str = "0.4.0";
+pub const CARD_SET_VERSION: &str = "m2.3";
 
 /// Vida inicial. Comandante usa 40.
 pub const STARTING_LIFE: i32 = 40;

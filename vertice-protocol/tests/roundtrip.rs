@@ -183,10 +183,35 @@ fn carta_atravessa_o_json_com_o_gatilho() {
 }
 
 #[test]
+fn gatilho_de_morte_atravessa_o_json() {
+    let com = CATALOG
+        .iter()
+        .find(|def| def.on_die.is_some())
+        .expect("o conjunto precisa de ao menos uma carta com gatilho de morte");
+    let json = serde_json::to_string(&CardDefDto::from(com)).unwrap();
+    assert!(
+        json.contains(r#""on_die":{"#),
+        "carta com gatilho de morte tem que mandar o gatilho: {json}"
+    );
+
+    let sem = CATALOG
+        .iter()
+        .find(|def| def.on_enter.is_none() && def.on_die.is_none())
+        .expect("e de pelo menos uma sem gatilho nenhum");
+    let sem_json = serde_json::to_string(&CardDefDto::from(sem)).unwrap();
+    assert!(sem_json.contains(r#""on_enter":null"#), "{sem_json}");
+    assert!(sem_json.contains(r#""on_die":null"#), "{sem_json}");
+}
+
+#[test]
 fn forma_do_efeito_de_vida_e_estavel() {
     assert_eq!(
         serde_json::to_string(&EffectDto::GainLife { amount: 3 }).unwrap(),
         r#"{"kind":"gain_life","amount":3}"#
+    );
+    assert_eq!(
+        serde_json::to_string(&EffectDto::LoseLife { amount: 2 }).unwrap(),
+        r#"{"kind":"lose_life","amount":2}"#
     );
 }
 

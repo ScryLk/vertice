@@ -26,6 +26,7 @@ fn criatura(power: i8, toughness: i8, keywords: &[Keyword]) -> Card {
         keywords: keywords.to_vec(),
         effect: Effect::None,
         on_enter: None,
+        on_die: None,
         justificativa: None,
     }
 }
@@ -41,6 +42,7 @@ fn magica(effect: Effect) -> Card {
         keywords: Vec::new(),
         effect,
         on_enter: None,
+        on_die: None,
         justificativa: None,
     }
 }
@@ -116,6 +118,14 @@ fn gatilho_de_entrada_entra_no_custo() {
     assert_eq!(curve::reference(&carta), Some(3));
 
     carta.on_enter = Some(Effect::GainLife(4));
+    assert_eq!(curve::reference(&carta), Some(4));
+
+    carta.on_enter = None;
+    carta.on_die = Some(Effect::LoseLife(2));
+    assert_eq!(curve::reference(&carta), Some(3));
+
+    // Os dois gatilhos somam: a carta carrega dois efeitos, e cada um cobra.
+    carta.on_enter = Some(Effect::Draw(1));
     assert_eq!(curve::reference(&carta), Some(4));
 }
 

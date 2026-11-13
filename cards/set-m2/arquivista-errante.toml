@@ -1,0 +1,9 @@
+slug = "arquivista-errante"
+name = "Arquivista Errante"
+cost = 5
+type = "creature"
+power = 2
+toughness = 2
+effect = { kind = "none" }
+on_enter = { kind = "draw", amount = 1 }
+on_die = { kind = "draw", amount = 1 }

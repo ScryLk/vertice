@@ -1,0 +1,8 @@
+slug = "negociante-de-dividas"
+name = "Negociante de Dívidas"
+cost = 4
+type = "creature"
+power = 3
+toughness = 1
+effect = { kind = "none" }
+on_die = { kind = "lose_life", amount = 3 }

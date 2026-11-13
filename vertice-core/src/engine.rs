@@ -20,6 +20,11 @@
 //!   sem alvo — sem alvo não há escolha, e sem escolha não há o que a janela
 //!   protegeria. No motor real o gatilho iria para a pilha como qualquer
 //!   outra coisa.
+//! - **Gatilho de morte dispara dentro do `cleanup` (M2.2).** A criatura vai
+//!   ao cemitério e o efeito é aplicado na hora, na ordem determinística em
+//!   que `cleanup` encontra os mortos — que é a ordem do campo, nunca a de
+//!   uma tabela de hash. Uma troca de dano em que as duas morrem dispara os
+//!   dois gatilhos, e a ordem entre eles é fixa.
 //!
 //! Nenhuma dessas simplificações pode violar as invariantes do crate:
 //! determinismo, redação e autoridade.
@@ -337,6 +342,10 @@ fn resolve(state: &mut GameState, pending: PendingSpell) {
         Effect::Draw(n) => draw(state, pending.controller, n as usize),
         // Vida não tem alvo: quem ganha é sempre quem controla o efeito.
         Effect::GainLife(n) => state.player_mut(pending.controller).life += i32::from(n),
+        Effect::LoseLife(n) => {
+            let opponent = state.opponent_of(pending.controller);
+            state.player_mut(opponent).life -= i32::from(n);
+        }
         Effect::DealDamage(n) => match pending.target {
             Some(Target::Player(tp)) => {
                 state.player_mut(tp).life -= n as i32;
@@ -377,10 +386,37 @@ fn fire_on_enter(state: &mut GameState, object: ObjectId) {
         return;
     };
     let controller = state.object(object).controller;
+    apply_untargeted(state, controller, effect);
+}
 
+/// Gatilho de morte. Chamado por `cleanup` **depois** de a criatura sair do
+/// campo: ela já não está lá quando o efeito acontece, que é o que "morreu"
+/// significa.
+///
+/// O controlador vem por parâmetro porque o objeto já está no cemitério e a
+/// leitura de `controller` continua válida — mas passar explícito deixa claro
+/// que o disparo acontece *depois* da mudança de zona, e não antes.
+fn fire_on_die(state: &mut GameState, object: ObjectId, controller: PlayerId) {
+    let def = card(state.object(object).card);
+    let Some(effect) = def.on_die else {
+        return;
+    };
+    apply_untargeted(state, controller, effect);
+}
+
+/// Efeitos que gatilho sabe aplicar: os que não pedem escolha.
+///
+/// O braço `_` não é preguiça — é o que permite a DSL ganhar um efeito com
+/// alvo sem que este `match` minta. O validador recusa esses no gatilho, mas
+/// ele roda em outra crate, e o motor não deve depender disso para estar certo.
+fn apply_untargeted(state: &mut GameState, controller: PlayerId, effect: Effect) {
     match effect {
         Effect::Draw(n) => draw(state, controller, n as usize),
         Effect::GainLife(n) => state.player_mut(controller).life += i32::from(n),
+        Effect::LoseLife(n) => {
+            let opponent = state.opponent_of(controller);
+            state.player_mut(opponent).life -= i32::from(n);
+        }
         _ => {}
     }
 }
@@ -503,6 +539,11 @@ fn cleanup(state: &mut GameState) {
         state.object_mut(id).damage = 0;
         state.object_mut(id).deathtouch_damage = false;
         state.object_mut(id).tapped = false;
+
+        // A criatura já saiu do campo. Só agora "morreu" é verdade, e é agora
+        // que o gatilho de morte pode olhar o estado e ver o cemitério com
+        // ela dentro. A ordem é a de `dead`, que é a ordem do campo.
+        fire_on_die(state, id, controller);
     }
 }
 

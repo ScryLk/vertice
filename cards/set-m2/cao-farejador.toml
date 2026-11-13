@@ -1,0 +1,9 @@
+slug = "cao-farejador"
+name = "Cão Farejador"
+cost = 4
+type = "creature"
+power = 2
+toughness = 2
+keywords = ["flying"]
+effect = { kind = "none" }
+on_die = { kind = "draw", amount = 1 }

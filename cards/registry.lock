@@ -332,3 +332,73 @@ sha256 = "02b3f348bdbca2affc4c7c937808d3b29ca1bcfec9b959905b3c111fec08a004"
 slug = "cao-de-guarda-do-arquivo"
 id = 65
 sha256 = "92e82dafb647162067ddbcadc738effb63dd16fd346b6c22460500fb90c55e81"
+
+[[card]]
+slug = "sinaleiro-do-arquivo"
+id = 66
+sha256 = "9034b892cf9b498b1694b7d3fa0c3ae268614a7a814d27d3284e98c9e770537c"
+
+[[card]]
+slug = "cao-de-presa"
+id = 67
+sha256 = "1c156cccec058b61e33c88bce75752eb233ae816cfd9773d9427ec4236979162"
+
+[[card]]
+slug = "zelador-de-cinzas"
+id = 68
+sha256 = "f371be17da3d1ca7945208ea4acb1d170a2ae6ffe680647fa4a23731c59c54ed"
+
+[[card]]
+slug = "negociante-de-dividas"
+id = 69
+sha256 = "7304da2b0ca1bd07839cabaad2dd7363f0a5c72c9482cdd6f0ee69b1af27c199"
+
+[[card]]
+slug = "portador-do-selo"
+id = 70
+sha256 = "683b02c41f0c011c1932a4453e801fbb9ecf929dc3fdfd7cea406b872eeea449"
+
+[[card]]
+slug = "cao-farejador"
+id = 71
+sha256 = "635fc16641c35961b36b817e2daaf73c435563f9957e8c728564db80f95b3a97"
+
+[[card]]
+slug = "guardiao-de-cinzas"
+id = 72
+sha256 = "e1ab58354938f7adbfcc6135786165c304bb75d53d35b1b2c3d216a9f9501c06"
+
+[[card]]
+slug = "lamina-do-patio"
+id = 73
+sha256 = "8756e3dff16d54ab6c1dd42879f202f71cea8863e855900dc670a2e8842028f6"
+
+[[card]]
+slug = "arquivista-errante"
+id = 74
+sha256 = "83be01df4583da03b00c8885dfdc2942de5bc6f6636e730a478a14494a0fa3f4"
+
+[[card]]
+slug = "conta-do-arquivo"
+id = 75
+sha256 = "ff100d205ecdd3ce62d3d3f895da3fdb6bb65ce4802a3ae5a5da0a3441c235b2"
+
+[[card]]
+slug = "cobranca-de-baluarte"
+id = 76
+sha256 = "d2c282c969c84d04e6e8832423041d11dec5ce5fbc6ea38c96c38272cf3aaa6b"
+
+[[card]]
+slug = "execucao-de-protocolo"
+id = 77
+sha256 = "d9a9e2046f3219ffd19277226237361927a817926a73bf44337012c9cc474ddd"
+
+[[card]]
+slug = "porta-voz-de-baluarte"
+id = 78
+sha256 = "67d49aebedb4d3b7bd45e28a296552f3ee29c6f9c25d518668479a241a53d165"
+
+[[card]]
+slug = "herdeiro-do-acervo"
+id = 79
+sha256 = "20e409aa8030fee9479995d220ea0d3ad23f17fb3cab194d8d2f8d406e2f6d89"

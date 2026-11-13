@@ -1,0 +1,8 @@
+slug = "sinaleiro-do-arquivo"
+name = "Sinaleiro do Arquivo"
+cost = 3
+type = "creature"
+power = 2
+toughness = 2
+effect = { kind = "none" }
+on_die = { kind = "draw", amount = 1 }

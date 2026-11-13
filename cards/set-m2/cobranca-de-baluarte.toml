@@ -1,0 +1,5 @@
+slug = "cobranca-de-baluarte"
+name = "Cobrança de Baluarte"
+cost = 1
+type = "spell"
+effect = { kind = "lose_life", amount = 2 }

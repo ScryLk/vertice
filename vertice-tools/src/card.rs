@@ -78,6 +78,8 @@ pub enum Effect {
     Draw(u8),
     Pump(i8, i8),
     GainLife(u8),
+    /// O oponente do controlador perde N de vida. Sem alvo.
+    LoseLife(u8),
 }
 
 impl Effect {
@@ -89,6 +91,7 @@ impl Effect {
             Effect::Draw(n) => format!("draw:{n}"),
             Effect::Pump(p, t) => format!("pump:{p},{t}"),
             Effect::GainLife(n) => format!("gain_life:{n}"),
+            Effect::LoseLife(n) => format!("lose_life:{n}"),
         }
     }
 
@@ -112,6 +115,8 @@ pub struct Card {
     pub effect: Effect,
     /// Efeito que dispara quando a criatura entra no campo.
     pub on_enter: Option<Effect>,
+    /// Efeito que dispara quando a criatura morre.
+    pub on_die: Option<Effect>,
     /// Escape previsto pelo `card-content`: carta fora da curva só passa com
     /// uma linha dizendo por quê. Não entra no hash — é comentário humano.
     pub justificativa: Option<String>,
@@ -119,7 +124,7 @@ pub struct Card {
 
 /// Campos aceitos. Qualquer outro é erro: erro de digitação silencioso em
 /// dado de jogo é bug que aparece semanas depois.
-const ALLOWED: [&str; 10] = [
+const ALLOWED: [&str; 11] = [
     "slug",
     "name",
     "cost",
@@ -129,6 +134,7 @@ const ALLOWED: [&str; 10] = [
     "keywords",
     "effect",
     "on_enter",
+    "on_die",
     "justificativa",
 ];
 
@@ -150,6 +156,7 @@ pub fn parse(text: &str) -> Result<Card, String> {
     let keywords = take_keywords(&mut table)?;
     let effect = take_effect(&mut table)?;
     let on_enter = take_optional_effect(&mut table, "on_enter")?;
+    let on_die = take_optional_effect(&mut table, "on_die")?;
     let justificativa = take_optional_string(&mut table, "justificativa")?;
 
     if let Some(extra) = table.keys().next() {
@@ -169,6 +176,7 @@ pub fn parse(text: &str) -> Result<Card, String> {
         keywords,
         effect,
         on_enter,
+        on_die,
         justificativa,
     })
 }
@@ -199,12 +207,25 @@ pub fn content_hash(card: &Card) -> String {
     );
 
     // O gatilho entra **só quando existe**. Acrescentar um campo fixo mudaria
-    // o hash das 50 cartas já publicadas e o validador as acusaria de
+    // o hash de toda carta já publicada e o validador as acusaria de
     // alteradas — um commit de motor reescrevendo o lock inteiro. Ausência
     // continua distinguível de presença (uma não tem o separador), que é
     // tudo o que o lock precisa garantir.
     if let Some(trigger) = card.on_enter {
         canonical.push('\u{1f}');
+        canonical.push_str(&trigger.token());
+    }
+
+    // `on_die` vai **rotulado**, e a assimetria é dívida herdada de propósito.
+    // O slot de `on_enter` está no formato desde a publicação das primeiras
+    // cartas com gatilho e não pode ganhar rótulo sem reescrever o lock delas.
+    // `on_die` nasce agora, então nasce rotulado — sem isso, "tem gatilho de
+    // entrada de compra 1" e "tem gatilho de morte de compra 1" produziriam a
+    // mesma string canônica, e publicar um e depois trocar pelo outro passaria
+    // batido.
+    if let Some(trigger) = card.on_die {
+        canonical.push('\u{1f}');
+        canonical.push_str("on_die:");
         canonical.push_str(&trigger.token());
     }
 
@@ -254,10 +275,12 @@ pub fn validate(card: &Card) -> Vec<String> {
                 // ignora — a divergência que o `card-content` existe pra evitar.
                 errors.push(at("terreno com efeito: o motor não aplica".into()));
             }
-            if card.on_enter.is_some() {
-                errors.push(at(
-                    "terreno com gatilho de entrada: só criatura dispara no motor".into(),
-                ));
+            for (campo, gatilho) in [("on_enter", card.on_enter), ("on_die", card.on_die)] {
+                if gatilho.is_some() {
+                    errors.push(at(format!(
+                        "terreno com `{campo}`: só criatura dispara gatilho no motor"
+                    )));
+                }
             }
         }
         Kind::Creature => {
@@ -276,21 +299,23 @@ pub fn validate(card: &Card) -> Vec<String> {
             if card.cost == 0 {
                 errors.push(at("criatura de custo 0".into()));
             }
-            match card.on_enter {
-                None => {}
-                Some(Effect::None) => errors.push(at(
-                    "gatilho de entrada sem efeito: `on_enter` só existe quando há efeito".into(),
-                )),
-                // O corte da fatia, escrito onde alguém vai esbarrar nele:
-                // escolher alvo no meio de um gatilho exige que o gatilho use
-                // a pilha, e gatilho usar a pilha é a fatia seguinte.
-                Some(effect) if effect.needs_target() => errors.push(at(format!(
-                    "gatilho com efeito que exige alvo (`{}`): sem alvo não há escolha, e é \
-                     isso que permite o gatilho resolver na hora. Gatilho com alvo é fatia \
-                     própria",
-                    effect.token()
-                ))),
-                Some(_) => {}
+            for (campo, gatilho) in [("on_enter", card.on_enter), ("on_die", card.on_die)] {
+                match gatilho {
+                    None => {}
+                    Some(Effect::None) => errors.push(at(format!(
+                        "`{campo}` sem efeito: o campo só existe quando há efeito"
+                    ))),
+                    // O corte da fatia, escrito onde alguém vai esbarrar nele:
+                    // escolher alvo no meio de um gatilho exige que o gatilho
+                    // use a pilha, e gatilho usar a pilha é a fatia seguinte.
+                    Some(effect) if effect.needs_target() => errors.push(at(format!(
+                        "`{campo}` com efeito que exige alvo (`{}`): sem alvo não há escolha, \
+                         e é isso que permite o gatilho resolver na hora. Gatilho com alvo é \
+                         fatia própria",
+                        effect.token()
+                    ))),
+                    Some(_) => {}
+                }
             }
         }
         Kind::Spell => {
@@ -309,10 +334,12 @@ pub fn validate(card: &Card) -> Vec<String> {
             if card.cost == 0 {
                 errors.push(at("mágica de custo 0".into()));
             }
-            if card.on_enter.is_some() {
-                errors.push(at(
-                    "mágica com gatilho de entrada: mágica não entra no campo".into(),
-                ));
+            for (campo, gatilho) in [("on_enter", card.on_enter), ("on_die", card.on_die)] {
+                if gatilho.is_some() {
+                    errors.push(at(format!(
+                        "mágica com gatilho (`{campo}`): mágica nem entra no campo nem morre"
+                    )));
+                }
             }
         }
     }
@@ -452,6 +479,7 @@ fn parse_effect(key: &str, value: toml::Value) -> Result<Effect, String> {
         "deal_damage" => Effect::DealDamage(take_u8(&mut effect, "amount")?),
         "draw" => Effect::Draw(take_u8(&mut effect, "amount")?),
         "gain_life" => Effect::GainLife(take_u8(&mut effect, "amount")?),
+        "lose_life" => Effect::LoseLife(take_u8(&mut effect, "amount")?),
         "pump" => {
             let power = take_i8_or(&mut effect, "power", 0)?;
             let toughness = take_i8_or(&mut effect, "toughness", 0)?;
@@ -460,7 +488,7 @@ fn parse_effect(key: &str, value: toml::Value) -> Result<Effect, String> {
         other => {
             return Err(format!(
                 "`{key}.kind` desconhecido: `{other}` (esperado none, deal_damage, draw, \
-                 gain_life ou pump)"
+                 gain_life, lose_life ou pump)"
             ))
         }
     };

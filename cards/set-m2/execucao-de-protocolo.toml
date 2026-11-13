@@ -1,0 +1,5 @@
+slug = "execucao-de-protocolo"
+name = "Execução de Protocolo"
+cost = 4
+type = "spell"
+effect = { kind = "lose_life", amount = 8 }

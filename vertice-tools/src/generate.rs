@@ -54,6 +54,7 @@ pub fn emit(cards: &[(u16, &Card)]) -> String {
         out.push_str(&format!("        keywords: {},\n", keywords_expr(card)));
         out.push_str(&format!("        effect: {},\n", effect_expr(card.effect)));
         out.push_str(&format!("        on_enter: {},\n", on_enter_expr(card)));
+        out.push_str(&format!("        on_die: {},\n", on_die_expr(card)));
         out.push_str("    },\n");
     }
 
@@ -116,7 +117,15 @@ fn keywords_expr(card: &Card) -> String {
 }
 
 fn on_enter_expr(card: &Card) -> String {
-    match card.on_enter {
+    trigger_expr(card.on_enter)
+}
+
+fn on_die_expr(card: &Card) -> String {
+    trigger_expr(card.on_die)
+}
+
+fn trigger_expr(trigger: Option<Effect>) -> String {
+    match trigger {
         None => "None".to_string(),
         Some(effect) => format!("Some({})", effect_expr(effect)),
     }
@@ -129,6 +138,7 @@ fn effect_expr(effect: Effect) -> String {
         Effect::Draw(amount) => format!("Effect::Draw({amount})"),
         Effect::Pump(power, toughness) => format!("Effect::Pump({power}, {toughness})"),
         Effect::GainLife(amount) => format!("Effect::GainLife({amount})"),
+        Effect::LoseLife(amount) => format!("Effect::LoseLife({amount})"),
     }
 }
 

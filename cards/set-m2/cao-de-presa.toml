@@ -1,0 +1,8 @@
+slug = "cao-de-presa"
+name = "Cão de Presa"
+cost = 3
+type = "creature"
+power = 2
+toughness = 1
+effect = { kind = "none" }
+on_die = { kind = "lose_life", amount = 2 }

@@ -1,0 +1,5 @@
+slug = "conta-do-arquivo"
+name = "Conta do Arquivo"
+cost = 2
+type = "spell"
+effect = { kind = "lose_life", amount = 4 }
