@@ -30,6 +30,12 @@ O duelo offline roda o motor compilado para WebAssembly e **não precisa do
 servidor**. O `.wasm` é gerado, não commitado: `predev` e `prebuild` cuidam
 disso (`npm run build:wasm` na mão, se precisar).
 
+Pré-requisito, uma vez por máquina, senão o passo acima falha:
+
+```bash
+rustup target add wasm32-unknown-unknown
+```
+
 Testes: `npm --prefix vertice-client test` (Vitest + Testing Library, visões
 fixas, sem servidor).
 
