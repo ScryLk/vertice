@@ -79,6 +79,7 @@ semanas depois.
 | `vertice-server/src/{http,registry,store}.rs` | WebSocket, `POST /matches`, persistência | `server-authority` |
 | `vertice-client/src/Ficha.tsx` | a carta como verbete; o sigilo é gerado do dado | `client-overworld` |
 | `vertice-client/src/{App,Duel,Catalogo}.tsx` | lobby, mesa e acervo | `client-overworld` |
+| `vertice-client/src/cenario/` | Pixi: a mesa e as leylines, tudo procedural | `client-overworld` |
 | `vertice-bot/src/eval.rs` | pesos da avaliação de tabuleiro | `engine-rules` |
 | `vertice-bot/src/lib.rs` | `choose_action` e níveis de dificuldade | `engine-rules` |
 | `vertice-wasm/src/lib.rs` | duelo offline no navegador (`Duel` puro + binding) | `client-overworld` |
@@ -112,6 +113,7 @@ Agente novo, comece por esta tabela em vez de varrer o repositório.
 | criar partida contra o bot | `vertice-server/src/registry.rs::Registry::create_vs_bot` |
 | ajustar o que o bot valoriza | `vertice-bot/src/eval.rs` |
 | ver o acervo na linguagem visual | `?cartas` no cliente, ou `src/Ficha.tsx` |
+| mexer no cenário do duelo | `vertice-client/src/cenario/mesa.ts` |
 | mudar a direção visual | `docs/direcao-visual.md` antes de qualquer código |
 | jogar sem servidor, no navegador | `vertice-wasm/src/lib.rs::Duel` |
 
@@ -315,7 +317,19 @@ track de produção, custo marginal de carta nova igual a zero. Decisão, riscos
 e gatilho de revisão em `docs/direcao-visual.md`; o acervo inteiro é visível em
 `?cartas`.
 
-Falta do M2: Pixi e transição de cena — agora com a linguagem definida.
+**Pixi — feito, em camada separada.** O cenário do duelo é Pixi atrás do
+React: pedra escura e leylines convergindo, **tudo procedural, nenhum asset**.
+A divisão é a da `arquitetura.md` §1 — Pixi desenha o que não tem texto, React
+desenha o que tem — e por isso as fichas continuam no DOM, onde layout e
+tipografia já funcionam. Sem WebGL o cenário não aparece e a mesa segue
+jogável, porque nada nele carrega informação. A entrada do duelo (as leylines
+abrindo em ~1,1s) é o encaixe onde a transição do overworld vai plugar quando
+o overworld existir, no M4.
+
+Falta do M2: **chibi e a transição a partir do overworld** — as duas dependem
+de arte que não é procedural, e a segunda depende de uma cena que só existe no
+M4. Ilustração de comandante e transição de cena continuam sendo o orçamento
+de arte reservado (`arquitetura.md` §9).
 
 **Próximo:** o resto do M2. O roteiro está em `docs/roadmap.md`; siga por ele
 em vez de reabrir o plano.

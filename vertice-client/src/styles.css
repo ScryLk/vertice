@@ -22,7 +22,22 @@ body {
   font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+/* O cenário fica atrás de tudo e não recebe ponteiro: clicar na mesa não é
+   interagir com a mesa. */
+.cenario {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cenario canvas {
+  display: block;
+}
+
 .mesa {
+  position: relative;
+  z-index: 1;
   max-width: 900px;
   margin: 0 auto;
   padding: 16px;
@@ -75,11 +90,15 @@ body {
   padding: 10px;
 }
 
+/* Painel translúcido: a mesa tem que atravessar a interface. Caixa opaca
+   sobre cenário é a forma mais rápida de o cenário deixar de existir. */
 .oponente {
-  background: var(--dele);
+  background: rgba(42, 29, 32, 0.82);
+  backdrop-filter: blur(2px);
 }
 .voce {
-  background: var(--meu);
+  background: rgba(29, 42, 34, 0.82);
+  backdrop-filter: blur(2px);
 }
 
 .lado h2 {

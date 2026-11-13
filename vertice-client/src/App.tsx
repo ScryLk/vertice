@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Catalogo } from './Catalogo';
+import { Cenario } from './cenario/Cenario';
 import { Duel } from './Duel';
 import type { CreateMatchResponse } from './protocol';
 import { useMatch } from './useMatch';
@@ -45,7 +46,12 @@ function Mesa({ matchId, seat }: { matchId: string; seat: number }) {
     );
   }
 
-  return <Duel view={view} estado={estado} aviso={aviso} jogar={jogar} />;
+  return (
+    <>
+      <Cenario />
+      <Duel view={view} estado={estado} aviso={aviso} jogar={jogar} />
+    </>
+  );
 }
 
 function MesaOffline({ nivel }: { nivel: Nivel }) {
@@ -71,12 +77,15 @@ function MesaOffline({ nivel }: { nivel: Nivel }) {
   }
 
   return (
-    <Duel
-      view={view}
-      estado={view.winner !== null ? 'encerrado' : 'conectado'}
-      aviso={null}
-      jogar={jogar}
-    />
+    <>
+      <Cenario />
+      <Duel
+        view={view}
+        estado={view.winner !== null ? 'encerrado' : 'conectado'}
+        aviso={null}
+        jogar={jogar}
+      />
+    </>
   );
 }
 

@@ -93,6 +93,13 @@ onde leylines convergem, e é lá que entra movimento, luz e som. A ficha não
 precisa ser bonita — precisa ser **legível e confiável**, como um documento
 que o jogador já viu mil vezes.
 
+Isso está implementado em `vertice-client/src/cenario/`: as leylines abrem do
+fora para o centro em ~1,1s quando o duelo começa, e o núcleo pulsa depois.
+Tudo geometria gerada, com semente fixa — cena que muda a cada recarregamento
+parece defeito, não variedade. Os painéis da interface são translúcidos de
+propósito: caixa opaca sobre cenário é a forma mais rápida de o cenário
+deixar de existir.
+
 **"Sem cor, perde legibilidade."** Reconhecimento não pode depender de cor,
 então depende de forma: moldura do sigilo, número do custo em posição fixa,
 corpo no canto do rodapé, marca de catalogação. Isso foi verificado com o
