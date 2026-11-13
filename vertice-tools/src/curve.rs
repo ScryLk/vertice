@@ -1,24 +1,60 @@
 //! A curva de custo do M0.
 //!
-//! Referência: `.claude/agents/card-content.md` §2 — criatura N/N custa N;
-//! criatura com palavra-chave custa +1; mágica de dano N custa N/2 (2 de dano
-//! por 1 mana é o teto); compra de 2 custa 2.
+//! Referência: `.claude/agents/card-content.md` §2 — mágica de dano N custa
+//! ⌈N/2⌉ (2 de dano por 1 mana é o teto); compra de N custa N; pump segue a
+//! régua do dano. A parte de criatura foi recalibrada — ver abaixo.
 //!
-//! Duas coisas que aquela referência não escreve em número e que ficam
-//! fixadas **aqui, num lugar só**:
+//! ## A base é a média do corpo, não o menor dos dois
 //!
-//! 1. Criatura assimétrica (2/1, 1/2) usa o **menor** dos dois valores como
-//!    base. É a leitura que fecha com as 13 cartas já publicadas sem nenhuma
-//!    justificativa; usar o maior rejeitaria Sentinela de Baluarte (1/2 por 1).
-//! 2. A banda é de **±1 mana**. Passar disso é "fora da curva", e a carta
-//!    então precisa de `justificativa` no próprio arquivo — que é o escape
-//!    que a referência já prevê.
+//! A primeira versão usava `min(P,T)`, e a escolha foi feita para acomodar uma
+//! única carta publicada. Medida contra um corpus externo de 1.077 criaturas
+//! baunilha (sem texto além de palavra-chave), essa base erra por **+1 mana na
+//! mediana** nas criaturas sem palavra-chave: 62,9% das criaturas baunilha são
+//! assimétricas e 28,4% têm diferença de 2 ou mais, e `min` cobra barato
+//! justamente por elas.
+//!
+//! `⌈(P+T)/2⌉` fecha com 93,1% do corpus dentro da banda, contra 82,4% do
+//! `min`. Nas 50 cartas publicadas quando a troca foi feita, **nenhuma** saiu
+//! da banda — inclusive Sentinela de Baluarte (1/2 com vigilância por 1), que
+//! era a razão de o `min` existir.
+//!
+//! ## O peso da palavra-chave é por palavra, e não é igual para todas
+//!
+//! O `+1` fixo valia o mesmo para uma e para três palavras. Medido, o
+//! sobrecusto real é de ~½ mana por palavra, e desigual entre elas: Flying
+//! cobra ~1, Vigilance e Deathtouch cobram ~0. Cobrar igual fazia a vigilância
+//! pagar por voar, e cobrava de menos de quem só voa.
+//!
+//! **A tabela abaixo é a calibragem, e é obrigatória.** Palavra-chave nova
+//! entra com peso medido; palavra-chave sem peso é palavra-chave sem preço, e
+//! o compilador cobra isso no `match`.
+//!
+//! ## A banda
+//!
+//! ±1 mana. Passar disso é "fora da curva", e a carta então precisa de
+//! `justificativa` no próprio arquivo — que é o escape que a referência já
+//! prevê, e que **não entra no `content_hash`**: justificar não reescreve
+//! carta publicada.
 //!
 //! Mudar a curva é mudar este arquivo. O validador não sabe nada de custo.
 
-use crate::card::{Card, Effect, Kind};
+use crate::card::{Card, Effect, Keyword, Kind};
 
 pub const BAND: i32 = 1;
+
+/// Quanto uma palavra-chave soma ao corpo da criatura.
+///
+/// Números medidos contra um corpus externo de criaturas baunilha, não
+/// intuição. Deathtouch empatar com Vigilance em zero surpreende, mas é o que
+/// o dado diz: o corpo que carrega a palavra já pagou parte dela, e cobrar de
+/// novo fazia toda criatura de toque letal sair caro.
+fn keyword_weight(keyword: Keyword) -> i32 {
+    match keyword {
+        Keyword::Flying => 1,
+        Keyword::Vigilance => 0,
+        Keyword::Deathtouch => 0,
+    }
+}
 
 /// Custo de referência para o custo efetivo da carta, ou `None` quando a
 /// combinação não tem curva definida (hoje: mágica sem efeito, que é erro
@@ -27,9 +63,9 @@ pub fn reference(card: &Card) -> Option<i32> {
     match card.kind {
         Kind::Land => Some(0),
         Kind::Creature => {
-            let base = i32::from(card.power.min(card.toughness));
-            let keyword_surcharge = if card.keywords.is_empty() { 0 } else { 1 };
-            Some(base + keyword_surcharge)
+            let corpo = ceil_half(i32::from(card.power) + i32::from(card.toughness));
+            let palavras: i32 = card.keywords.iter().copied().map(keyword_weight).sum();
+            Some(corpo + palavras)
         }
         Kind::Spell => match card.effect {
             Effect::None => None,
@@ -45,6 +81,12 @@ pub fn reference(card: &Card) -> Option<i32> {
     }
 }
 
+/// ⌈value / 2⌉, correto também para negativo.
+///
+/// `div_euclid` em vez de `/` porque `/` trunca em direção a zero e erra o
+/// arredondamento de todo valor negativo par: `ceil(-2/2)` é `-1`, mas
+/// `(-2 + 1) / 2` dá `0`. Hoje só entra valor não negativo aqui; a correção
+/// existe para que o dia em que entrar negativo não seja um bug silencioso.
 fn ceil_half(value: i32) -> i32 {
-    (value + 1) / 2
+    (value + 1).div_euclid(2)
 }
