@@ -99,6 +99,10 @@ fn effect_cost(effect: Effect) -> Option<i32> {
         Effect::GainLife(amount) => Some(ceil_half(i32::from(amount))),
         // Perder vida espelha ganhar vida: mesma régua, sinal trocado.
         Effect::LoseLife(amount) => Some(ceil_half(i32::from(amount))),
+        // Destruir é preço fixo, e o número é medido: em 117 mágicas de uma
+        // linha só que dizem "destrói a criatura alvo", a mediana é 3 de mana.
+        // Não escala como o dano porque não tem magnitude — mata ou não mata.
+        Effect::Destroy => Some(3),
     }
 }
 

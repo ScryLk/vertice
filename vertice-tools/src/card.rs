@@ -80,6 +80,8 @@ pub enum Effect {
     GainLife(u8),
     /// O oponente do controlador perde N de vida. Sem alvo.
     LoseLife(u8),
+    /// Destrói a criatura alvo.
+    Destroy,
 }
 
 impl Effect {
@@ -92,6 +94,7 @@ impl Effect {
             Effect::Pump(p, t) => format!("pump:{p},{t}"),
             Effect::GainLife(n) => format!("gain_life:{n}"),
             Effect::LoseLife(n) => format!("lose_life:{n}"),
+            Effect::Destroy => "destroy".to_string(),
         }
     }
 
@@ -99,7 +102,10 @@ impl Effect {
     /// o validador recusa gatilho com alvo justamente porque o motor não
     /// consegue resolver escolha dentro de um gatilho.
     pub fn needs_target(self) -> bool {
-        matches!(self, Effect::DealDamage(_) | Effect::Pump(..))
+        matches!(
+            self,
+            Effect::DealDamage(_) | Effect::Pump(..) | Effect::Destroy
+        )
     }
 }
 
@@ -484,6 +490,7 @@ fn parse_effect(key: &str, value: toml::Value) -> Result<Effect, String> {
         "draw" => Effect::Draw(take_u8(&mut effect, "amount")?),
         "gain_life" => Effect::GainLife(take_u8(&mut effect, "amount")?),
         "lose_life" => Effect::LoseLife(take_u8(&mut effect, "amount")?),
+        "destroy" => Effect::Destroy,
         "pump" => {
             let power = take_i8_or(&mut effect, "power", 0)?;
             let toughness = take_i8_or(&mut effect, "toughness", 0)?;
@@ -492,7 +499,7 @@ fn parse_effect(key: &str, value: toml::Value) -> Result<Effect, String> {
         other => {
             return Err(format!(
                 "`{key}.kind` desconhecido: `{other}` (esperado none, deal_damage, draw, \
-                 gain_life, lose_life ou pump)"
+                 gain_life, lose_life, destroy ou pump)"
             ))
         }
     };

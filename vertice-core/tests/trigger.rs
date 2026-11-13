@@ -78,6 +78,19 @@ impl Ctx {
     fn end_turn(&mut self) {
         self.act(Action::EndTurn);
     }
+
+    /// Avança `terrenos` turnos do jogador 0, baixando um terreno em cada um.
+    ///
+    /// Termina no turno do jogador 0 com `terrenos` de mana: a mana é definida
+    /// na abertura do turno, então o terreno baixado no último turno só conta
+    /// no seguinte — e é por isso que o laço termina um turno depois.
+    fn avancar(&mut self, terrenos: usize) {
+        for _ in 0..terrenos {
+            self.play_land(0);
+            self.end_turn();
+            self.end_turn();
+        }
+    }
 }
 
 // ---------------------------------------------------------------- testes
@@ -427,6 +440,38 @@ fn gatilho_de_entrada_pode_matar_e_acordar_o_gatilho_de_morte() {
         STARTING_LIFE + 3,
         "e a morte dele tinha que disparar o gatilho de morte"
     );
+}
+
+#[test]
+fn gatilho_de_entrada_destroi_a_criatura_alvo() {
+    let land = id("Várzea de Cruzilha");
+    let brasa = id("Brasa Viva"); // 2/1, custo 1
+    let carrasco = id("Carrasco do Poço"); // custo 4, "ao entrar, destrua a criatura alvo"
+
+    let mut ctx = Ctx::new(vec![land, land, land, land, land, brasa, carrasco], vec![land], 20);
+    ctx.avancar(5);
+    assert_eq!(ctx.state.player(0).mana, 5);
+
+    let b_oid = hand_object(&ctx.state, 0, brasa);
+    ctx.act(Action::Cast {
+        object: b_oid,
+        target: None,
+    });
+
+    let c_oid = hand_object(&ctx.state, 0, carrasco);
+    ctx.act(Action::Cast {
+        object: c_oid,
+        target: Some(Target::Object(b_oid)),
+    });
+
+    // Destruir não pergunta resistência: 2/1 morre igual, e sai do campo antes
+    // de qualquer conta de dano.
+    assert!(
+        ctx.state.player(0).zones.graveyard.contains(&b_oid),
+        "a criatura destruída tinha que estar no cemitério"
+    );
+    assert!(!on_battlefield(&ctx.state, 0, brasa));
+    assert!(on_battlefield(&ctx.state, 0, carrasco));
 }
 
 #[test]

@@ -71,7 +71,7 @@ Gerado do dado, determinístico, sem desenho por carta:
 |---|---|
 | moldura | tipo — quadrado (terreno), hexágono (criatura), círculo (mágica) |
 | traços radiais | custo, um por mana |
-| marca central | efeito — ponto (nenhum), barras (dano), círculos (compra), traço (pump), losango (vida) |
+| marca central | efeito — ponto (nenhum), barras (dano), círculos (compra), traço (pump), losango (vida), quadrado cheio (destruir) |
 | anel pontilhado | palavra-chave, um anel por palavra |
 | meio anel em cima | gatilho de entrada |
 | meio anel embaixo | gatilho de morte |
@@ -169,6 +169,12 @@ graça. É o primeiro caso em que o sistema não precisou de conserto, e vale
 registrar: quando o glifo é **derivado** do dado e não desenhado à mão, eixo
 novo às vezes já está coberto.
 
-**Revisar de novo quando a DSL ganhar primitivas com forma própria** —
-destruir, criar ficha, contador. Aí entram tipos de efeito que o sigilo ainda
-não sabe desenhar, e o sistema vai precisar de conserto de verdade.
+**Aceitou destruir com uma marca nova, e sem conserto (M2.4).** Destruir ganhou
+**quadrado cheio** — a única marca preenchida e angular do sistema, então não
+disputa forma com ponto, anel, losango, barras ou cruz. Sem magnitude porque
+destruir não tem tamanho: mata ou não mata. O sistema continua sendo um
+vocabulário, e vocabulário cresce por acréscimo, não por reforma.
+
+**Revisar de novo quando a DSL ganhar primitivas com forma própria** — criar
+ficha (que é corpo e precisa de outra moldura) e contador (que é estado
+persistente, não efeito). Aí o sigilo vai precisar de conserto de verdade.

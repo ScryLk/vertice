@@ -38,6 +38,8 @@ function textoDoEfeito(effect: EffectDto): string | null {
       return `Ganha ${effect.amount} de vida.`;
     case 'lose_life':
       return `O oponente perde ${effect.amount} de vida.`;
+    case 'destroy':
+      return 'Destrói a criatura alvo.';
     case 'pump':
       return `${effect.power >= 0 ? '+' : ''}${effect.power}/${effect.toughness >= 0 ? '+' : ''}${effect.toughness}.`;
   }
@@ -61,6 +63,8 @@ function textoDoGatilho(effect: EffectDto, quando: 'Ao entrar' | 'Ao morrer'): s
       return `${quando}, o oponente perde ${effect.amount} de vida.`;
     case 'deal_damage':
       return `${quando}, cause ${effect.amount} de dano a um alvo.`;
+    case 'destroy':
+      return `${quando}, destrua a criatura alvo.`;
     case 'pump':
       return `${quando}, uma criatura recebe ${effect.power >= 0 ? '+' : ''}${effect.power}/${
         effect.toughness >= 0 ? '+' : ''
@@ -148,6 +152,12 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
         Array.from({ length: marca.amount }, (_, indice) => (
           <circle key={indice} cx={42 + indice * 16} cy={50} r="5" fill="none" stroke="currentColor" strokeWidth="2" />
         ))}
+      {marca.kind === 'destroy' && (
+        // Quadrado cheio: é a única marca preenchida e angular do sistema, e
+        // por isso não disputa forma com ponto, anel, losango, barras ou cruz.
+        // Sem magnitude porque destruir não tem tamanho — mata ou não mata.
+        <rect x="41" y="41" width="18" height="18" fill="currentColor" />
+      )}
       {marca.kind === 'gain_life' && (
         // Losango, e o tamanho carrega a magnitude — mesma lição do pump:
         // glifo que ignora número faz duas cartas diferentes parecerem iguais.

@@ -1,0 +1,5 @@
+slug = "sentenca-do-arquivo"
+name = "Sentença do Arquivo"
+cost = 3
+type = "spell"
+effect = { kind = "destroy" }

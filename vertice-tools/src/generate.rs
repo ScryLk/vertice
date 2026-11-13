@@ -139,6 +139,7 @@ fn effect_expr(effect: Effect) -> String {
         Effect::Pump(power, toughness) => format!("Effect::Pump({power}, {toughness})"),
         Effect::GainLife(amount) => format!("Effect::GainLife({amount})"),
         Effect::LoseLife(amount) => format!("Effect::LoseLife({amount})"),
+        Effect::Destroy => "Effect::Destroy".to_string(),
     }
 }
 

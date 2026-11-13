@@ -1,0 +1,9 @@
+slug = "testemunha-do-fim"
+name = "Testemunha do Fim"
+cost = 5
+type = "creature"
+power = 1
+toughness = 1
+effect = { kind = "none" }
+on_enter = { kind = "destroy" }
+on_die = { kind = "draw", amount = 1 }

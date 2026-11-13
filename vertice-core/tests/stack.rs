@@ -82,6 +82,17 @@ impl Ctx {
     fn end_turn(&mut self) {
         self.act(Action::EndTurn);
     }
+
+    /// Termina no turno do jogador 0 com `terrenos` de mana. Ver a nota em
+    /// `trigger.rs`: o terreno baixado no último turno só vira mana no
+    /// seguinte, então o laço termina um turno depois.
+    fn avancar(&mut self, terrenos: usize) {
+        for _ in 0..terrenos {
+            self.play_land(0);
+            self.end_turn();
+            self.end_turn();
+        }
+    }
 }
 
 // ---------------------------------------------------------------- testes
@@ -236,6 +247,110 @@ fn replay_de_abertura_roteirizada_reproduz_bit_a_bit() {
     let b = rec.replay().expect("replay válido");
     assert_eq!(a, b);
     assert_eq!(a.fingerprint(), b.fingerprint());
+}
+
+#[test]
+fn destruir_mata_e_acorda_o_gatilho_de_morte() {
+    let land = id("Várzea de Cruzilha");
+    let sinaleiro = id("Sinaleiro do Arquivo"); // 2/2, "ao morrer, compre 1"
+    let corte = id("Corte Sumário"); // custo 2, "destrói a criatura alvo"
+
+    let mut ctx = Ctx {
+        state: new_game_with_hands(
+            &deck_with(&[sinaleiro, corte]),
+            &deck_with(&[]),
+            31,
+            &[land, land, land, land, land, sinaleiro, corte],
+            &[land],
+        )
+        .unwrap(),
+        rec: MatchRecord::with_hands(
+            deck_with(&[sinaleiro, corte]),
+            deck_with(&[]),
+            31,
+            vec![land, land, land, land, land, sinaleiro, corte],
+            vec![land],
+        ),
+    };
+    ctx.avancar(5);
+
+    let s_oid = hand_object(&ctx.state, 0, sinaleiro);
+    ctx.act(Action::Cast {
+        object: s_oid,
+        target: None,
+    });
+
+    let biblioteca_antes = ctx.state.player(0).zones.library.len();
+    let c_oid = hand_object(&ctx.state, 0, corte);
+    ctx.act(Action::Cast {
+        object: c_oid,
+        target: Some(Target::Object(s_oid)),
+    });
+    // Mágica é mágica: só mata quando resolve.
+    assert!(ctx.state.player(0).zones.battlefield.contains(&s_oid));
+
+    ctx.act(Action::Pass);
+
+    assert!(zoned(&ctx.state, 0, sinaleiro), "destruída vai ao cemitério");
+    assert!(
+        !ctx.state.player(0).zones.battlefield.contains(&s_oid),
+        "e sai do campo de batalha"
+    );
+    assert_eq!(
+        ctx.state.player(0).zones.library.len(),
+        biblioteca_antes - 1,
+        "destruir mata pelo mesmo caminho do dano letal, então o gatilho de \
+         morte dispara"
+    );
+}
+
+#[test]
+fn destruir_nao_aceita_terreno_como_alvo() {
+    let land = id("Várzea de Cruzilha");
+    let corte = id("Corte Sumário");
+
+    let mut ctx = Ctx {
+        state: new_game_with_hands(
+            &deck_with(&[corte]),
+            &deck_with(&[]),
+            32,
+            &[land, land, corte],
+            &[land],
+        )
+        .unwrap(),
+        rec: MatchRecord::with_hands(
+            deck_with(&[corte]),
+            deck_with(&[]),
+            32,
+            vec![land, land, corte],
+            vec![land],
+        ),
+    };
+    ctx.avancar(2);
+
+    let terreno = ctx.state.player(0).zones.battlefield[0];
+    let c_oid = hand_object(&ctx.state, 0, corte);
+
+    // Não é só recusado na hora: nem aparece como ação legal, porque oferecer
+    // um botão que o motor recusa em seguida é pior que não oferecer.
+    let legais = legal_actions(&ctx.state, 0);
+    assert!(
+        !legais.contains(&Action::Cast {
+            object: c_oid,
+            target: Some(Target::Object(terreno)),
+        }),
+        "terreno não pode ser alvo de destruição"
+    );
+    assert_eq!(
+        apply(
+            &mut ctx.state,
+            Action::Cast {
+                object: c_oid,
+                target: Some(Target::Object(terreno)),
+            }
+        ),
+        Err(EngineError::IllegalAction)
+    );
 }
 
 #[test]

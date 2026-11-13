@@ -193,6 +193,25 @@ describe('Ficha', () => {
     expect(vida(2).svg).not.toBe(vida(8).svg);
   });
 
+  it('destruir vira texto e glifo próprio', () => {
+    const ficha = (effect: CardDefDto['effect']) => {
+      const { container } = render(<Ficha carta={carta({ kind: 'spell', effect })} />);
+      const texto = container.querySelector('.ficha-efeito')?.textContent;
+      const svg = container.querySelector('.sigilo')?.innerHTML;
+      cleanup();
+      return { texto, svg };
+    };
+
+    expect(ficha({ kind: 'destroy' }).texto).toBe('Destrói a criatura alvo.');
+
+    // Destruir não tem magnitude, mas precisa de marca que não seja nenhuma
+    // das outras: é o único efeito cujo resultado não é um número.
+    const destruir = ficha({ kind: 'destroy' }).svg;
+    expect(destruir).not.toBe(ficha({ kind: 'none' }).svg);
+    expect(destruir).not.toBe(ficha({ kind: 'deal_damage', amount: 2 }).svg);
+    expect(destruir).not.toBe(ficha({ kind: 'pump', power: 2, toughness: 2 }).svg);
+  });
+
   it('o efeito vira texto legível', () => {
     const { container } = render(
       <Ficha carta={carta({ kind: 'spell', effect: { kind: 'deal_damage', amount: 3 } })} />,

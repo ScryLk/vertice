@@ -115,7 +115,8 @@ export type EffectDto =
   | { kind: 'draw'; amount: number }
   | { kind: 'pump'; power: number; toughness: number }
   | { kind: 'gain_life'; amount: number }
-  | { kind: 'lose_life'; amount: number };
+  | { kind: 'lose_life'; amount: number }
+  | { kind: 'destroy' };
 
 export interface CardDefDto {
   id: CardId;

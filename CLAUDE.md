@@ -380,6 +380,26 @@ novas, ids 80..91, `next_id = 92`, `CARD_SET_VERSION = "m2.4"`,
 morre pela ação de outra pessoa, e não existe ação do controlador para carregar
 a escolha. Abrir isso é gatilho na pilha — a fatia que falta.
 
+**M2.4 — destruir, e o pool em 102.** `Effect::Destroy`, o primeiro efeito cujo
+resultado não é um número. 10 cartas novas, ids 92..101, `next_id = 102`,
+`CARD_SET_VERSION = "m2.5"`, `ENGINE_VERSION = "0.6.0"`. Alvo é **só criatura**:
+terreno não entra em `effect_targets`, porque oferecer um botão que o motor
+recusa é pior que não oferecer.
+
+**Destruir mata pelo mesmo caminho do dano letal.** `bury` saiu de dentro de
+`cleanup` e virou função compartilhada — se destruir tivesse caminho próprio,
+`on_die` funcionaria num e não no outro, e o defeito só apareceria quando
+alguém destruísse uma criatura com gatilho e estranhasse o silêncio. Há teste e
+mutação cobrindo exatamente isso.
+
+Preço medido: 3 de mana, mediana de 117 mágicas de uma linha só que destroem
+criatura. Não escala como o dano porque não tem magnitude.
+
+O baralho provisório cicla o catálogo, então crescer o pool muda o placar do
+bot junto: com 102 cartas, o calouro fez 17×7 contra o aleatório e a barra do
+teste era 18. A barra desceu para 16 com a medição registrada no próprio teste.
+**A lição:** aquele número é do bot *mais* o baralho provisório, não do bot.
+
 **A mão do duelo passou a mostrar o que a carta faz.** A `PlayerView` carrega só
 o id da carta, então a mão mostrava nome e corpo, e com gatilho com alvo o
 jogador escolhia entre vários botões sem saber o que cada um fazia. Agora

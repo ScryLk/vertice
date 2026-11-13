@@ -137,6 +137,11 @@ fn magica_mantem_a_regua_anterior() {
     // Pump segue a régua do dano: +2/+2 é o mesmo que 2 de dano, que custa 1.
     assert_eq!(curve::reference(&magica(Effect::Pump(2, 2))), Some(1));
     assert_eq!(curve::reference(&magica(Effect::Pump(-3, -3))), Some(2));
+    // Destruir tem preço fixo, medido: 3 é a mediana entre as mágicas de uma
+    // linha só que destroem criatura. Não escala como o dano porque não tem
+    // magnitude — mata ou não mata.
+    assert_eq!(curve::reference(&magica(Effect::Destroy)), Some(3));
+
     assert_eq!(curve::reference(&magica(Effect::None)), None);
 }
 

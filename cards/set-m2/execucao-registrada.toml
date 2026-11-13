@@ -1,0 +1,5 @@
+slug = "execucao-registrada"
+name = "Execução Registrada"
+cost = 4
+type = "spell"
+effect = { kind = "destroy" }

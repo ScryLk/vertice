@@ -1,0 +1,9 @@
+slug = "carcereiro-de-cinzas"
+name = "Carcereiro de Cinzas"
+cost = 6
+type = "creature"
+power = 2
+toughness = 1
+keywords = ["flying"]
+effect = { kind = "none" }
+on_enter = { kind = "destroy" }

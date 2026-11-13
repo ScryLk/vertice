@@ -46,6 +46,13 @@ pub enum Effect {
     /// escolher. Num gatilho, que não abre janela de resposta, a diferença é a
     /// carta existir ou não.
     LoseLife(u8),
+    /// Destrói a **criatura** alvo. Terreno não é alvo válido.
+    ///
+    /// É o primeiro efeito cujo resultado não é um número: mata, e matar
+    /// dispara gatilho de morte. Por isso ele passa pelo mesmo caminho que o
+    /// dano letal — se tivesse um caminho próprio, `on_die` funcionaria num e
+    /// não no outro, e o bug apareceria semanas depois.
+    Destroy,
 }
 
 impl Effect {
@@ -57,7 +64,10 @@ impl Effect {
     /// gatilho com alvo exigiria escolha no meio da resolução, e escolha exige
     /// janela na pilha, que gatilho ainda não tem. Duas cópias divergiriam.
     pub fn needs_target(self) -> bool {
-        matches!(self, Effect::DealDamage(_) | Effect::Pump(..))
+        matches!(
+            self,
+            Effect::DealDamage(_) | Effect::Pump(..) | Effect::Destroy
+        )
     }
 }
 

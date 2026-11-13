@@ -213,6 +213,10 @@ fn forma_do_efeito_de_vida_e_estavel() {
         serde_json::to_string(&EffectDto::LoseLife { amount: 2 }).unwrap(),
         r#"{"kind":"lose_life","amount":2}"#
     );
+    assert_eq!(
+        serde_json::to_string(&EffectDto::Destroy).unwrap(),
+        r#"{"kind":"destroy"}"#
+    );
 }
 
 #[test]

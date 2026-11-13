@@ -1,0 +1,9 @@
+slug = "aprendiz-do-corte"
+name = "Aprendiz do Corte"
+cost = 5
+type = "creature"
+power = 1
+toughness = 1
+keywords = ["deathtouch"]
+effect = { kind = "none" }
+on_enter = { kind = "destroy" }

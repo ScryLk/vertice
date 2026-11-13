@@ -50,8 +50,12 @@ pub use view::{view, PlayerView};
 /// criatura era sempre `None`. Um `MatchRecord` antigo continua válido porque
 /// nenhuma ação antiga usava esse slot, mas a mesma ação agora significa outra
 /// coisa, e é isso que a versão precisa dizer.
-pub const ENGINE_VERSION: &str = "0.5.0";
-pub const CARD_SET_VERSION: &str = "m2.4";
+///
+/// 0.6.0 acrescentou `destroy`. Nenhuma partida antiga o alcança, mas o motor
+/// passou a saber matar por outro caminho, e o caminho é o mesmo do dano letal
+/// de propósito: `bury` é um só, senão `on_die` funcionaria num e não no outro.
+pub const ENGINE_VERSION: &str = "0.6.0";
+pub const CARD_SET_VERSION: &str = "m2.5";
 
 /// Vida inicial. Comandante usa 40.
 pub const STARTING_LIFE: i32 = 40;

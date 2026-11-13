@@ -11,7 +11,7 @@
 # Ele SÓ SOBE. Ao publicar carta nova, some 1 nele e dê o id antigo à carta.
 # Apagar carta não baixa `next_id` — é justamente isso que faz a deleção
 # aparecer como erro em vez de sumir calada.
-next_id = 92
+next_id = 102
 
 [cards]
 # Terrenos
@@ -113,3 +113,13 @@ aprendiz-marcado = 88
 mestra-de-esgrima = 89
 tocador-de-alarme = 90
 arauto-do-poco = 91
+sentenca-do-arquivo = 92
+corte-sumario = 93
+execucao-registrada = 94
+carrasco-do-poco = 95
+verdugo-de-baluarte = 96
+lamina-do-protocolo = 97
+carcereiro-de-cinzas = 98
+testemunha-do-fim = 99
+tabeliao-do-corte = 100
+aprendiz-do-corte = 101

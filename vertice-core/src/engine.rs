@@ -386,6 +386,12 @@ fn apply_to_target(state: &mut GameState, effect: Effect, target: Target) {
             }
             cleanup(state);
         }
+        // Destruir não pergunta resistência: vai ao cemitério do mesmo jeito,
+        // pelo mesmo caminho do dano letal, e acorda o gatilho de morte.
+        (Effect::Destroy, Target::Object(tid)) => {
+            let controller = state.object(tid).controller;
+            bury(state, vec![(controller, tid)]);
+        }
         _ => {}
     }
 }
@@ -560,6 +566,16 @@ fn cleanup(state: &mut GameState) {
         }
     }
 
+    bury(state, dead);
+}
+
+/// Move as criaturas para o cemitério e dispara os gatilhos de morte.
+///
+/// **Um caminho só**, compartilhado por dano letal e por destruição. Se cada um
+/// tivesse o seu, `on_die` funcionaria num e não no outro — e o defeito só
+/// apareceria quando alguém destruísse uma criatura com gatilho e estranhasse o
+/// silêncio.
+fn bury(state: &mut GameState, dead: Vec<(PlayerId, ObjectId)>) {
     for (controller, id) in dead {
         state
             .player_mut(controller)
@@ -660,6 +676,17 @@ fn effect_targets(state: &GameState, effect: Effect) -> Vec<Target> {
             for p in &state.players {
                 for &id in &p.zones.battlefield {
                     out.push(Target::Object(id));
+                }
+            }
+        }
+        // Só criatura. Oferecer terreno como botão seria oferecer uma ação que
+        // o motor recusa em seguida — pior que não oferecer.
+        Effect::Destroy => {
+            for p in &state.players {
+                for &id in &p.zones.battlefield {
+                    if card(state.object(id).card).kind == CardKind::Creature {
+                        out.push(Target::Object(id));
+                    }
                 }
             }
         }

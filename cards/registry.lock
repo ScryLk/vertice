@@ -462,3 +462,53 @@ sha256 = "6990aef291ffe02f892210b744d80dbc4c0e2b289bac997f395bbb339cf3b368"
 slug = "arauto-do-poco"
 id = 91
 sha256 = "99d29ce5f0ba616e91d16daf18b384c594bfe0e95979f7a9c9788bdd73e76bce"
+
+[[card]]
+slug = "sentenca-do-arquivo"
+id = 92
+sha256 = "760a3f2349f05de9fa3f34811c6c17f60df41af0ebd9c6f9cbe140759ecf3b20"
+
+[[card]]
+slug = "corte-sumario"
+id = 93
+sha256 = "9e662dd3f3b33070d8ef5f01f2707d771c1521fcb382f3bbc7110b9149eb92a8"
+
+[[card]]
+slug = "execucao-registrada"
+id = 94
+sha256 = "c04eb6f7a872c908d7d4118fb5a1d6a1984235a3a1846af97b1d71055b5b70b2"
+
+[[card]]
+slug = "carrasco-do-poco"
+id = 95
+sha256 = "c10dde4cf9303f311acd316015fcc281d4e0421ef848af00801b8fa14032e666"
+
+[[card]]
+slug = "verdugo-de-baluarte"
+id = 96
+sha256 = "ca9590a7a19dead5cb94663acb83e51fe61bba2ea2246be99371c2c551296c05"
+
+[[card]]
+slug = "lamina-do-protocolo"
+id = 97
+sha256 = "d31cb9d249e2112f4c97aac6af974488e0822f4c81231683744dc447d8c769a2"
+
+[[card]]
+slug = "carcereiro-de-cinzas"
+id = 98
+sha256 = "0dbe2c17227cbd26c9a41ecfa9605fce1e759a87b415fca6c8179f55f235e7ad"
+
+[[card]]
+slug = "testemunha-do-fim"
+id = 99
+sha256 = "39b85bc6d11095614db6886709835d7c38636b01ff8b8e1258a1412473552e3f"
+
+[[card]]
+slug = "tabeliao-do-corte"
+id = 100
+sha256 = "4bbe3d4200009d5368ad353ad9539cd334a357db9eab3a09002d41988ba07898"
+
+[[card]]
+slug = "aprendiz-do-corte"
+id = 101
+sha256 = "cc7dd19876b224608cd3363b4ce14c26a5f86c50e973a9aeb04a1d31fb4d21d4"

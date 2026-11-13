@@ -1,0 +1,8 @@
+slug = "lamina-do-protocolo"
+name = "Lâmina do Protocolo"
+cost = 4
+type = "creature"
+power = 1
+toughness = 2
+effect = { kind = "none" }
+on_enter = { kind = "destroy" }

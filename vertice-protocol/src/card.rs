@@ -28,6 +28,7 @@ pub enum EffectDto {
     Pump { power: i8, toughness: i8 },
     GainLife { amount: u8 },
     LoseLife { amount: u8 },
+    Destroy,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -79,5 +80,6 @@ fn effect_dto(effect: Effect) -> EffectDto {
         Effect::Pump(power, toughness) => EffectDto::Pump { power, toughness },
         Effect::GainLife(amount) => EffectDto::GainLife { amount },
         Effect::LoseLife(amount) => EffectDto::LoseLife { amount },
+        Effect::Destroy => EffectDto::Destroy,
     }
 }
