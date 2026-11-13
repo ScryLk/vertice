@@ -15,6 +15,7 @@ use axum::{Json, Router};
 use futures_util::{Sink, SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use tokio::sync::{mpsc, oneshot};
+use vertice_bot::Level;
 use vertice_core::PlayerId;
 
 use crate::actor::Command;
@@ -39,6 +40,12 @@ pub struct CreateMatchRequest {
     /// fica registrada no `MatchRecord`, então o replay continua exato.
     #[serde(default)]
     pub seed: Option<u64>,
+
+    /// `"calouro"` ou `"formando"`. Ausente = dois humanos.
+    ///
+    /// Quando presente, o assento 1 é o bot e o humano joga no assento 0.
+    #[serde(default)]
+    pub level: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -55,10 +62,19 @@ async fn create_match(
     State(registry): State<SharedRegistry>,
     Json(request): Json<CreateMatchRequest>,
 ) -> Result<Json<CreateMatchResponse>, (StatusCode, String)> {
-    let match_id = registry
-        .create_default(request.seed)
-        .await
-        .map_err(|error| (StatusCode::BAD_REQUEST, format!("{error:?}")))?;
+    let criacao = match request.level.as_deref() {
+        None => registry.create_default(request.seed).await,
+        Some("calouro") => registry.create_vs_bot(request.seed, Level::Calouro).await,
+        Some("formando") => registry.create_vs_bot(request.seed, Level::Formando).await,
+        Some(outro) => {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                format!("nível desconhecido: `{outro}` (use `calouro` ou `formando`)"),
+            ))
+        }
+    };
+
+    let match_id = criacao.map_err(|error| (StatusCode::BAD_REQUEST, format!("{error:?}")))?;
 
     Ok(Json(CreateMatchResponse {
         match_id,

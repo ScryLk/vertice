@@ -76,3 +76,29 @@ async fn partidas_diferentes_nao_colidem() {
         "dois ids iguais seriam duas mesas servindo a mesma partida"
     );
 }
+
+#[tokio::test]
+async fn criar_contra_o_bot_devolve_id_jogavel() {
+    let registry = Arc::new(Registry::new());
+    let app = vertice_server::router(registry.clone());
+
+    let (status, body) = criar(app, r#"{"level":"formando","seed":3}"#).await;
+    assert_eq!(status, StatusCode::OK);
+
+    let id = body["match_id"].as_str().expect("match_id").to_string();
+    assert!(registry.handle(&id).await.is_some());
+    assert!(registry.fingerprint(&id).await.is_some());
+}
+
+#[tokio::test]
+async fn nivel_desconhecido_e_recusado() {
+    let registry = Arc::new(Registry::new());
+    let app = vertice_server::router(registry);
+
+    let (status, _) = criar(app, r#"{"level":"mestre"}"#).await;
+    assert_eq!(
+        status,
+        StatusCode::BAD_REQUEST,
+        "nível que não existe tem que falhar na porta, não virar partida"
+    );
+}

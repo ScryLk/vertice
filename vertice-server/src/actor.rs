@@ -19,6 +19,8 @@
 //!   "compartilhada" que possa vazar mão alheia.
 
 use tokio::sync::{mpsc, oneshot};
+use vertice_bot::{choose_action, Level};
+use vertice_core::rng::Rng;
 use vertice_core::{
     apply, legal_actions, new_game, view, CardId, EngineError, GameState, MatchRecord, PlayerId,
 };
@@ -66,6 +68,11 @@ impl Seat {
     }
 }
 
+/// Quantas jogadas seguidas o bot pode fazer antes de o ator devolver o
+/// controle. Um bot contra bot joga muitas; o limite existe para que um bug
+/// no bot não trave a task para sempre.
+const LIMITE_DE_JOGADAS_DO_BOT: usize = 512;
+
 pub struct Actor {
     id: String,
     state: GameState,
@@ -74,6 +81,12 @@ pub struct Actor {
     next_generation: u64,
     seats: [Seat; 2],
     store: Option<Store>,
+    /// Assento controlado pelo bot, se houver.
+    bots: [Option<Level>; 2],
+    /// Semente do bot derivada da partida: a mesma partida dá as mesmas
+    /// decisões. Não entra no registro porque o registro guarda as *ações*,
+    /// que é o que o replay precisa.
+    bot_rng: Rng,
 }
 
 impl Actor {
@@ -83,6 +96,7 @@ impl Actor {
         deck1: &[CardId],
         seed: u64,
         store: Option<Store>,
+        bots: [Option<Level>; 2],
     ) -> Result<Self, EngineError> {
         Ok(Actor {
             state: new_game(deck0, deck1, seed)?,
@@ -92,6 +106,8 @@ impl Actor {
             seq: 0,
             next_generation: 1,
             seats: [Seat::empty(), Seat::empty()],
+            bots,
+            bot_rng: Rng::new(seed ^ 0xb07_b07_b07),
         })
     }
 
@@ -108,6 +124,7 @@ impl Actor {
     ) -> Result<Self, EngineError> {
         let state = record.replay()?;
         let seq = record.actions.len() as u64;
+        let seed = record.seed;
         Ok(Actor {
             state,
             record,
@@ -116,6 +133,10 @@ impl Actor {
             seq,
             next_generation: 1,
             seats: [Seat::empty(), Seat::empty()],
+            // Partida contra bot não é gravada (ver `Registry::create_vs_bot`),
+            // então o que volta do disco é sempre humano contra humano.
+            bots: [None; 2],
+            bot_rng: Rng::new(seed ^ 0xb07_b07_b07),
         })
     }
 
@@ -137,6 +158,10 @@ impl Actor {
                         generation,
                         outbound: Some(outbound),
                     };
+                    // Se o bot abre a partida, ele joga agora — antes de o
+                    // humano receber a view, para ela já vir com a jogada dele.
+                    self.pump_bots().await;
+
                     let _ = reply.send(Attached {
                         generation,
                         seq: self.seq,
@@ -185,24 +210,57 @@ impl Actor {
 
         match apply(&mut self.state, action) {
             Ok(()) => {
-                self.seq += 1;
-                self.record.push(action);
-
-                // Persistir **antes** de avisar. O cliente só fica sabendo de
-                // uma ação depois que ela está durável, então reiniciar o
-                // servidor logo em seguida não perde nada que alguém já viu.
-                self.persist().await;
-
-                for viewer in 0..2u8 {
-                    let message = ServerMessage::View {
-                        seq: self.seq,
-                        view: self.view_for(viewer),
-                    };
-                    self.push(viewer, message).await;
-                }
+                self.commit(action).await;
+                self.pump_bots().await;
             }
             Err(EngineError::GameOver) => self.reject(seat, RejectReason::GameOver).await,
             Err(_) => self.reject(seat, RejectReason::IllegalAction).await,
+        }
+    }
+
+    /// Grava a ação já aplicada e avisa os dois assentos.
+    async fn commit(&mut self, action: vertice_core::Action) {
+        self.seq += 1;
+        self.record.push(action);
+
+        // Persistir **antes** de avisar. O cliente só fica sabendo de uma ação
+        // depois que ela está durável, então reiniciar o servidor logo em
+        // seguida não perde nada que alguém já viu.
+        self.persist().await;
+
+        for viewer in 0..2u8 {
+            let message = ServerMessage::View {
+                seq: self.seq,
+                view: self.view_for(viewer),
+            };
+            self.push(viewer, message).await;
+        }
+    }
+
+    /// Deixa o bot jogar enquanto for a vez dele.
+    ///
+    /// Roda dentro da task da partida, então a decisão do bot nunca corre em
+    /// paralelo com uma ação de cliente: a mensagem seguinte só é lida depois
+    /// que o bot terminou de jogar. O limite de jogadas seguidas existe para
+    /// que um bug no bot não trave a task para sempre.
+    async fn pump_bots(&mut self) {
+        for _ in 0..LIMITE_DE_JOGADAS_DO_BOT {
+            if self.state.winner.is_some() {
+                return;
+            }
+
+            let seat = self.state.priority;
+            let Some(level) = self.bots[seat as usize] else {
+                return;
+            };
+            let Some(action) = choose_action(&self.state, seat, level, &mut self.bot_rng) else {
+                return;
+            };
+            if apply(&mut self.state, action).is_err() {
+                return;
+            }
+
+            self.commit(action).await;
         }
     }
 

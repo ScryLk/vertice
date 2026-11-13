@@ -22,8 +22,9 @@ npm --prefix vertice-client install
 npm --prefix vertice-client run dev
 ```
 
-Abra http://localhost:5173, crie uma partida e abra os dois assentos em abas
-diferentes.
+Abra http://localhost:5173. Dá para criar uma partida de dois jogadores (abra
+os dois assentos em abas diferentes) ou jogar direto contra o bot, no nível
+`calouro` ou `formando`.
 
 Testes: `npm --prefix vertice-client test` (Vitest + Testing Library, visões
 fixas, sem servidor).

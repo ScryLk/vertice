@@ -31,29 +31,47 @@ function Mesa({ matchId, seat }: { matchId: string; seat: number }) {
   return <Duel view={view} estado={estado} aviso={aviso} jogar={jogar} />;
 }
 
+async function criarPartida(corpo: Record<string, unknown>): Promise<string> {
+  const resposta = await fetch('/matches', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    // A semente vem do cliente porque é a única coisa que ele pode escolher.
+    // O servidor grava no `MatchRecord`, então o replay é exato.
+    body: JSON.stringify({ seed: Math.floor(Math.random() * 1_000_000), ...corpo }),
+  });
+
+  if (!resposta.ok) throw new Error(`${resposta.status}: ${await resposta.text()}`);
+
+  const dados = (await resposta.json()) as CreateMatchResponse;
+  return dados.match_id;
+}
+
 function Lobby() {
-  const [criando, setCriando] = useState(false);
+  const [ocupado, setOcupado] = useState<'nenhum' | 'dois' | 'bot'>('nenhum');
   const [criada, setCriada] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
-  async function criar() {
-    setCriando(true);
+  async function doisJogadores() {
+    setOcupado('dois');
     setErro(null);
     try {
-      const resposta = await fetch('/matches', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        // A semente vem do cliente porque é a única coisa que ele pode
-        // escolher. O servidor grava no `MatchRecord`, então o replay é exato.
-        body: JSON.stringify({ seed: Math.floor(Math.random() * 1_000_000) }),
-      });
-      if (!resposta.ok) throw new Error(`${resposta.status}: ${await resposta.text()}`);
-      const dados = (await resposta.json()) as CreateMatchResponse;
-      setCriada(dados.match_id);
+      setCriada(await criarPartida({}));
     } catch (falha) {
       setErro(String(falha));
     } finally {
-      setCriando(false);
+      setOcupado('nenhum');
+    }
+  }
+
+  async function contraOBot(nivel: 'calouro' | 'formando') {
+    setOcupado('bot');
+    setErro(null);
+    try {
+      const id = await criarPartida({ level: nivel });
+      window.location.search = `?match=${id}&seat=0`;
+    } catch (falha) {
+      setErro(String(falha));
+      setOcupado('nenhum');
     }
   }
 
@@ -80,9 +98,17 @@ function Lobby() {
           </ul>
         </>
       ) : (
-        <button type="button" onClick={criar} disabled={criando}>
-          {criando ? 'Criando…' : 'Criar partida'}
-        </button>
+        <div className="botoes">
+          <button type="button" onClick={doisJogadores} disabled={ocupado !== 'nenhum'}>
+            {ocupado === 'dois' ? 'Criando…' : 'Dois jogadores'}
+          </button>
+          <button type="button" onClick={() => contraOBot('calouro')} disabled={ocupado !== 'nenhum'}>
+            {ocupado === 'bot' ? 'Criando…' : 'Jogar contra o calouro'}
+          </button>
+          <button type="button" onClick={() => contraOBot('formando')} disabled={ocupado !== 'nenhum'}>
+            Jogar contra o formando
+          </button>
+        </div>
       )}
 
       {erro && <p className="aviso">{erro}</p>}

@@ -105,6 +105,7 @@ Agente novo, comece por esta tabela em vez de varrer o repositório.
 | saber a forma do protocolo | `vertice-server/src/protocol/` |
 | subir o servidor | `vertice-server/src/main.rs` (`VERTICE_DATA`, `PORT`) |
 | fazer o bot escolher uma jogada | `vertice-bot/src/lib.rs::choose_action` |
+| criar partida contra o bot | `vertice-server/src/registry.rs::Registry::create_vs_bot` |
 | ajustar o que o bot valoriza | `vertice-bot/src/eval.rs` |
 
 Fluxo normal de um turno, em ordem:
@@ -278,11 +279,18 @@ coberto por teste de renderização com visões fixas: cada tipo de ação vira
 botão, o clique manda a ação exata, e fim de partida remove os botões. O teste
 headless prova a partida; o de renderização prova a tela.
 
-**M2 — em andamento, pelo bot.** `vertice-bot` existe e escolhe jogada a um
-passo: aplica cada ação legal num clone e avalia a posição resultante. Níveis
+**M2 — em andamento, pelo bot.** `vertice-bot` escolhe jogada a um passo:
+aplica cada ação legal num clone e avalia a posição resultante. Níveis
 `Calouro` e `Formando` diferem só na frequência de erro deliberado. Medido com
-placar espelhado (as duas orientações na mesma seed, para o viés de assento
+placar espelhado (duas orientações na mesma seed, para o viés de assento
 cancelar): formando 22×2 no calouro e 24×0 no aleatório, em 24 partidas cada.
+
+O bot **joga no servidor**: `POST /matches` com `level` cria a partida com o
+assento 1 controlado por ele, e o ator da partida o faz jogar enquanto for a
+vez dele — o cliente não pede nada por ele. Verificado em navegador: "Jogar
+contra o formando" e cinco turnos depois o humano estava em 0 de vida.
+Partida contra bot **não é gravada** (ver `arquitetura.md` §5).
+
 Falta do M2: Pixi, chibi, transição de cena e duelo offline por WASM.
 
 **Próximo:** o resto do M2. O roteiro está em `docs/roadmap.md`; siga por ele

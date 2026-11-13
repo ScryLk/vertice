@@ -14,6 +14,7 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use tokio::sync::{mpsc, oneshot, RwLock};
+use vertice_bot::Level;
 use vertice_core::{CardId, EngineError};
 
 use crate::actor::{Actor, Command};
@@ -85,7 +86,7 @@ impl Registry {
         seed: u64,
     ) -> Result<String, EngineError> {
         let id = format!("partida-{}", self.counter.fetch_add(1, Ordering::Relaxed));
-        let actor = Actor::new(id.clone(), &deck0, &deck1, seed, self.store.clone())?;
+        let actor = Actor::new(id.clone(), &deck0, &deck1, seed, self.store.clone(), [None; 2])?;
         self.register(id.clone(), actor).await;
 
         Ok(id)
@@ -102,8 +103,36 @@ impl Registry {
 
         let deck0 = deck_provisorio(0);
         let deck1 = deck_provisorio(3);
-        let actor = Actor::new(id.clone(), &deck0, &deck1, seed, self.store.clone())?;
+        let actor = Actor::new(id.clone(), &deck0, &deck1, seed, self.store.clone(), [None; 2])?;
         self.register(id.clone(), actor).await;
+        Ok(id)
+    }
+
+    /// Cria uma partida contra o bot. O humano é o assento 0.
+    ///
+    /// **Não é gravada**, e é de propósito. Persistir exigiria gravar junto a
+    /// configuração do bot — assento e nível —, que não cabe no `MatchRecord`
+    /// do motor. Um registro que voltasse do disco sem ela voltaria como
+    /// partida travada, esperando um jogador que não existe, e isso é pior
+    /// que não ter o registro. Gravar partida contra bot é trabalho do M3,
+    /// quando a campanha precisar ser retomada.
+    ///
+    /// Os dois lados usam o mesmo baralho: `baralho(0)` e `baralho(3)` não têm
+    /// a mesma composição (ver `deck_provisorio`), e num duelo contra a máquina
+    /// não há por que dar uma mão melhor a um dos lados.
+    pub async fn create_vs_bot(
+        &self,
+        seed: Option<u64>,
+        level: Level,
+    ) -> Result<String, EngineError> {
+        let number = self.counter.fetch_add(1, Ordering::Relaxed);
+        let seed = seed.unwrap_or(number);
+        let id = format!("partida-{number}");
+
+        let deck = deck_provisorio(0);
+        let actor = Actor::new(id.clone(), &deck, &deck, seed, None, [None, Some(level)])?;
+        self.register(id.clone(), actor).await;
+
         Ok(id)
     }
 
