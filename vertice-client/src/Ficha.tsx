@@ -72,6 +72,23 @@ function textoDoGatilho(effect: EffectDto, quando: 'Ao entrar' | 'Ao morrer'): s
   }
 }
 
+/**
+ * Tudo o que a carta faz, numa linha.
+ *
+ * Para onde não cabe a ficha inteira — a mão do duelo. Reaproveita as mesmas
+ * frases da ficha de propósito: duas redações para a mesma carta divergem, e a
+ * que fica escondida é sempre a que mente.
+ */
+export function resumoDaCarta(carta: CardDefDto): string | null {
+  const partes = [
+    textoDoEfeito(carta.effect),
+    carta.on_enter ? textoDoGatilho(carta.on_enter, 'Ao entrar') : null,
+    carta.on_die ? textoDoGatilho(carta.on_die, 'Ao morrer') : null,
+  ].filter((parte): parte is string => parte !== null);
+
+  return partes.length > 0 ? partes.join(' ') : null;
+}
+
 function numeroDeCatalogo(id: number): string {
   return String(id).padStart(4, '0');
 }

@@ -14,6 +14,44 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Duel } from './Duel';
 import type { CardViewDto, PlayerViewDto } from './protocol';
 
+// O catálogo real vem do WASM; aqui ele é fixo. O que se prova nesta suíte é a
+// renderização, e o catálogo é a única dependência que o teste não controla.
+vi.mock('./acervo', () => ({
+  useAcervo: () =>
+    new Map([
+      [
+        7,
+        {
+          id: 7,
+          name: 'Faísca',
+          cost: 1,
+          kind: 'spell',
+          power: 0,
+          toughness: 0,
+          keywords: [],
+          effect: { kind: 'deal_damage', amount: 2 },
+          on_enter: null,
+          on_die: null,
+        },
+      ],
+      [
+        8,
+        {
+          id: 8,
+          name: 'Arqueiro do Pátio',
+          cost: 2,
+          kind: 'creature',
+          power: 1,
+          toughness: 2,
+          keywords: [],
+          effect: { kind: 'none' },
+          on_enter: { kind: 'deal_damage', amount: 2 },
+          on_die: null,
+        },
+      ],
+    ]),
+}));
+
 afterEach(cleanup);
 
 function carta(campos: Partial<CardViewDto> & { object: number; name: string }): CardViewDto {
@@ -71,7 +109,10 @@ const COM_ACOES = visao({
     mana: 1,
     library_count: 90,
     graveyard: [],
-    hand: [carta({ object: 10, name: 'Várzea de Cruzilha' }), carta({ object: 11, name: 'Faísca' })],
+    hand: [
+      carta({ object: 10, name: 'Várzea de Cruzilha' }),
+      carta({ object: 11, card: 7, name: 'Faísca' }),
+    ],
     battlefield: [carta({ object: 20, name: 'Cão de Dívida', power: 2, toughness: 2 })],
   },
   opponent: {
@@ -114,11 +155,45 @@ describe('Duel', () => {
     const rotulos = screen.getAllByRole('button').map((botao) => botao.textContent);
     expect(rotulos).toEqual([
       'Baixar Várzea de Cruzilha',
-      'Conjurar Faísca → objeto 30',
+      'Conjurar Faísca → Corvo do Arquivo',
       'Atacar com Cão de Dívida → jogador 1',
       'Passar',
       'Encerrar turno',
     ]);
+  });
+
+  it('a mão mostra o que a carta faz', () => {
+    // A `PlayerView` carrega o id da carta, não o texto. Sem o catálogo, a mão
+    // mostra nome e corpo e o jogador conjura no escuro.
+    const { container } = render(
+      <Duel view={COM_ACOES} estado="conectado" aviso={null} jogar={vi.fn()} />,
+    );
+    expect(screen.getByText('Causa 2 de dano.')).toBeTruthy();
+
+    // E sem corpo inventado: nem o terreno nem a mágica têm 0/0 para mostrar.
+    const mao = [...container.querySelectorAll('.zona')].find((zona) =>
+      zona.querySelector('h3')?.textContent?.startsWith('Sua mão'),
+    );
+    expect(mao?.querySelectorAll('.corpo')).toHaveLength(0);
+  });
+
+  it('a mão mostra o gatilho, que é o que o alvo do botão vai fazer', () => {
+    mostrar(
+      visao({
+        you: {
+          id: 0,
+          life: 40,
+          mana: 2,
+          library_count: 90,
+          graveyard: [],
+          hand: [
+            carta({ object: 12, card: 8, name: 'Arqueiro do Pátio', power: 1, toughness: 2 }),
+          ],
+          battlefield: [],
+        },
+      }),
+    );
+    expect(screen.getByText('Ao entrar, cause 2 de dano a um alvo.')).toBeTruthy();
   });
 
   it('clicar manda a ação exata que veio do servidor', () => {

@@ -1,6 +1,9 @@
+import { useAcervo, type Acervo } from './acervo';
+import { resumoDaCarta } from './Ficha';
 import {
   nomeDaPalavraChave,
   type ActionDto,
+  type CardDefDto,
   type CardViewDto,
   type PlayerViewDto,
   type TargetDto,
@@ -19,8 +22,15 @@ function nomeDoObjeto(view: PlayerViewDto, object: number): string {
   return visiveis.find((carta) => carta.object === object)?.name ?? `objeto ${object}`;
 }
 
-function nomeDoAlvo(target: TargetDto): string {
-  return target.type === 'player' ? `jogador ${target.player}` : `objeto ${target.object}`;
+/**
+ * O alvo pelo nome, não pelo id.
+ *
+ * `objeto 30` não diz nada a quem está jogando; `Corvo do Arquivo` diz. Quando
+ * a criatura não está visível — e só então — cai para o id, porque inventar um
+ * nome seria pior que assumir que não se sabe.
+ */
+function nomeDoAlvo(view: PlayerViewDto, target: TargetDto): string {
+  return target.type === 'player' ? `jogador ${target.player}` : nomeDoObjeto(view, target.object);
 }
 
 function rotuloDaAcao(view: PlayerViewDto, acao: ActionDto): string {
@@ -29,10 +39,10 @@ function rotuloDaAcao(view: PlayerViewDto, acao: ActionDto): string {
       return `Baixar ${nomeDoObjeto(view, acao.object)}`;
     case 'cast':
       return acao.target
-        ? `Conjurar ${nomeDoObjeto(view, acao.object)} → ${nomeDoAlvo(acao.target)}`
+        ? `Conjurar ${nomeDoObjeto(view, acao.object)} → ${nomeDoAlvo(view, acao.target)}`
         : `Conjurar ${nomeDoObjeto(view, acao.object)}`;
     case 'attack':
-      return `Atacar com ${nomeDoObjeto(view, acao.attacker)} → ${nomeDoAlvo(acao.target)}`;
+      return `Atacar com ${nomeDoObjeto(view, acao.attacker)} → ${nomeDoAlvo(view, acao.target)}`;
     case 'pass':
       return 'Passar';
     case 'end_turn':
@@ -40,23 +50,50 @@ function rotuloDaAcao(view: PlayerViewDto, acao: ActionDto): string {
   }
 }
 
-function Carta({ carta, minha }: { carta: CardViewDto; minha: boolean }) {
+function Carta({
+  carta,
+  minha,
+  def,
+}: {
+  carta: CardViewDto;
+  minha: boolean;
+  def?: CardDefDto;
+}) {
   const marcas = carta.keywords.map(nomeDaPalavraChave);
   if (carta.damage > 0) marcas.push(`${carta.damage} de dano`);
   if (carta.tapped) marcas.push('virada');
 
+  // O texto da carta só aparece onde ele decide alguma coisa: na mão. No campo
+  // a linha viraria ruído, e o que importa ali já está nas marcas.
+  const efeito = def ? resumoDaCarta(def) : null;
+
   return (
     <li className={`carta ${minha ? 'minha' : 'alheia'} ${carta.tapped ? 'virada' : ''}`}>
       <span className="nome">{carta.name}</span>
-      <span className="corpo">
-        {carta.power}/{carta.toughness}
-      </span>
+      {/* Corpo só quando existe. "0/0" embaixo de uma mágica não é informação,
+          é ruído — e com o texto da carta logo abaixo, ruído atrapalha. */}
+      {(carta.power > 0 || carta.toughness > 0) && (
+        <span className="corpo">
+          {carta.power}/{carta.toughness}
+        </span>
+      )}
       {marcas.length > 0 && <span className="marcas">{marcas.join(' · ')}</span>}
+      {efeito && <span className="efeito">{efeito}</span>}
     </li>
   );
 }
 
-function Zona({ titulo, cartas, minha }: { titulo: string; cartas: CardViewDto[]; minha: boolean }) {
+function Zona({
+  titulo,
+  cartas,
+  minha,
+  acervo,
+}: {
+  titulo: string;
+  cartas: CardViewDto[];
+  minha: boolean;
+  acervo?: Acervo | null;
+}) {
   return (
     <section className="zona">
       <h3>
@@ -67,7 +104,12 @@ function Zona({ titulo, cartas, minha }: { titulo: string; cartas: CardViewDto[]
       ) : (
         <ul className="cartas">
           {cartas.map((carta) => (
-            <Carta key={carta.object} carta={carta} minha={minha} />
+            <Carta
+              key={carta.object}
+              carta={carta}
+              minha={minha}
+              def={acervo?.get(carta.card)}
+            />
           ))}
         </ul>
       )}
@@ -77,6 +119,7 @@ function Zona({ titulo, cartas, minha }: { titulo: string; cartas: CardViewDto[]
 
 export function Duel({ view, estado, aviso, jogar }: Props) {
   const encerrada = view.winner !== null;
+  const acervo = useAcervo();
 
   return (
     <div className="mesa">
@@ -124,7 +167,7 @@ export function Duel({ view, estado, aviso, jogar }: Props) {
           baralho
         </h2>
         <Zona titulo="Seu campo" cartas={view.you.battlefield} minha />
-        <Zona titulo="Sua mão" cartas={view.you.hand} minha />
+        <Zona titulo="Sua mão" cartas={view.you.hand} minha acervo={acervo} />
       </section>
 
       <section className="acoes">

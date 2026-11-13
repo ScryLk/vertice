@@ -80,6 +80,7 @@ semanas depois.
 | `vertice-server/src/{http,registry,store}.rs` | WebSocket, `POST /matches`, persistência | `server-authority` |
 | `vertice-client/src/Ficha.tsx` | a carta como verbete; o sigilo é gerado do dado | `client-overworld` |
 | `vertice-client/src/{App,Duel,Catalogo}.tsx` | lobby, mesa e acervo | `client-overworld` |
+| `vertice-client/src/acervo.ts` | catálogo por `CardId` vindo do WASM; é o que deixa a mão mostrar o texto da carta | `client-overworld` |
 | `vertice-client/src/cenario/` | Pixi: a mesa e as leylines, tudo procedural | `client-overworld` |
 | `vertice-bot/src/eval.rs` | pesos da avaliação de tabuleiro | `engine-rules` |
 | `vertice-bot/src/lib.rs` | `choose_action` e níveis de dificuldade | `engine-rules` |
@@ -378,6 +379,16 @@ novas, ids 80..91, `next_id = 92`, `CARD_SET_VERSION = "m2.4"`,
 `on_die` com alvo **continua cortado**, e agora por um motivo sozinho: a criatura
 morre pela ação de outra pessoa, e não existe ação do controlador para carregar
 a escolha. Abrir isso é gatilho na pilha — a fatia que falta.
+
+**A mão do duelo passou a mostrar o que a carta faz.** A `PlayerView` carrega só
+o id da carta, então a mão mostrava nome e corpo, e com gatilho com alvo o
+jogador escolhia entre vários botões sem saber o que cada um fazia. Agora
+`src/acervo.ts` indexa o catálogo do WASM por id e o `Duel` usa `resumoDaCarta`
+(as mesmas frases da ficha) para escrever o efeito sob a carta. O rótulo do alvo
+também deixou de ser `objeto 30` e virou o nome. Zero de protocolo: definição de
+carta é dado público e não precisa viajar na view. O módulo chama-se `acervo` e
+não `catalogo` porque `Catalogo.tsx` já existe e o macOS não diferencia
+maiúscula de minúscula.
 
 Falta do M2: **chibi e a transição a partir do overworld** — as duas dependem
 de arte que não é procedural, e a segunda depende de uma cena que só existe no

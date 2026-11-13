@@ -151,6 +151,19 @@ body {
   color: var(--apagado);
 }
 
+/*
+ * O texto da carta na mão. É onde a decisão acontece: sem ele, escolher entre
+ * vários botões "Conjurar X → alvo" é escolher às cegas.
+ */
+.carta .efeito {
+  font-size: 11px;
+  line-height: 1.3;
+  max-width: 200px;
+  margin-top: 2px;
+  color: var(--apagado);
+  font-family: ui-serif, Georgia, 'Times New Roman', serif;
+}
+
 .vazio {
   color: var(--apagado);
   margin: 4px 0;
