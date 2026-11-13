@@ -1,0 +1,9 @@
+slug = "zelador-de-chaves"
+name = "Zelador de Chaves"
+cost = 2
+type = "creature"
+power = 1
+toughness = 2
+keywords = ["vigilance"]
+effect = { kind = "none" }
+on_enter = { kind = "gain_life", amount = 2 }

@@ -36,8 +36,13 @@ pub use view::{view, PlayerView};
 /// 0.2.0 acrescentou fim de partida: vida <= 0 encerra o jogo e `winner`
 /// passa a fazer parte do estado. Um `MatchRecord` da 0.1.0 não significa a
 /// mesma coisa, então a versão tinha que dizer isso.
-pub const ENGINE_VERSION: &str = "0.2.0";
-pub const CARD_SET_VERSION: &str = "m2.1";
+///
+/// 0.3.0 acrescentou gatilho de entrada (`CardDef.on_enter`). O estado ganhou
+/// **nenhum** campo novo — o gatilho é dado da carta e resolve dentro da
+/// conjuração —, mas a mesma sequência de ações deixa de levar ao mesmo
+/// estado, que é precisamente o que a versão precisa dizer.
+pub const ENGINE_VERSION: &str = "0.3.0";
+pub const CARD_SET_VERSION: &str = "m2.2";
 
 /// Vida inicial. Comandante usa 40.
 pub const STARTING_LIFE: i32 = 40;

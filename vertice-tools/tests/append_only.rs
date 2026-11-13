@@ -287,3 +287,95 @@ fn campo_desconhecido_e_recusado() {
         "esperava recusa apontando o campo, veio: {erro}"
     );
 }
+
+// ------------------------------------------------------------ gatilho de entrada
+
+const COM_GATILHO: &str = r#"
+slug = "vigia"
+name = "Vigia"
+cost = 3
+type = "creature"
+power = 2
+toughness = 2
+effect = { kind = "none" }
+on_enter = { kind = "draw", amount = 1 }
+"#;
+
+#[test]
+fn gatilho_em_magica_e_recusado() {
+    let magica = r#"
+slug = "eco"
+name = "Eco"
+cost = 2
+type = "spell"
+effect = { kind = "draw", amount = 2 }
+on_enter = { kind = "draw", amount = 1 }
+"#;
+    let erros = errors(&registry(1, &[("eco", 0)]), "", &[magica]);
+    assert!(
+        contains(&erros, "mágica com gatilho"),
+        "veio: {erros:#?}"
+    );
+}
+
+#[test]
+fn gatilho_com_efeito_de_alvo_e_recusado() {
+    // O corte da fatia: gatilho com alvo exigiria escolha no meio da
+    // resolução. Recusar no validador é o que impede a carta de existir para
+    // depois o motor ignorá-la em silêncio.
+    let com_alvo = r#"
+slug = "brasa-vigiada"
+name = "Brasa Vigiada"
+cost = 3
+type = "creature"
+power = 2
+toughness = 2
+effect = { kind = "none" }
+on_enter = { kind = "deal_damage", amount = 2 }
+"#;
+    let erros = errors(&registry(1, &[("brasa-vigiada", 0)]), "", &[com_alvo]);
+    assert!(contains(&erros, "exige alvo"), "veio: {erros:#?}");
+}
+
+#[test]
+fn alterar_gatilho_de_carta_publicada_e_recusado() {
+    let alterado = COM_GATILHO.replace("amount = 1", "amount = 2");
+    let erros = errors(
+        &registry(1, &[("vigia", 0)]),
+        &lock_for(&[(0, COM_GATILHO)]),
+        &[&alterado],
+    );
+    assert!(
+        contains(&erros, "carta publicada alterada"),
+        "veio: {erros:#?}"
+    );
+}
+
+#[test]
+fn acrescentar_gatilho_a_carta_publicada_e_recusado() {
+    // O caso que o hash condicional precisa cobrir. Se o campo ausente e o
+    // presente hasheassem igual, publicar a carta sem gatilho e acrescentá-lo
+    // depois passaria batido — e a carta mudaria de comportamento sem que
+    // ninguém soubesse.
+    let sem_gatilho = COM_GATILHO.replace("on_enter = { kind = \"draw\", amount = 1 }\n", "");
+    let erros = errors(
+        &registry(1, &[("vigia", 0)]),
+        &lock_for(&[(0, &sem_gatilho)]),
+        &[COM_GATILHO],
+    );
+    assert!(
+        contains(&erros, "carta publicada alterada"),
+        "veio: {erros:#?}"
+    );
+}
+
+#[test]
+fn carta_sem_gatilho_publica_normalmente() {
+    // A contraprova: o hash condicional não pode ter quebrado o caminho comum.
+    let erros = errors(
+        &registry(1, &[("vigia", 0)]),
+        &lock_for(&[(0, COM_GATILHO)]),
+        &[COM_GATILHO],
+    );
+    assert!(erros.is_empty(), "carta publicada e não tocada: {erros:#?}");
+}

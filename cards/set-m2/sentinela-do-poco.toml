@@ -1,0 +1,8 @@
+slug = "sentinela-do-poco"
+name = "Sentinela do Poço"
+cost = 5
+type = "creature"
+power = 3
+toughness = 3
+effect = { kind = "none" }
+on_enter = { kind = "gain_life", amount = 4 }

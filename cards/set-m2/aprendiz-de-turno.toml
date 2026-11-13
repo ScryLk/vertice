@@ -1,0 +1,8 @@
+slug = "aprendiz-de-turno"
+name = "Aprendiz de Turno"
+cost = 3
+type = "creature"
+power = 2
+toughness = 1
+effect = { kind = "none" }
+on_enter = { kind = "draw", amount = 1 }

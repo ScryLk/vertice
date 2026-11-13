@@ -25,6 +25,7 @@ fn criatura(power: i8, toughness: i8, keywords: &[Keyword]) -> Card {
         toughness,
         keywords: keywords.to_vec(),
         effect: Effect::None,
+        on_enter: None,
         justificativa: None,
     }
 }
@@ -39,6 +40,7 @@ fn magica(effect: Effect) -> Card {
         toughness: 0,
         keywords: Vec::new(),
         effect,
+        on_enter: None,
         justificativa: None,
     }
 }
@@ -100,6 +102,21 @@ fn peso_de_palavra_chave_soma() {
         )),
         Some(2)
     );
+}
+
+#[test]
+fn gatilho_de_entrada_entra_no_custo() {
+    // A criatura carrega o efeito: sem cobrar por ele, o validador certificaria
+    // uma carta barata demais — o único tipo de erro que passa no portão e
+    // estraga o jogo depois.
+    let mut carta = criatura(2, 2, &[]);
+    assert_eq!(curve::reference(&carta), Some(2));
+
+    carta.on_enter = Some(Effect::Draw(1));
+    assert_eq!(curve::reference(&carta), Some(3));
+
+    carta.on_enter = Some(Effect::GainLife(4));
+    assert_eq!(curve::reference(&carta), Some(4));
 }
 
 #[test]

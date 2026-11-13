@@ -1,0 +1,9 @@
+slug = "tabeliao-de-baluarte"
+name = "Tabelião de Baluarte"
+cost = 5
+type = "creature"
+power = 2
+toughness = 2
+keywords = ["flying"]
+effect = { kind = "none" }
+on_enter = { kind = "draw", amount = 1 }

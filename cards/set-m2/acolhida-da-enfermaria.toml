@@ -1,0 +1,8 @@
+slug = "acolhida-da-enfermaria"
+name = "Acolhida da Enfermaria"
+cost = 3
+type = "creature"
+power = 1
+toughness = 3
+effect = { kind = "none" }
+on_enter = { kind = "gain_life", amount = 3 }

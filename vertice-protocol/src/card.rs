@@ -26,6 +26,7 @@ pub enum EffectDto {
     DealDamage { amount: u8 },
     Draw { amount: u8 },
     Pump { power: i8, toughness: i8 },
+    GainLife { amount: u8 },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -38,6 +39,10 @@ pub struct CardDefDto {
     pub toughness: i8,
     pub keywords: Vec<KeywordDto>,
     pub effect: EffectDto,
+    /// Gatilho de entrada. `null` quando a carta não tem — e a maioria não
+    /// tem, então o campo é sempre enviado para que o cliente não precise
+    /// distinguir "ausente" de "não manda este campo".
+    pub on_enter: Option<EffectDto>,
 }
 
 impl From<&CardDef> for CardDefDto {
@@ -54,12 +59,20 @@ impl From<&CardDef> for CardDefDto {
             power: def.power,
             toughness: def.toughness,
             keywords: def.keywords.iter().copied().map(KeywordDto::from).collect(),
-            effect: match def.effect {
-                Effect::None => EffectDto::None,
-                Effect::DealDamage(amount) => EffectDto::DealDamage { amount },
-                Effect::Draw(amount) => EffectDto::Draw { amount },
-                Effect::Pump(power, toughness) => EffectDto::Pump { power, toughness },
-            },
+            effect: effect_dto(def.effect),
+            on_enter: def.on_enter.map(effect_dto),
         }
+    }
+}
+
+/// Conversão exaustiva: efeito novo no motor quebra o build aqui, e é o que
+/// se quer — o cliente precisa saber desenhar o que o motor sabe fazer.
+fn effect_dto(effect: Effect) -> EffectDto {
+    match effect {
+        Effect::None => EffectDto::None,
+        Effect::DealDamage(amount) => EffectDto::DealDamage { amount },
+        Effect::Draw(amount) => EffectDto::Draw { amount },
+        Effect::Pump(power, toughness) => EffectDto::Pump { power, toughness },
+        Effect::GainLife(amount) => EffectDto::GainLife { amount },
     }
 }

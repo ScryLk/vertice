@@ -33,9 +33,32 @@ function textoDoEfeito(effect: EffectDto): string | null {
     case 'deal_damage':
       return `Causa ${effect.amount} de dano.`;
     case 'draw':
-      return `Compre ${effect.amount} cartas.`;
+      return `Compre ${effect.amount} ${effect.amount === 1 ? 'carta' : 'cartas'}.`;
+    case 'gain_life':
+      return `Ganha ${effect.amount} de vida.`;
     case 'pump':
       return `${effect.power >= 0 ? '+' : ''}${effect.power}/${effect.toughness >= 0 ? '+' : ''}${effect.toughness}.`;
+  }
+}
+
+/**
+ * O gatilho de entrada em texto.
+ *
+ * Separado de `textoDoEfeito` porque a frase muda de sujeito: "Causa 3 de
+ * dano" vira "Ao entrar, causa 3 de dano", e juntar as duas com concatenação
+ * produziria "Ao entrar, Compre 1 carta". Duas funções pequenas e certas valem
+ * mais que uma genérica e torta.
+ */
+function textoDoGatilho(effect: EffectDto): string | null {
+  switch (effect.kind) {
+    case 'draw':
+      return `Ao entrar, compre ${effect.amount} ${effect.amount === 1 ? 'carta' : 'cartas'}.`;
+    case 'gain_life':
+      return `Ao entrar, ganhe ${effect.amount} de vida.`;
+    default:
+      // O validador só deixa passar gatilho sem alvo. Se um dia chegar outro
+      // aqui, a ficha cala em vez de mentir.
+      return null;
   }
 }
 
@@ -51,7 +74,13 @@ function numeroDeCatalogo(id: number): string {
  */
 function Sigilo({ carta }: { carta: CardDefDto }) {
   const tracos = carta.cost;
-  const magnitude = carta.effect.kind === 'pump' ? Math.abs(carta.effect.power) : 0;
+  // A marca central mostra o que a carta *faz* — e criatura não tem efeito
+  // próprio: o que ela faz é o gatilho. Sem esta troca, duas criaturas de
+  // mesmo corpo e gatilhos diferentes sairiam com o mesmo glifo, que é
+  // exatamente o defeito que já apareceu com −1/−1 e −3/−3.
+  const marca: EffectDto =
+    carta.effect.kind !== 'none' ? carta.effect : (carta.on_enter ?? carta.effect);
+  const magnitude = marca.kind === 'pump' ? Math.abs(marca.power) : 0;
   const forcaDoPump = Math.min(26, 8 + magnitude * 5);
   const moldura =
     carta.kind === 'land'
@@ -73,9 +102,9 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
         return <line key={indice} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth="2" />;
       })}
 
-      {carta.effect.kind === 'none' && <circle cx="50" cy="50" r="3" fill="currentColor" />}
-      {carta.effect.kind === 'deal_damage' &&
-        Array.from({ length: carta.effect.amount }, (_, indice) => (
+      {marca.kind === 'none' && <circle cx="50" cy="50" r="3" fill="currentColor" />}
+      {marca.kind === 'deal_damage' &&
+        Array.from({ length: marca.amount }, (_, indice) => (
           <line
             key={indice}
             x1={38 + indice * 8}
@@ -86,17 +115,35 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
             strokeWidth="3"
           />
         ))}
-      {carta.effect.kind === 'draw' &&
-        Array.from({ length: carta.effect.amount }, (_, indice) => (
+      {marca.kind === 'draw' &&
+        Array.from({ length: marca.amount }, (_, indice) => (
           <circle key={indice} cx={42 + indice * 16} cy={50} r="5" fill="none" stroke="currentColor" strokeWidth="2" />
         ))}
-      {carta.effect.kind === 'pump' && (
+      {marca.kind === 'gain_life' && (
+        // Losango, e o tamanho carrega a magnitude — mesma lição do pump:
+        // glifo que ignora número faz duas cartas diferentes parecerem iguais.
+        //
+        // Losango e não anel: o anel de palavra-chave já mora no mesmo centro,
+        // e com 1 palavra-chave e 2 de vida os dois caíam no mesmo raio. Visto
+        // no acervo com 66 cartas — a mesma colisão de glifo que já apareceu
+        // com +2/+2 e +4/+4, só que entre eixos diferentes.
+        <path
+          d={(() => {
+            const r = Math.min(14, 6 + marca.amount);
+            return `M50 ${50 - r} L${50 + r} 50 L50 ${50 + r} L${50 - r} 50 Z`;
+          })()}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+        />
+      )}
+      {marca.kind === 'pump' && (
         // O comprimento do traço carrega a magnitude. Sem isso, +2/+2 e +4/+4
         // ficam com o mesmo glifo — visível no acervo real, e o sigilo deixa
         // de dizer o que a carta faz.
         <path
           d={
-            carta.effect.power < 0
+            marca.power < 0
               ? `M${50 - forcaDoPump} 50 H${50 + forcaDoPump}`
               : `M50 ${50 - forcaDoPump} V${50 + forcaDoPump} M${50 - forcaDoPump} 50 H${50 + forcaDoPump}`
           }
@@ -106,12 +153,23 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
         />
       )}
 
+      {carta.on_enter && (
+        // Gatilho de entrada: anel contínuo por fora de tudo. Contínuo porque
+        // o tracejado já significa palavra-chave — a diferença de estilo é o
+        // que distingue os dois anéis sem cor.
+        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2" />
+      )}
+
       {carta.keywords.map((palavra, indice) => (
+        // A partir de 18, e não de 10: a faixa de 3 a 13 do centro é da marca
+        // do efeito — desenho de compra e losango de vida moram ali. Com o
+        // raio antigo o anel de palavra-chave caía em cima deles, e duas
+        // cartas que só diferem na palavra-chave saíam iguais.
         <circle
           key={palavra}
           cx={50}
           cy={50}
-          r={10 + indice * 5}
+          r={18 + indice * 5}
           fill="none"
           stroke="currentColor"
           strokeWidth="1"
@@ -124,6 +182,7 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
 
 export function Ficha({ carta, escala = 1 }: { carta: CardDefDto; escala?: number }) {
   const efeito = textoDoEfeito(carta.effect);
+  const gatilho = carta.on_enter ? textoDoGatilho(carta.on_enter) : null;
   const palavras = carta.keywords.map((palavra) => NOME_DA_PALAVRA[palavra]);
   const ehCriatura = carta.kind === 'creature';
 
@@ -149,6 +208,7 @@ export function Ficha({ carta, escala = 1 }: { carta: CardDefDto; escala?: numbe
       </p>
 
       {efeito && <p className="ficha-efeito">{efeito}</p>}
+      {gatilho && <p className="ficha-efeito ficha-gatilho">{gatilho}</p>}
 
       <footer className="ficha-rodape">
         <span className="selo" aria-hidden="true">

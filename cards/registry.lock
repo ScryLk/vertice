@@ -252,3 +252,83 @@ sha256 = "8e2a03581a9507612c6219dc12b9e4d9cc98c9a87ad66c19948ba84de4818b09"
 slug = "mingua"
 id = 49
 sha256 = "478a2fcfaa1354d0d3d42aac41f3989719345839fd4a40775e763ea8b72583ab"
+
+[[card]]
+slug = "escriba-do-arquivo"
+id = 50
+sha256 = "25232e1607015b786099b616ce36ee780323f906bb1c0923543ff21cfc55a764"
+
+[[card]]
+slug = "aprendiz-de-turno"
+id = 51
+sha256 = "a279613518aa2a34e5081c7469411813a6b5747fa36db44240a6eca8b6ebcba3"
+
+[[card]]
+slug = "copista-veloz"
+id = 52
+sha256 = "e1a03c0f48d6e304cbc32442ddfdfaacb5e33b10ccb45ace7eea43abe1e36efb"
+
+[[card]]
+slug = "tabeliao-de-baluarte"
+id = 53
+sha256 = "e69b10fb54834a2d87d5796422e3e6c68f9d8d9c02f4f5e7728f38d4291a3d4f"
+
+[[card]]
+slug = "guia-do-patio"
+id = 54
+sha256 = "8f09e10c82e416668d1af3b8041bef5afc21d4a91ef5d4a5b45196f705590292"
+
+[[card]]
+slug = "leitor-de-sulcos"
+id = 55
+sha256 = "4b6258d458ac21a50ae33800273c79a1e575d5d57b60862ef0864cd5f6d36c3f"
+
+[[card]]
+slug = "acolhida-da-enfermaria"
+id = 56
+sha256 = "7cae22683668fcd47d0b4f13cf64bc141f5981750c4e2355822909e0b1c31ccb"
+
+[[card]]
+slug = "vigia-da-portaria"
+id = 57
+sha256 = "682550002e016dc4b393d4b7f69121bffb7a7f901956d3320237afb3a46ba713"
+
+[[card]]
+slug = "zelador-de-chaves"
+id = 58
+sha256 = "7966068240c33e5561dfd178d44c11c3319ee2120d822b54cd4e8bb9338a48f3"
+
+[[card]]
+slug = "sentinela-do-poco"
+id = 59
+sha256 = "1e06d69936aa1b24f957e32ecf31be2ed85f98a85149a1a94e427b23442879bd"
+
+[[card]]
+slug = "mordomo-do-arquivo"
+id = 60
+sha256 = "21a5bb50708959558ea48546ee5f74a3144b365a63de6db168bea31aded46b53"
+
+[[card]]
+slug = "curativo-de-campo"
+id = 61
+sha256 = "6943da131b692d8d9199298b6f32dc1d028f965af77e2e34975313865c9067df"
+
+[[card]]
+slug = "folego-retomado"
+id = 62
+sha256 = "199cf532eb87bbf645f659819caca2c55e697d652b6f08bdd7e207cd96ffd31c"
+
+[[card]]
+slug = "tonico-do-arquivo"
+id = 63
+sha256 = "243e8025e3f8b4bdffd20abd70c53606848d753c1bfb1a4d94b211354fc25941"
+
+[[card]]
+slug = "batedor-de-telhado"
+id = 64
+sha256 = "02b3f348bdbca2affc4c7c937808d3b29ca1bcfec9b959905b3c111fec08a004"
+
+[[card]]
+slug = "cao-de-guarda-do-arquivo"
+id = 65
+sha256 = "92e82dafb647162067ddbcadc738effb63dd16fd346b6c22460500fb90c55e81"

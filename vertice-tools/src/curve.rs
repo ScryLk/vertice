@@ -65,19 +65,37 @@ pub fn reference(card: &Card) -> Option<i32> {
         Kind::Creature => {
             let corpo = ceil_half(i32::from(card.power) + i32::from(card.toughness));
             let palavras: i32 = card.keywords.iter().copied().map(keyword_weight).sum();
-            Some(corpo + palavras)
+            // O gatilho de entrada é um efeito que a carta carrega: cobra o
+            // mesmo que cobraria como mágica. Sem isso, criatura com gatilho
+            // sairia pelo preço de criatura sem, e o validador estaria
+            // certificando uma carta barata demais — o pior tipo de erro, o
+            // que passa no portão.
+            let gatilho = card.on_enter.and_then(effect_cost).unwrap_or(0);
+            Some(corpo + palavras + gatilho)
         }
-        Kind::Spell => match card.effect {
-            Effect::None => None,
-            // Teto de 2 de dano por 1 mana.
-            Effect::DealDamage(amount) => Some(ceil_half(i32::from(amount))),
-            // Compra de N custa N.
-            Effect::Draw(amount) => Some(i32::from(amount)),
-            // Pump é dano em potencial, mesma régua do dano.
-            Effect::Pump(power, toughness) => Some(ceil_half(
-                i32::from(power).abs().max(i32::from(toughness).abs()),
-            )),
-        },
+        Kind::Spell => effect_cost(card.effect),
+    }
+}
+
+/// Quanto um efeito custa por si. Um efeito é um efeito, venha ele de mágica
+/// conjurada ou de gatilho de entrada — régua única, senão o gatilho vira
+/// desconto.
+fn effect_cost(effect: Effect) -> Option<i32> {
+    match effect {
+        Effect::None => None,
+        // Teto de 2 de dano por 1 mana.
+        Effect::DealDamage(amount) => Some(ceil_half(i32::from(amount))),
+        // Compra de N custa N.
+        Effect::Draw(amount) => Some(i32::from(amount)),
+        // Pump é dano em potencial, mesma régua do dano.
+        Effect::Pump(power, toughness) => Some(ceil_half(
+            i32::from(power).abs().max(i32::from(toughness).abs()),
+        )),
+        // Vida ganha espelha o dano causado. Não foi medida como a base da
+        // criatura foi: ganhar vida é mais fraco que causar dano, e o corpus
+        // tem menos cartas de vida pura para calibrar. Fica a régua do dano
+        // até haver medida melhor — e é o primeiro número a revisar.
+        Effect::GainLife(amount) => Some(ceil_half(i32::from(amount))),
     }
 }
 

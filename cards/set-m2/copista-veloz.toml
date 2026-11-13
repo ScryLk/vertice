@@ -1,0 +1,8 @@
+slug = "copista-veloz"
+name = "Copista Veloz"
+cost = 4
+type = "creature"
+power = 2
+toughness = 2
+effect = { kind = "none" }
+on_enter = { kind = "draw", amount = 1 }

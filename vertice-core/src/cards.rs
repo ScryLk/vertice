@@ -38,6 +38,20 @@ pub enum Effect {
     DealDamage(u8),
     Draw(u8),
     Pump(i8, i8),
+    GainLife(u8),
+}
+
+impl Effect {
+    /// O efeito exige que o jogador escolha um alvo?
+    ///
+    /// Existe uma definição só porque há dois consumidores com interesse
+    /// oposto: o motor pergunta para decidir se a conjuração precisa carregar
+    /// alvo, e o validador pergunta para recusar efeito com alvo em gatilho —
+    /// gatilho com alvo exigiria escolha no meio da resolução, e escolha exige
+    /// janela na pilha, que gatilho ainda não tem. Duas cópias divergiriam.
+    pub fn needs_target(self) -> bool {
+        matches!(self, Effect::DealDamage(_) | Effect::Pump(..))
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -50,6 +64,13 @@ pub struct CardDef {
     pub toughness: i8,
     pub keywords: &'static [Keyword],
     pub effect: Effect,
+    /// Efeito que dispara quando a criatura entra no campo de batalha.
+    ///
+    /// Só criatura tem, e só efeito **sem alvo** cabe aqui. O gatilho resolve
+    /// na hora, dentro da própria conjuração: sem alvo não há escolha, e sem
+    /// escolha não há o que a janela de resposta proteger. Gatilho com alvo é
+    /// fatia própria, e depende de gatilho usar a pilha.
+    pub on_enter: Option<Effect>,
 }
 
 pub const CATALOG_LEN: usize = CATALOG.len();

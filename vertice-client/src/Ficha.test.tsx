@@ -23,6 +23,7 @@ function carta(over: Partial<CardDefDto> = {}): CardDefDto {
     toughness: 1,
     keywords: [],
     effect: { kind: 'none' },
+    on_enter: null,
     ...over,
   };
 }
@@ -97,6 +98,45 @@ describe('Ficha', () => {
     expect(glifo(2)).not.toBe(glifo(4));
     expect(glifo(-1)).not.toBe(glifo(-3));
     expect(glifo(2)).not.toBe(glifo(-2));
+  });
+
+  it('o gatilho de entrada vira texto', () => {
+    const { container } = render(
+      <Ficha carta={carta({ on_enter: { kind: 'draw', amount: 1 } })} />,
+    );
+    expect(container.querySelector('.ficha-gatilho')?.textContent).toBe('Ao entrar, compre 1 carta.');
+  });
+
+  it('o sigilo muda quando a criatura tem gatilho', () => {
+    // A lição de `direcao-visual.md`: um glifo tem que ser função de *tudo*
+    // que distingue a carta. Duas criaturas de mesmo corpo e custo — uma com
+    // compra ao entrar, outra sem — não podem sair idênticas.
+    const glifo = (over: Partial<CardDefDto>) => {
+      const { container } = render(<Ficha carta={carta(over)} />);
+      const svg = container.querySelector('.sigilo')?.innerHTML;
+      cleanup();
+      return svg;
+    };
+
+    expect(glifo({})).not.toBe(glifo({ on_enter: { kind: 'draw', amount: 1 } }));
+    expect(glifo({ on_enter: { kind: 'draw', amount: 1 } })).not.toBe(
+      glifo({ on_enter: { kind: 'gain_life', amount: 1 } }),
+    );
+  });
+
+  it('vida ganha vira texto, e a magnitude muda o glifo', () => {
+    const vida = (amount: number) => {
+      const { container } = render(
+        <Ficha carta={carta({ kind: 'spell', effect: { kind: 'gain_life', amount } })} />,
+      );
+      const texto = container.querySelector('.ficha-efeito')?.textContent;
+      const svg = container.querySelector('.sigilo')?.innerHTML;
+      cleanup();
+      return { texto, svg };
+    };
+
+    expect(vida(3).texto).toBe('Ganha 3 de vida.');
+    expect(vida(2).svg).not.toBe(vida(8).svg);
   });
 
   it('o efeito vira texto legível', () => {

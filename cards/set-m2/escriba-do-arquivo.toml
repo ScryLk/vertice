@@ -1,0 +1,8 @@
+slug = "escriba-do-arquivo"
+name = "Escriba do Arquivo"
+cost = 3
+type = "creature"
+power = 1
+toughness = 2
+effect = { kind = "none" }
+on_enter = { kind = "draw", amount = 1 }

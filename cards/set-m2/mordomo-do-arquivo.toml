@@ -1,0 +1,8 @@
+slug = "mordomo-do-arquivo"
+name = "Mordomo do Arquivo"
+cost = 4
+type = "creature"
+power = 2
+toughness = 3
+effect = { kind = "none" }
+on_enter = { kind = "gain_life", amount = 3 }

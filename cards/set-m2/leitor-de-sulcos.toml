@@ -1,0 +1,8 @@
+slug = "leitor-de-sulcos"
+name = "Leitor de Sulcos"
+cost = 5
+type = "creature"
+power = 3
+toughness = 2
+effect = { kind = "none" }
+on_enter = { kind = "draw", amount = 2 }

@@ -75,6 +75,8 @@ Esta é a seção mais importante do documento. Cada mecânica que você mantive
 
 **Corte resolução ambígua.** Nada de "cada jogador escolhe simultaneamente". Toda escolha é sequencial, com dono claro. Ambiguidade é inferno de implementação e de rede.
 
+**Gatilho de entrada existe desde o M2.1, e só sem alvo.** O motor sabe "quando esta criatura entra, acontece X" — `CardDef.on_enter`, restrito a efeito que não pede alvo (`comprar`, `ganhar vida`). O corte é o alvo, e o motivo é estrutural: escolher alvo no meio de um gatilho exigiria que o gatilho usasse a pilha, e gatilho na pilha é fatia própria. Sem alvo não há escolha, e é isso que permite o gatilho resolver dentro da própria conjuração — está escrito como simplificação no cabeçalho de `engine.rs`. O validador recusa gatilho com alvo, então a carta não chega a existir para o motor ignorar em silêncio. **Gatilho** é a porta de entrada do espaço de design: num corpus externo de ~34 mil cartas, 43% têm habilidade disparada, e o de entrada é o mais comum de todos.
+
 **Palavras-chave são seu melhor conteúdo.** Uma palavra-chave bem definida gera dezenas de cartas quase de graça. Cartas com texto único são caríssimas. Meta: 70% do pool usa palavras-chave da lista fechada, 30% tem texto próprio.
 
 **Comece 1v1.** Faça um duelo completo funcionar ponta a ponta antes de tocar em quatro jogadores. Quatro jogadores multiplica interface, rede, IA e casos de regra por três ou quatro. O modo de quatro é o objetivo, não o ponto de partida.
@@ -123,7 +125,9 @@ A DSL cobre os casos comuns: custo, tipo, palavras-chave, efeito composto de pri
 
 O escape pra cartas esquisitas é **script WASM por carta**, carregado no servidor. Custa mais e é mais lento, então é exceção — se 20% das cartas precisam de WASM, sua DSL está fraca.
 
-**Onde o pool parou, e por quê (M2).** O conjunto tem 50 cartas. Com três palavras-chave e três efeitos, essa é aproximadamente a fronteira em que cada carta ainda é distinguível — passar daqui produz duplicata com outro nome. Chegar às 200–250 abaixo exige **primitivas novas** na DSL (destruir, criar ficha, modificar característica), que é trabalho de motor e uma decisão de regra, não de catálogo. O validador não impede crescer; a distinção é que impede.
+**Onde o pool parou, e por quê (M2).** O conjunto chegou a 50 cartas com três palavras-chave e três efeitos, e ali a distinção acabou: daí para cima o que se produz é duplicata com outro nome. A leitura estava certa, e foi medida — contra um corpus externo de ~34 mil cartas, crescer de 3 para 20 palavras-chave move o alcance de 1,4% para 2,2% do espaço de design. **Palavra-chave nova é a alavanca mais fraca que existe.**
+
+**O que destravou o pool foi primitiva de motor, não de catálogo (M2.1).** `on_enter` e o efeito `gain_life` levaram o conjunto a 66 cartas, e nenhuma delas é duplicata: a criatura que compra ao entrar é um arquétipo que não existia. O mesmo censo que mostrou isso mostrou o tamanho do buraco — 43% das cartas de um card game têm habilidade disparada, 29% têm ativada, e o motor tinha zero. Chegar às 200–250 que esta seção pede continua exigindo primitivas: destruir, criar ficha, gatilho com alvo, gatilho de morte. Cada uma é fatia de motor.
 
 **Tamanho de pool.** Isto é o orçamento real de conteúdo, e ele é maior do que você imagina:
 

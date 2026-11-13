@@ -1,0 +1,9 @@
+slug = "cao-de-guarda-do-arquivo"
+name = "Cão de Guarda do Arquivo"
+cost = 2
+type = "creature"
+power = 1
+toughness = 1
+keywords = ["deathtouch"]
+effect = { kind = "none" }
+on_enter = { kind = "gain_life", amount = 2 }

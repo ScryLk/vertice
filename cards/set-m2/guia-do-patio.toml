@@ -1,0 +1,8 @@
+slug = "guia-do-patio"
+name = "Guia do Pátio"
+cost = 2
+type = "creature"
+power = 1
+toughness = 1
+effect = { kind = "none" }
+on_enter = { kind = "draw", amount = 1 }

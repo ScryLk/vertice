@@ -1,0 +1,5 @@
+slug = "folego-retomado"
+name = "Fôlego Retomado"
+cost = 1
+type = "spell"
+effect = { kind = "gain_life", amount = 2 }

@@ -1,0 +1,5 @@
+slug = "curativo-de-campo"
+name = "Curativo de Campo"
+cost = 2
+type = "spell"
+effect = { kind = "gain_life", amount = 4 }

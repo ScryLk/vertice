@@ -66,6 +66,7 @@ semanas depois.
 | `vertice-core/tests/replay.rs` | determinismo e reprodução | `determinism-guard` |
 | `vertice-core/tests/redaction.rs` | garantia de não vazamento | `redaction-auditor` |
 | `vertice-core/tests/stack.rs` | pilha, fizzle e abertura roteirizada | `engine-rules` |
+| `vertice-core/tests/trigger.rs` | gatilho de entrada: quando dispara e quando não | `engine-rules` |
 | `vertice-core/tests/outcome.rs` | fim de partida e desempate por prioridade | `engine-rules` |
 | `vertice-core/tests/catalog.rs` | invariantes do catálogo gerado | `card-content` |
 | `vertice-core/tests/golden.rs` | partida dourada com fingerprint fixo | `determinism-guard` |
@@ -334,7 +335,23 @@ primeira — a curva estava certa antes de o dado existir.
 efeitos, ~50 cartas é onde a distinção acaba: daqui para cima o que se produz é
 duplicata com outro nome. Chegar às 200–250 que a `arquitetura.md` §6 pede
 exige **primitivas novas** — destruir, criar ficha, modificar característica —,
-e isso é trabalho de motor, não de catálogo. É a próxima decisão de verdade.
+e isso é trabalho de motor, não de catálogo.
+
+**M2.1 — gatilho de entrada, e o pool em 66.** A primeira primitiva de motor
+desde o M0: `CardDef.on_enter` dispara quando a criatura entra, mais o efeito
+`gain_life`. 16 cartas novas em `cards/set-m2/`, ids 50..65, `next_id = 66`,
+`CARD_SET_VERSION = "m2.2"`, `ENGINE_VERSION = "0.3.0"`. O estado ganhou
+**nenhum** campo — o gatilho é dado da carta e resolve dentro da conjuração.
+
+O corte é o alvo: gatilho com alvo exigiria que o gatilho usasse a pilha, e o
+validador recusa a carta antes de o motor poder ignorá-la. A escolha veio de
+medida, não de gosto: num corpus externo de ~34 mil cartas, 43% têm habilidade
+disparada, 29% ativada, e o motor tinha zero de ambas — enquanto crescer de 3
+para 20 palavras-chave movia o alcance de 1,4% para 2,2%. **Palavra-chave é a
+alavanca mais fraca que existe.**
+
+A curva de custo também foi recalibrada: a base da criatura virou
+`⌈(P+T)/2⌉` e o `+1` fixo por palavra-chave virou peso por palavra (`arquitetura.md` §6).
 
 Falta do M2: **chibi e a transição a partir do overworld** — as duas dependem
 de arte que não é procedural, e a segunda depende de uma cena que só existe no

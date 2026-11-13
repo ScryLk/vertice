@@ -1,0 +1,5 @@
+slug = "tonico-do-arquivo"
+name = "Tônico do Arquivo"
+cost = 3
+type = "spell"
+effect = { kind = "gain_life", amount = 6 }

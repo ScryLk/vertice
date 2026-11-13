@@ -113,7 +113,8 @@ export type EffectDto =
   | { kind: 'none' }
   | { kind: 'deal_damage'; amount: number }
   | { kind: 'draw'; amount: number }
-  | { kind: 'pump'; power: number; toughness: number };
+  | { kind: 'pump'; power: number; toughness: number }
+  | { kind: 'gain_life'; amount: number };
 
 export interface CardDefDto {
   id: CardId;
@@ -124,4 +125,6 @@ export interface CardDefDto {
   toughness: number;
   keywords: KeywordDto[];
   effect: EffectDto;
+  /** Gatilho de entrada. O servidor manda `null` quando não há. */
+  on_enter: EffectDto | null;
 }

@@ -13,6 +13,13 @@
 //!   pilha e só vai ao cemitério quando resolve. Se o alvo deixar o campo
 //!   antes disso, ela **fizzla**: não faz nada, mas continua tendo sido
 //!   conjurada e paga.
+//! - **Gatilho de entrada resolve na hora (M2.1).** A criatura entra, o
+//!   efeito de `on_enter` é aplicado ali mesmo, e só depois a ação termina.
+//!   Não abre janela de resposta: o oponente não tem como reagir *antes* de
+//!   o gatilho acontecer. É consequência de o gatilho ser, por construção,
+//!   sem alvo — sem alvo não há escolha, e sem escolha não há o que a janela
+//!   protegeria. No motor real o gatilho iria para a pilha como qualquer
+//!   outra coisa.
 //!
 //! Nenhuma dessas simplificações pode violar as invariantes do crate:
 //! determinismo, redação e autoridade.
@@ -274,6 +281,9 @@ fn cast(state: &mut GameState, object: ObjectId, target: Option<Target>) -> Resu
             state.object_mut(object).summoned = true;
             state.object_mut(object).controller = pid;
             state.player_mut(pid).zones.battlefield.push(object);
+            // A criatura já entrou: o gatilho de entrada dispara agora, e não
+            // depois — o estado que ele observa é o de "já no campo".
+            fire_on_enter(state, object);
         }
         CardKind::Spell => {
             // A carta vai para a pilha, não para o cemitério: ela ainda pode
@@ -325,6 +335,8 @@ fn resolve(state: &mut GameState, pending: PendingSpell) {
     match pending.effect {
         Effect::None => {}
         Effect::Draw(n) => draw(state, pending.controller, n as usize),
+        // Vida não tem alvo: quem ganha é sempre quem controla o efeito.
+        Effect::GainLife(n) => state.player_mut(pending.controller).life += i32::from(n),
         Effect::DealDamage(n) => match pending.target {
             Some(Target::Player(tp)) => {
                 state.player_mut(tp).life -= n as i32;
@@ -345,6 +357,31 @@ fn resolve(state: &mut GameState, pending: PendingSpell) {
                 cleanup(state);
             }
         }
+    }
+}
+
+/// Aplica o efeito de entrada, se a carta tiver um.
+///
+/// O único ponto de entrada de criatura no campo é `cast`, e é por isso que
+/// este gatilho é seguro de resolver na hora: existe exatamente um momento em
+/// que ele pode disparar, e o motor controla esse momento. Quando terreno ou
+/// ficha também dispararem, este é o lugar — mas aí com cuidado, porque
+/// passar a haver mais de um caminho é exatamente o que torna a ordem
+/// interessante.
+///
+/// Efeito com alvo não chega aqui: o validador recusa. O braço `_` existe para
+/// que a DSL possa ganhar um efeito novo sem que este `match` minta.
+fn fire_on_enter(state: &mut GameState, object: ObjectId) {
+    let def = card(state.object(object).card);
+    let Some(effect) = def.on_enter else {
+        return;
+    };
+    let controller = state.object(object).controller;
+
+    match effect {
+        Effect::Draw(n) => draw(state, controller, n as usize),
+        Effect::GainLife(n) => state.player_mut(controller).life += i32::from(n),
+        _ => {}
     }
 }
 
@@ -487,10 +524,6 @@ fn is_on_battlefield(state: &GameState, id: ObjectId) -> bool {
         .any(|p| p.zones.battlefield.contains(&id))
 }
 
-fn needs_target(effect: Effect) -> bool {
-    matches!(effect, Effect::DealDamage(_) | Effect::Pump(..))
-}
-
 fn candidate_casts(state: &GameState, pid: PlayerId) -> Vec<Action> {
     let mut out = Vec::new();
     if state.stack.len() >= 2 {
@@ -505,7 +538,7 @@ fn candidate_casts(state: &GameState, pid: PlayerId) -> Vec<Action> {
         if def.kind == CardKind::Land || mana < def.cost {
             continue;
         }
-        if needs_target(def.effect) {
+        if def.effect.needs_target() {
             for target in effect_targets(state, def.effect) {
                 out.push(Action::Cast {
                     object: oid,

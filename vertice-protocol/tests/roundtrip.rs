@@ -12,7 +12,7 @@
 //!    `PROTOCOL_VERSION` tem que subir e cliente e servidor têm que subir
 //!    juntos.
 
-use vertice_core::cards::CATALOG_LEN;
+use vertice_core::cards::{CATALOG, CATALOG_LEN};
 use vertice_core::*;
 use vertice_protocol::*;
 
@@ -146,6 +146,47 @@ fn forma_json_e_estavel() {
         }))
         .unwrap(),
         r#"{"type":"attack","attacker":3,"target":{"type":"object","object":42}}"#
+    );
+}
+
+#[test]
+fn carta_atravessa_o_json_com_o_gatilho() {
+    // O catálogo não viaja pela rede — ele é assado no cliente pelo WASM. Mas
+    // é por este JSON que a ficha recebe o dado, e um campo que some aqui
+    // some da tela em silêncio: a carta perde o texto do gatilho e o sigilo
+    // passa a dizer que ela não faz nada ao entrar.
+    let com = CATALOG
+        .iter()
+        .find(|def| def.on_enter.is_some())
+        .expect("o conjunto precisa de ao menos uma carta com gatilho");
+    let sem = CATALOG
+        .iter()
+        .find(|def| def.on_enter.is_none())
+        .expect("e de ao menos uma sem");
+
+    let dto = CardDefDto::from(com);
+    let json = serde_json::to_string(&dto).unwrap();
+    assert!(
+        json.contains(r#""on_enter":{"#),
+        "carta com gatilho tem que mandar o gatilho: {json}"
+    );
+    // Ausência vai como `null`, não como campo omitido: o cliente não deve
+    // precisar distinguir "não tem gatilho" de "o servidor é velho".
+    let sem_json = serde_json::to_string(&CardDefDto::from(sem)).unwrap();
+    assert!(
+        sem_json.contains(r#""on_enter":null"#),
+        "carta sem gatilho manda null: {sem_json}"
+    );
+
+    let devolta: CardDefDto = serde_json::from_str(&json).unwrap();
+    assert_eq!(devolta, dto);
+}
+
+#[test]
+fn forma_do_efeito_de_vida_e_estavel() {
+    assert_eq!(
+        serde_json::to_string(&EffectDto::GainLife { amount: 3 }).unwrap(),
+        r#"{"kind":"gain_life","amount":3}"#
     );
 }
 

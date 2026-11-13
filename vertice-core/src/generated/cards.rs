@@ -9,7 +9,7 @@
 
 use crate::cards::{CardDef, CardKind, Effect, Keyword};
 
-/// Catálogo do conjunto. 50 cartas.
+/// Catálogo do conjunto. 66 cartas.
 pub static CATALOG: &[CardDef] = &[
     CardDef {
         id: 0,
@@ -20,6 +20,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 1,
@@ -30,6 +31,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 2,
@@ -40,6 +42,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 2,
         keywords: &[Keyword::Vigilance],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 3,
@@ -50,6 +53,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[Keyword::Flying],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 4,
@@ -60,6 +64,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 2,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 5,
@@ -70,6 +75,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 6,
@@ -80,6 +86,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 4,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 7,
@@ -90,6 +97,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 3,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 8,
@@ -100,6 +108,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[Keyword::Deathtouch],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 9,
@@ -110,6 +119,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::DealDamage(2),
+        on_enter: None,
     },
     CardDef {
         id: 10,
@@ -120,6 +130,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::Draw(2),
+        on_enter: None,
     },
     CardDef {
         id: 11,
@@ -130,6 +141,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::Pump(-2, -2),
+        on_enter: None,
     },
     CardDef {
         id: 12,
@@ -140,6 +152,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::DealDamage(3),
+        on_enter: None,
     },
     CardDef {
         id: 13,
@@ -150,6 +163,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 14,
@@ -160,6 +174,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 15,
@@ -170,6 +185,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 16,
@@ -180,6 +196,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 17,
@@ -190,6 +207,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 18,
@@ -200,6 +218,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[Keyword::Vigilance],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 19,
@@ -210,6 +229,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[Keyword::Deathtouch],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 20,
@@ -220,6 +240,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 2,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 21,
@@ -230,6 +251,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[Keyword::Flying],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 22,
@@ -240,6 +262,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 23,
@@ -250,6 +273,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 3,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 24,
@@ -260,6 +284,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 2,
         keywords: &[Keyword::Vigilance],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 25,
@@ -270,6 +295,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 1,
         keywords: &[Keyword::Flying, Keyword::Vigilance],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 26,
@@ -280,6 +306,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 3,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 27,
@@ -290,6 +317,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 2,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 28,
@@ -300,6 +328,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 4,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 29,
@@ -310,6 +339,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 2,
         keywords: &[Keyword::Flying],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 30,
@@ -320,6 +350,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 2,
         keywords: &[Keyword::Deathtouch],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 31,
@@ -330,6 +361,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 3,
         keywords: &[Keyword::Vigilance],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 32,
@@ -340,6 +372,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 4,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 33,
@@ -350,6 +383,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 3,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 34,
@@ -360,6 +394,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 5,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 35,
@@ -370,6 +405,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 4,
         keywords: &[Keyword::Flying],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 36,
@@ -380,6 +416,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 3,
         keywords: &[Keyword::Deathtouch],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 37,
@@ -390,6 +427,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 6,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 38,
@@ -400,6 +438,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 5,
         keywords: &[Keyword::Vigilance],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 39,
@@ -410,6 +449,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 4,
         keywords: &[],
         effect: Effect::None,
+        on_enter: None,
     },
     CardDef {
         id: 40,
@@ -420,6 +460,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::DealDamage(1),
+        on_enter: None,
     },
     CardDef {
         id: 41,
@@ -430,6 +471,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::DealDamage(4),
+        on_enter: None,
     },
     CardDef {
         id: 42,
@@ -440,6 +482,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::DealDamage(5),
+        on_enter: None,
     },
     CardDef {
         id: 43,
@@ -450,6 +493,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::DealDamage(6),
+        on_enter: None,
     },
     CardDef {
         id: 44,
@@ -460,6 +504,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::Draw(1),
+        on_enter: None,
     },
     CardDef {
         id: 45,
@@ -470,6 +515,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::Draw(3),
+        on_enter: None,
     },
     CardDef {
         id: 46,
@@ -480,6 +526,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::Pump(2, 2),
+        on_enter: None,
     },
     CardDef {
         id: 47,
@@ -490,6 +537,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::Pump(4, 4),
+        on_enter: None,
     },
     CardDef {
         id: 48,
@@ -500,6 +548,7 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::Pump(-1, -1),
+        on_enter: None,
     },
     CardDef {
         id: 49,
@@ -510,5 +559,182 @@ pub static CATALOG: &[CardDef] = &[
         toughness: 0,
         keywords: &[],
         effect: Effect::Pump(-3, -3),
+        on_enter: None,
+    },
+    CardDef {
+        id: 50,
+        name: "Escriba do Arquivo",
+        cost: 3,
+        kind: CardKind::Creature,
+        power: 1,
+        toughness: 2,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::Draw(1)),
+    },
+    CardDef {
+        id: 51,
+        name: "Aprendiz de Turno",
+        cost: 3,
+        kind: CardKind::Creature,
+        power: 2,
+        toughness: 1,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::Draw(1)),
+    },
+    CardDef {
+        id: 52,
+        name: "Copista Veloz",
+        cost: 4,
+        kind: CardKind::Creature,
+        power: 2,
+        toughness: 2,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::Draw(1)),
+    },
+    CardDef {
+        id: 53,
+        name: "Tabelião de Baluarte",
+        cost: 5,
+        kind: CardKind::Creature,
+        power: 2,
+        toughness: 2,
+        keywords: &[Keyword::Flying],
+        effect: Effect::None,
+        on_enter: Some(Effect::Draw(1)),
+    },
+    CardDef {
+        id: 54,
+        name: "Guia do Pátio",
+        cost: 2,
+        kind: CardKind::Creature,
+        power: 1,
+        toughness: 1,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::Draw(1)),
+    },
+    CardDef {
+        id: 55,
+        name: "Leitor de Sulcos",
+        cost: 5,
+        kind: CardKind::Creature,
+        power: 3,
+        toughness: 2,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::Draw(2)),
+    },
+    CardDef {
+        id: 56,
+        name: "Acolhida da Enfermaria",
+        cost: 3,
+        kind: CardKind::Creature,
+        power: 1,
+        toughness: 3,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::GainLife(3)),
+    },
+    CardDef {
+        id: 57,
+        name: "Vigia da Portaria",
+        cost: 3,
+        kind: CardKind::Creature,
+        power: 2,
+        toughness: 2,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::GainLife(2)),
+    },
+    CardDef {
+        id: 58,
+        name: "Zelador de Chaves",
+        cost: 2,
+        kind: CardKind::Creature,
+        power: 1,
+        toughness: 2,
+        keywords: &[Keyword::Vigilance],
+        effect: Effect::None,
+        on_enter: Some(Effect::GainLife(2)),
+    },
+    CardDef {
+        id: 59,
+        name: "Sentinela do Poço",
+        cost: 5,
+        kind: CardKind::Creature,
+        power: 3,
+        toughness: 3,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::GainLife(4)),
+    },
+    CardDef {
+        id: 60,
+        name: "Mordomo do Arquivo",
+        cost: 4,
+        kind: CardKind::Creature,
+        power: 2,
+        toughness: 3,
+        keywords: &[],
+        effect: Effect::None,
+        on_enter: Some(Effect::GainLife(3)),
+    },
+    CardDef {
+        id: 61,
+        name: "Curativo de Campo",
+        cost: 2,
+        kind: CardKind::Spell,
+        power: 0,
+        toughness: 0,
+        keywords: &[],
+        effect: Effect::GainLife(4),
+        on_enter: None,
+    },
+    CardDef {
+        id: 62,
+        name: "Fôlego Retomado",
+        cost: 1,
+        kind: CardKind::Spell,
+        power: 0,
+        toughness: 0,
+        keywords: &[],
+        effect: Effect::GainLife(2),
+        on_enter: None,
+    },
+    CardDef {
+        id: 63,
+        name: "Tônico do Arquivo",
+        cost: 3,
+        kind: CardKind::Spell,
+        power: 0,
+        toughness: 0,
+        keywords: &[],
+        effect: Effect::GainLife(6),
+        on_enter: None,
+    },
+    CardDef {
+        id: 64,
+        name: "Batedor de Telhado",
+        cost: 3,
+        kind: CardKind::Creature,
+        power: 2,
+        toughness: 1,
+        keywords: &[Keyword::Flying],
+        effect: Effect::None,
+        on_enter: Some(Effect::Draw(1)),
+    },
+    CardDef {
+        id: 65,
+        name: "Cão de Guarda do Arquivo",
+        cost: 2,
+        kind: CardKind::Creature,
+        power: 1,
+        toughness: 1,
+        keywords: &[Keyword::Deathtouch],
+        effect: Effect::None,
+        on_enter: Some(Effect::GainLife(2)),
     },
 ];

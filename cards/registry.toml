@@ -11,7 +11,7 @@
 # Ele SÓ SOBE. Ao publicar carta nova, some 1 nele e dê o id antigo à carta.
 # Apagar carta não baixa `next_id` — é justamente isso que faz a deleção
 # aparecer como erro em vez de sumir calada.
-next_id = 50
+next_id = 66
 
 [cards]
 # Terrenos
@@ -71,3 +71,19 @@ gesto-de-forca = 46
 reforco-de-baluarte = 47
 peso-de-chumbo = 48
 mingua = 49
+escriba-do-arquivo = 50
+aprendiz-de-turno = 51
+copista-veloz = 52
+tabeliao-de-baluarte = 53
+guia-do-patio = 54
+leitor-de-sulcos = 55
+acolhida-da-enfermaria = 56
+vigia-da-portaria = 57
+zelador-de-chaves = 58
+sentinela-do-poco = 59
+mordomo-do-arquivo = 60
+curativo-de-campo = 61
+folego-retomado = 62
+tonico-do-arquivo = 63
+batedor-de-telhado = 64
+cao-de-guarda-do-arquivo = 65

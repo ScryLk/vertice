@@ -1,0 +1,8 @@
+slug = "vigia-da-portaria"
+name = "Vigia da Portaria"
+cost = 3
+type = "creature"
+power = 2
+toughness = 2
+effect = { kind = "none" }
+on_enter = { kind = "gain_life", amount = 2 }

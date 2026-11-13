@@ -71,8 +71,12 @@ Gerado do dado, determinístico, sem desenho por carta:
 |---|---|
 | moldura | tipo — quadrado (terreno), hexágono (criatura), círculo (mágica) |
 | traços radiais | custo, um por mana |
-| marca central | efeito — ponto (nenhum), barras (dano), círculos (compra), traço (pump) |
+| marca central | efeito — ponto (nenhum), barras (dano), círculos (compra), traço (pump), losango (vida) |
 | anel pontilhado | palavra-chave, um anel por palavra |
+| anel sólido por fora | gatilho de entrada |
+
+Quando a carta é criatura com gatilho, a **marca central desenha o efeito do
+gatilho**, porque é isso que a carta faz: criatura não tem efeito próprio.
 
 Carta nova ganha sigilo sozinha. O custo marginal de uma carta é **zero**.
 
@@ -136,6 +140,19 @@ A lição vale para os próximos eixos: **um glifo tem que ser função de tudo 
 que distingue a carta**, não só do que a nomeia. Se um número muda o
 comportamento, ele tem que mudar o desenho.
 
+**Revisado com 66 cartas, quando a DSL ganhou o gatilho de entrada.** O sistema
+aguentou de novo, e de novo achou colisão — a mesma classe de defeito, num eixo
+novo. O anel de palavra-chave nascia no raio 10 e a marca do efeito mora na
+faixa de 3 a 13 do centro: criatura com uma palavra-chave e "ao entrar, ganhe 2
+de vida" desenhava o anel *em cima* do losango. Pior, o glifo da compra já
+caía dentro desse raio desde antes — o gatilho só tornou o caso comum.
+
+Corrigido em duas partes: o anel de palavra-chave passou a nascer no raio 18, e
+a marca de vida virou **losango** em vez de anel, para não disputar a mesma
+forma com ele. Com teste cobrindo que criaturas de mesmo corpo e gatilhos
+diferentes não saem iguais.
+
 **Revisar de novo quando o pool passar de ~80**, ou quando a DSL ganhar
 primitivas novas — nesse momento entram tipos de efeito que o sigilo ainda não
-sabe desenhar.
+sabe desenhar. Gatilho com alvo e gatilho de morte são os próximos candidatos,
+e o segundo vai precisar de um anel que diga *quando*, não só *se*.
