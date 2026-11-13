@@ -8,4 +8,4 @@
 # A seta aponta sempre para dentro: server → core. Nunca o contrário.
 [workspace]
 resolver = "2"
-members = ["vertice-core", "vertice-tools", "vertice-server", "vertice-bot"]
+members = ["vertice-core", "vertice-tools", "vertice-server", "vertice-bot", "vertice-protocol", "vertice-wasm"]

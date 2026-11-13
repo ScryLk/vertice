@@ -76,7 +76,7 @@ pub struct PlayerViewDto {
     pub phase: PhaseDto,
     pub priority: PlayerId,
     pub stack: Vec<StackViewDto>,
-    pub legal_actions: Vec<crate::protocol::ActionDto>,
+    pub legal_actions: Vec<crate::ActionDto>,
     /// Quem venceu. `null` enquanto a partida corre.
     pub winner: Option<PlayerId>,
 }

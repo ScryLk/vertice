@@ -172,3 +172,26 @@ button:disabled {
 a {
   color: #7fa8d8;
 }
+
+.lobby h2 {
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--apagado);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 18px 0 6px;
+}
+
+a.botao {
+  display: inline-block;
+  font: inherit;
+  color: var(--texto);
+  background: #232830;
+  border: 1px solid var(--borda);
+  padding: 6px 10px;
+  text-decoration: none;
+}
+
+a.botao:hover {
+  background: #2e3540;
+}

@@ -14,7 +14,7 @@
 
 use vertice_core::cards::CATALOG_LEN;
 use vertice_core::*;
-use vertice_server::protocol::*;
+use vertice_protocol::*;
 
 fn baralho(offset: u16) -> Vec<CardId> {
     let n = CATALOG_LEN as u16;

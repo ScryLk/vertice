@@ -15,6 +15,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use tokio::sync::{mpsc, oneshot, RwLock};
 use vertice_bot::Level;
+use vertice_core::cards::provisional_deck;
 use vertice_core::{CardId, EngineError};
 
 use crate::actor::{Actor, Command};
@@ -101,8 +102,8 @@ impl Registry {
         let seed = seed.unwrap_or(number);
         let id = format!("partida-{number}");
 
-        let deck0 = deck_provisorio(0);
-        let deck1 = deck_provisorio(3);
+        let deck0 = provisional_deck(0);
+        let deck1 = provisional_deck(3);
         let actor = Actor::new(id.clone(), &deck0, &deck1, seed, self.store.clone(), [None; 2])?;
         self.register(id.clone(), actor).await;
         Ok(id)
@@ -118,7 +119,7 @@ impl Registry {
     /// quando a campanha precisar ser retomada.
     ///
     /// Os dois lados usam o mesmo baralho: `baralho(0)` e `baralho(3)` não têm
-    /// a mesma composição (ver `deck_provisorio`), e num duelo contra a máquina
+    /// a mesma composição (ver `cards::provisional_deck`), e num duelo contra a máquina
     /// não há por que dar uma mão melhor a um dos lados.
     pub async fn create_vs_bot(
         &self,
@@ -129,7 +130,7 @@ impl Registry {
         let seed = seed.unwrap_or(number);
         let id = format!("partida-{number}");
 
-        let deck = deck_provisorio(0);
+        let deck = provisional_deck(0);
         let actor = Actor::new(id.clone(), &deck, &deck, seed, None, [None, Some(level)])?;
         self.register(id.clone(), actor).await;
 
@@ -154,17 +155,4 @@ impl Registry {
         sender.send(Command::Fingerprint { reply }).await.ok()?;
         answer.await.ok()
     }
-}
-
-/// Baralho provisório: 100 cartas ciclando o catálogo.
-///
-/// **Placeholder declarado.** Deck de verdade vem de deck building, que é M2.
-/// Aqui basta um baralho válido para exercitar o protocolo na interface — e
-/// ciclar o catálogo garante que toda carta do conjunto apareça em algum
-/// momento da partida, o que é exatamente o que falta no M1.
-pub fn deck_provisorio(offset: u16) -> Vec<CardId> {
-    let catalogo = vertice_core::cards::CATALOG_LEN as u16;
-    (0..vertice_core::DECK_SIZE as u16)
-        .map(|i| i.wrapping_mul(7).wrapping_add(offset) % catalogo)
-        .collect()
 }

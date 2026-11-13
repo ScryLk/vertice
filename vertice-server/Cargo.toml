@@ -8,6 +8,7 @@ edition = "2021"
 # o servidor. `vertice-core` continua com zero dependências.
 vertice-core = { path = "../vertice-core" }
 vertice-bot = { path = "../vertice-bot" }
+vertice-protocol = { path = "../vertice-protocol" }
 
 # `serde` existe só aqui. O motor nunca aprende a virar bytes.
 serde = { version = "1", features = ["derive"] }

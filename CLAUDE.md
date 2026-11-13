@@ -73,12 +73,14 @@ semanas depois.
 | `cards/registry.lock` | hash de cada carta publicada. Gerado | `card-content` |
 | `cards/set-*/` | as cartas em TOML | `card-content` |
 | `vertice-tools/` | `validate` e `generate` do catálogo | `card-content` |
-| `vertice-server/src/protocol/` | DTOs de rede; espelho em `vertice-client/src/protocol.ts` | `server-authority` |
+| `vertice-protocol/` | DTOs de rede — servidor e WASM falam a mesma forma | `server-authority` |
+| `vertice-server/src/` | `protocol` reexportado de `vertice-protocol`; espelho em `vertice-client/src/protocol.ts` | `server-authority` |
 | `vertice-server/src/actor.rs` | uma task por partida, dona do `GameState` | `server-authority` |
 | `vertice-server/src/{http,registry,store}.rs` | WebSocket, `POST /matches`, persistência | `server-authority` |
 | `vertice-client/` | React mínimo, sem Pixi (Pixi é M2) | `client-overworld` |
 | `vertice-bot/src/eval.rs` | pesos da avaliação de tabuleiro | `engine-rules` |
 | `vertice-bot/src/lib.rs` | `choose_action` e níveis de dificuldade | `engine-rules` |
+| `vertice-wasm/src/lib.rs` | duelo offline no navegador (`Duel` puro + binding) | `client-overworld` |
 | `docs/biblia-de-historia.md` | cânone: casas, atos, NPCs | `lore-guardian` |
 | `docs/arquitetura.md` | decisões técnicas e o porquê | `lore-guardian` (cuida do porquê) |
 
@@ -107,6 +109,7 @@ Agente novo, comece por esta tabela em vez de varrer o repositório.
 | fazer o bot escolher uma jogada | `vertice-bot/src/lib.rs::choose_action` |
 | criar partida contra o bot | `vertice-server/src/registry.rs::Registry::create_vs_bot` |
 | ajustar o que o bot valoriza | `vertice-bot/src/eval.rs` |
+| jogar sem servidor, no navegador | `vertice-wasm/src/lib.rs::Duel` |
 
 Fluxo normal de um turno, em ordem:
 `view → legal_actions → apply → (muta GameState) → view`.
@@ -125,14 +128,14 @@ cargo clippy --all-targets -- -D warnings
 ```
 
 Da raiz, para o workspace inteiro (`vertice-core`, `vertice-tools`,
-`vertice-server`):
+`vertice-server`, `vertice-bot`, `vertice-protocol`, `vertice-wasm`):
 
 ```bash
 cargo test --workspace
 cargo clippy --workspace --all-targets -- -D warnings
 cargo run -p vertice-tools -- validate   # ids, curva, append-only, hash, geração em dia
 npm --prefix vertice-client test         # renderização do cliente (Vitest)
-npm --prefix vertice-client run build    # type-check + build do cliente
+npm --prefix vertice-client run build    # wasm + type-check + build do cliente
 ```
 
 **Portão de qualidade:** nenhuma mudança no core é concluída sem `cargo test`,
@@ -291,7 +294,16 @@ vez dele — o cliente não pede nada por ele. Verificado em navegador: "Jogar
 contra o formando" e cinco turnos depois o humano estava em 0 de vida.
 Partida contra bot **não é gravada** (ver `arquitetura.md` §5).
 
-Falta do M2: Pixi, chibi, transição de cena e duelo offline por WASM.
+**Duelo offline por WASM — feito.** `vertice-wasm` compila o motor para o
+navegador e expõe a mesma forma de JSON que o servidor manda, então a tela não
+sabe a diferença entre online e offline. Os DTOs saíram de `vertice-server`
+para `vertice-protocol`, para o WASM falar a mesma forma sem arrastar axum.
+Offline **não tem autoridade nenhuma** — é modo de treino e de campanha; quem
+decide partida valendo continua sendo o servidor. O `.wasm` é gerado, não
+commitado: `predev` e `prebuild` o reconstroem (1,6s incremental), então ele
+nunca fica velho.
+
+Falta do M2: Pixi, chibi e transição de cena.
 
 **Próximo:** o resto do M2. O roteiro está em `docs/roadmap.md`; siga por ele
 em vez de reabrir o plano.

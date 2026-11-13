@@ -1,0 +1,20 @@
+[package]
+name = "vertice-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+# `cdylib` para o navegador, `rlib` para os testes rodarem nativos nesta
+# máquina — o duelo offline tem teste, e teste que só roda no navegador não
+# roda no portão.
+crate-type = ["cdylib", "rlib"]
+
+[dev-dependencies]
+serde_json = "1"
+
+[dependencies]
+vertice-core = { path = "../vertice-core" }
+vertice-protocol = { path = "../vertice-protocol" }
+vertice-bot = { path = "../vertice-bot" }
+serde_json = "1"
+wasm-bindgen = "0.2"

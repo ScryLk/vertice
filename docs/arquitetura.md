@@ -103,6 +103,8 @@ Esta é a seção mais importante do documento. Cada mecânica que você mantive
 
 **Partida contra bot não é gravada.** O bot roda dentro da task da partida, e o ator o faz jogar sempre que a prioridade é dele. Mas persistir exigiria gravar junto a configuração do bot — assento e nível —, que não cabe no `MatchRecord` do motor; um registro que voltasse do disco sem ela voltaria como partida travada, esperando um jogador que não existe. Gravar é trabalho do M3, quando a campanha precisar ser retomada.
 
+**Offline é o mesmo motor, sem autoridade (M2).** `vertice-wasm` compila `vertice-core` + `vertice-bot` para o navegador e expõe JSON com a mesma forma que o servidor manda, então o React não distingue online de offline. Os DTOs moram em `vertice-protocol` justamente para isso: o servidor e o WASM falam a mesma forma sem que o segundo arraste axum e tokio junto. **Offline não tem autoridade nenhuma** — o jogador pode abrir o console e mentir. É modo de treino e de campanha; partida valendo continua no servidor, e é por isso que ele não sai.
+
 **O cliente do M1.4 é feio de propósito.** React sem Pixi, botões gerados de `legal_actions`, sem animação e sem transição: o que está na tela é o protocolo, e enfeite esconderia o que precisa doer. O Vite faz proxy de `/matches` e `/ws` para o servidor Rust, então **não existe CORS no servidor** — em desenvolvimento o navegador fala com o Vite, em produção os dois saem da mesma origem. Quem decide o que é legal é o servidor; o cliente só desenha os botões que recebeu.
 
 ---

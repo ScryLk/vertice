@@ -20,9 +20,13 @@
 
 pub mod actor;
 pub mod http;
-pub mod protocol;
 pub mod registry;
 pub mod store;
+
+/// Os DTOs da rede moram em `vertice-protocol`, para o WASM falar a mesma
+/// forma sem arrastar o servidor junto. Reexportado aqui para os testes e o
+/// código do servidor continuarem usando `crate::protocol::…`.
+pub use vertice_protocol as protocol;
 
 pub use http::router;
 pub use protocol::PROTOCOL_VERSION;

@@ -1,0 +1,13 @@
+[package]
+name = "vertice-protocol"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Os DTOs da rede num crate próprio: o servidor e o WASM falam a mesma forma,
+# e o motor continua sem saber o que é JSON.
+vertice-core = { path = "../vertice-core" }
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1"

@@ -80,3 +80,17 @@ pub fn card(id: CardId) -> &'static CardDef {
 pub(crate) fn exists(id: CardId) -> bool {
     CATALOG.binary_search_by_key(&id, |def| def.id).is_ok()
 }
+
+/// Baralho provisório: `DECK_SIZE` cartas ciclando o catálogo.
+///
+/// **Placeholder declarado** até deck building existir. Vive aqui porque o
+/// servidor e o duelo offline precisam do mesmo baralho, e duas cópias
+/// divergiriam — o teste do bot já mostrou que até o *deslocamento* muda a
+/// composição: 100 cartas em 13 valores deixam 9 valores com 8 cópias e 4 com
+/// 7, e quais são depende do offset.
+pub fn provisional_deck(offset: u16) -> Vec<CardId> {
+    let catalogo = CATALOG_LEN as u16;
+    (0..crate::DECK_SIZE as u16)
+        .map(|i| i.wrapping_mul(7).wrapping_add(offset) % catalogo)
+        .collect()
+}

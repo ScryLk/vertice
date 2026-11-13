@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:wasm": "wasm-pack build ../vertice-wasm --target web --out-dir ../vertice-client/src/wasm",
+    "predev": "npm run build:wasm",
+    "prebuild": "npm run build:wasm"
   },
   "dependencies": {
     "react": "^19.3.1",
@@ -21,6 +24,7 @@
     "jsdom": "^29.1.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
-    "vitest": "^4.1.12"
+    "vitest": "^4.1.12",
+    "wasm-pack": "^0.15.1"
   }
 }

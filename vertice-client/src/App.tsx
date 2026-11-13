@@ -3,14 +3,22 @@ import { useState } from 'react';
 import { Duel } from './Duel';
 import type { CreateMatchResponse } from './protocol';
 import { useMatch } from './useMatch';
+import { useOfflineMatch } from './useOfflineMatch';
+
+type Nivel = 'calouro' | 'formando';
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
-  const matchId = params.get('match');
-  const seat = Number(params.get('seat') ?? '0');
 
+  const offline = params.get('offline');
+  if (offline === 'calouro' || offline === 'formando') {
+    return <MesaOffline nivel={offline} />;
+  }
+
+  const matchId = params.get('match');
   if (!matchId) return <Lobby />;
-  return <Mesa matchId={matchId} seat={seat} />;
+
+  return <Mesa matchId={matchId} seat={Number(params.get('seat') ?? '0')} />;
 }
 
 function Mesa({ matchId, seat }: { matchId: string; seat: number }) {
@@ -29,6 +37,38 @@ function Mesa({ matchId, seat }: { matchId: string; seat: number }) {
   }
 
   return <Duel view={view} estado={estado} aviso={aviso} jogar={jogar} />;
+}
+
+function MesaOffline({ nivel }: { nivel: Nivel }) {
+  const { view, erro, jogar } = useOfflineMatch(nivel);
+
+  if (erro) {
+    return (
+      <div className="mesa">
+        <p className="aviso">Não consegui carregar o motor offline: {erro}</p>
+        <p>
+          <a href="?">voltar</a>
+        </p>
+      </div>
+    );
+  }
+
+  if (!view) {
+    return (
+      <div className="mesa">
+        <p>Carregando o motor…</p>
+      </div>
+    );
+  }
+
+  return (
+    <Duel
+      view={view}
+      estado={view.winner !== null ? 'encerrado' : 'conectado'}
+      aviso={null}
+      jogar={jogar}
+    />
+  );
 }
 
 async function criarPartida(corpo: Record<string, unknown>): Promise<string> {
@@ -63,7 +103,7 @@ function Lobby() {
     }
   }
 
-  async function contraOBot(nivel: 'calouro' | 'formando') {
+  async function contraOBot(nivel: Nivel) {
     setOcupado('bot');
     setErro(null);
     try {
@@ -98,17 +138,42 @@ function Lobby() {
           </ul>
         </>
       ) : (
-        <div className="botoes">
-          <button type="button" onClick={doisJogadores} disabled={ocupado !== 'nenhum'}>
-            {ocupado === 'dois' ? 'Criando…' : 'Dois jogadores'}
-          </button>
-          <button type="button" onClick={() => contraOBot('calouro')} disabled={ocupado !== 'nenhum'}>
-            {ocupado === 'bot' ? 'Criando…' : 'Jogar contra o calouro'}
-          </button>
-          <button type="button" onClick={() => contraOBot('formando')} disabled={ocupado !== 'nenhum'}>
-            Jogar contra o formando
-          </button>
-        </div>
+        <>
+          <h2>Pelo servidor</h2>
+          <div className="botoes">
+            <button type="button" onClick={doisJogadores} disabled={ocupado !== 'nenhum'}>
+              {ocupado === 'dois' ? 'Criando…' : 'Dois jogadores'}
+            </button>
+            <button
+              type="button"
+              onClick={() => contraOBot('calouro')}
+              disabled={ocupado !== 'nenhum'}
+            >
+              {ocupado === 'bot' ? 'Criando…' : 'Contra o calouro'}
+            </button>
+            <button
+              type="button"
+              onClick={() => contraOBot('formando')}
+              disabled={ocupado !== 'nenhum'}
+            >
+              Contra o formando
+            </button>
+          </div>
+
+          <h2>Offline</h2>
+          <p className="explicacao">
+            O mesmo motor compilado para WebAssembly, rodando nesta aba. Sem servidor, e sem
+            autoridade nenhuma — é modo de treino, não de partida valendo.
+          </p>
+          <div className="botoes">
+            <a className="botao" href="?offline=calouro">
+              Offline contra o calouro
+            </a>
+            <a className="botao" href="?offline=formando">
+              Offline contra o formando
+            </a>
+          </div>
+        </>
       )}
 
       {erro && <p className="aviso">{erro}</p>}

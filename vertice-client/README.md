@@ -26,6 +26,10 @@ Abra http://localhost:5173. Dá para criar uma partida de dois jogadores (abra
 os dois assentos em abas diferentes) ou jogar direto contra o bot, no nível
 `calouro` ou `formando`.
 
+O duelo offline roda o motor compilado para WebAssembly e **não precisa do
+servidor**. O `.wasm` é gerado, não commitado: `predev` e `prebuild` cuidam
+disso (`npm run build:wasm` na mão, se precisar).
+
 Testes: `npm --prefix vertice-client test` (Vitest + Testing Library, visões
 fixas, sem servidor).
 
