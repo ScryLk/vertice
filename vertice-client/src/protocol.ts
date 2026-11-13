@@ -11,6 +11,7 @@
 export const PROTOCOL_VERSION = 2;
 
 export type PlayerId = number;
+export type CardId = number;
 
 export type TargetDto =
   | { type: 'player'; player: PlayerId }
@@ -99,4 +100,28 @@ const NOMES_DE_PALAVRA_CHAVE: Record<KeywordDto, string> = {
 
 export function nomeDaPalavraChave(keyword: KeywordDto): string {
   return NOMES_DE_PALAVRA_CHAVE[keyword];
+}
+
+// ---------------------------------------------------------------- catálogo
+//
+// A carta fora do motor. Vem de `CardDefDto` no `vertice-protocol`, servido
+// pelo WASM em `catalogo()`.
+
+export type CardKindDto = 'land' | 'creature' | 'spell';
+
+export type EffectDto =
+  | { kind: 'none' }
+  | { kind: 'deal_damage'; amount: number }
+  | { kind: 'draw'; amount: number }
+  | { kind: 'pump'; power: number; toughness: number };
+
+export interface CardDefDto {
+  id: CardId;
+  name: string;
+  cost: number;
+  kind: CardKindDto;
+  power: number;
+  toughness: number;
+  keywords: KeywordDto[];
+  effect: EffectDto;
 }

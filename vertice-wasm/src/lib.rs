@@ -21,7 +21,7 @@ use vertice_bot::{choose_action, Level};
 use vertice_core::cards::provisional_deck;
 use vertice_core::rng::Rng;
 use vertice_core::{apply, legal_actions, new_game, view, Action, GameState, PlayerId};
-use vertice_protocol::{ActionDto, PlayerViewDto};
+use vertice_protocol::{ActionDto, CardDefDto, PlayerViewDto};
 
 /// O assento do humano. O bot fica no 1.
 pub const HUMAN: PlayerId = 0;
@@ -115,6 +115,17 @@ impl Duel {
             }
         }
     }
+}
+
+/// O catálogo inteiro, em JSON.
+///
+/// O cliente precisa disto para desenhar carta: nome, custo, corpo e efeito.
+/// Sai por aqui, e não por uma cópia em TypeScript, porque o catálogo é dado
+/// gerado — duas cópias divergiriam na primeira carta nova.
+#[wasm_bindgen(js_name = catalogo)]
+pub fn catalogo() -> String {
+    let cartas: Vec<CardDefDto> = vertice_core::cards::CATALOG.iter().map(CardDefDto::from).collect();
+    serde_json::to_string(&cartas).unwrap_or_else(|_| "[]".to_string())
 }
 
 /// O binding. Fino de propósito: só converte JSON e erro para o que o JS

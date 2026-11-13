@@ -11,11 +11,13 @@
 //! variante que a rede ainda não sabe falar.
 
 mod action;
+mod card;
 mod message;
 mod record;
 mod view;
 
 pub use action::{ActionDto, TargetDto};
+pub use card::{CardDefDto, CardKindDto, EffectDto};
 pub use message::{ClientMessage, ErrorKind, RejectReason, ServerMessage, PROTOCOL_VERSION};
 pub use record::MatchRecordDto;
 pub use view::{

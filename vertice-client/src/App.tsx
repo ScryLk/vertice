@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Catalogo } from './Catalogo';
 import { Duel } from './Duel';
 import type { CreateMatchResponse } from './protocol';
 import { useMatch } from './useMatch';
@@ -13,6 +14,14 @@ export default function App() {
   const offline = params.get('offline');
   if (offline === 'calouro' || offline === 'formando') {
     return <MesaOffline nivel={offline} />;
+  }
+
+  if (params.has('cartas')) {
+    return (
+      <div className="mesa">
+        <Catalogo />
+      </div>
+    );
   }
 
   const matchId = params.get('match');
@@ -171,6 +180,16 @@ function Lobby() {
             </a>
             <a className="botao" href="?offline=formando">
               Offline contra o formando
+            </a>
+          </div>
+
+          <h2>Acervo</h2>
+          <p className="explicacao">
+            Todas as cartas na linguagem visual do Arquivo — verbete, sem cor, sigilo gerado.
+          </p>
+          <div className="botoes">
+            <a className="botao" href="?cartas">
+              Ver o acervo
             </a>
           </div>
         </>

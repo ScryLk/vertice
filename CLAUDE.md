@@ -77,12 +77,14 @@ semanas depois.
 | `vertice-server/src/` | `protocol` reexportado de `vertice-protocol`; espelho em `vertice-client/src/protocol.ts` | `server-authority` |
 | `vertice-server/src/actor.rs` | uma task por partida, dona do `GameState` | `server-authority` |
 | `vertice-server/src/{http,registry,store}.rs` | WebSocket, `POST /matches`, persistência | `server-authority` |
-| `vertice-client/` | React mínimo, sem Pixi (Pixi é M2) | `client-overworld` |
+| `vertice-client/src/Ficha.tsx` | a carta como verbete; o sigilo é gerado do dado | `client-overworld` |
+| `vertice-client/src/{App,Duel,Catalogo}.tsx` | lobby, mesa e acervo | `client-overworld` |
 | `vertice-bot/src/eval.rs` | pesos da avaliação de tabuleiro | `engine-rules` |
 | `vertice-bot/src/lib.rs` | `choose_action` e níveis de dificuldade | `engine-rules` |
 | `vertice-wasm/src/lib.rs` | duelo offline no navegador (`Duel` puro + binding) | `client-overworld` |
 | `docs/biblia-de-historia.md` | cânone: casas, atos, NPCs | `lore-guardian` |
 | `docs/arquitetura.md` | decisões técnicas e o porquê | `lore-guardian` (cuida do porquê) |
+| `docs/direcao-visual.md` | o que o jogo se parece, e o que isso custa | `lore-guardian` |
 
 ---
 
@@ -109,6 +111,8 @@ Agente novo, comece por esta tabela em vez de varrer o repositório.
 | fazer o bot escolher uma jogada | `vertice-bot/src/lib.rs::choose_action` |
 | criar partida contra o bot | `vertice-server/src/registry.rs::Registry::create_vs_bot` |
 | ajustar o que o bot valoriza | `vertice-bot/src/eval.rs` |
+| ver o acervo na linguagem visual | `?cartas` no cliente, ou `src/Ficha.tsx` |
+| mudar a direção visual | `docs/direcao-visual.md` antes de qualquer código |
 | jogar sem servidor, no navegador | `vertice-wasm/src/lib.rs::Duel` |
 
 Fluxo normal de um turno, em ordem:
@@ -303,7 +307,15 @@ decide partida valendo continua sendo o servidor. O `.wasm` é gerado, não
 commitado: `predev` e `prebuild` o reconstroem (1,6s incremental), então ele
 nunca fica velho.
 
-Falta do M2: Pixi, chibi e transição de cena.
+**Direção visual — decidida.** Verbete em tudo, sem cor: a carta é uma ficha
+do Arquivo, e o reconhecimento vem de um sigilo gerado do dado (moldura pelo
+tipo, traços pelo custo, marca pelo efeito), mais uma marca de catalogação
+derivada do `CardId` para desempatar cartas de perfil igual. Uma linguagem, um
+track de produção, custo marginal de carta nova igual a zero. Decisão, riscos
+e gatilho de revisão em `docs/direcao-visual.md`; o acervo inteiro é visível em
+`?cartas`.
+
+Falta do M2: Pixi e transição de cena — agora com a linguagem definida.
 
 **Próximo:** o resto do M2. O roteiro está em `docs/roadmap.md`; siga por ele
 em vez de reabrir o plano.

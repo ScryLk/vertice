@@ -171,6 +171,8 @@ Duas saídas que funcionam:
 
 O resto (chibi, cenário, interface) é terceirizável por peça, e deve ser — motor é seu, arte não precisa ser. Reserve orçamento pra duas coisas: os comandantes e a transição de cena do overworld pro duelo, que é o momento de maior valor de produção do jogo.
 
+**Decidido (M2): verbete em tudo, sem cor.** A carta é uma ficha do Arquivo — papel, tinta, número de catálogo, tipografia — e o reconhecimento de relance vem de um sigilo gerado do dado da carta, não de ilustração. Uma linguagem, um track de produção, custo marginal de carta nova igual a zero. O cânone entregou o sistema: o pátio do Vértice é coberto de assinaturas gravadas, e a escola é uma instituição que cataloga ecos. Os detalhes, os dois riscos assumidos e o gatilho de revisão estão em `docs/direcao-visual.md`. Ilustração paga continua reservada a duas coisas: retrato dos comandantes e a transição de cena.
+
 ---
 
 ## 10. Marcos

@@ -195,3 +195,146 @@ a.botao {
 a.botao:hover {
   background: #2e3540;
 }
+
+/* ------------------------------------------------------------ a ficha
+   Verbete do Arquivo: tinta sobre papel, sobre pedra escura. Sem cor — toda
+   a informação vem de estrutura, numeral e tipografia. */
+
+.ficha {
+  --papel: #efebe1;
+  --papel-fundo: #e3ddd0;
+  --tinta: #1b1916;
+  --tinta-fraca: #6b6459;
+  --escala: 1;
+
+  width: calc(190px * var(--escala));
+  min-height: calc(262px * var(--escala));
+  background: linear-gradient(var(--papel), var(--papel-fundo));
+  color: var(--tinta);
+  border: 1px solid #0d0b09;
+  box-shadow: 0 2px 0 #0d0b09;
+  padding: calc(10px * var(--escala)) calc(11px * var(--escala));
+  display: flex;
+  flex-direction: column;
+  gap: calc(6px * var(--escala));
+  font-family: ui-serif, Georgia, 'Times New Roman', serif;
+  text-align: left;
+}
+
+.ficha-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--tinta-fraca);
+  padding-bottom: calc(4px * var(--escala));
+}
+
+.registro {
+  font-family: ui-monospace, monospace;
+  font-size: calc(9px * var(--escala));
+  letter-spacing: 0.12em;
+  color: var(--tinta-fraca);
+}
+
+.custo {
+  font-family: ui-monospace, monospace;
+  font-size: calc(20px * var(--escala));
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ficha-nome {
+  font-size: calc(15px * var(--escala));
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: 0.02em;
+  font-variant: small-caps;
+}
+
+.ficha-sigilo {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: calc(6px * var(--escala)) 0;
+}
+
+.sigilo {
+  width: calc(96px * var(--escala));
+  height: calc(96px * var(--escala));
+  color: var(--tinta);
+}
+
+.ficha-tipo {
+  margin: 0;
+  font-family: ui-monospace, monospace;
+  font-size: calc(9px * var(--escala));
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tinta-fraca);
+  border-top: 1px solid var(--tinta-fraca);
+  padding-top: calc(4px * var(--escala));
+}
+
+.ficha-efeito {
+  margin: 0;
+  font-size: calc(12px * var(--escala));
+  line-height: 1.3;
+}
+
+.ficha-rodape {
+  border-top: 1px solid var(--tinta-fraca);
+  margin-top: auto;
+  padding-top: calc(4px * var(--escala));
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.selo {
+  font-size: calc(11px * var(--escala));
+  color: var(--tinta-fraca);
+}
+
+.corpo {
+  font-family: ui-monospace, monospace;
+  font-size: calc(17px * var(--escala));
+  font-weight: 700;
+}
+
+.corpo.vazio {
+  min-height: 1px;
+}
+
+/* A ficha de terreno não tem corpo — a estrutura muda, não a cor. */
+.ficha-land .sigilo {
+  width: calc(78px * var(--escala));
+  height: calc(78px * var(--escala));
+}
+
+.ficha-land .ficha-rodape {
+  border-top-style: double;
+}
+
+.grade-fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 14px 0;
+}
+
+.marca {
+  display: flex;
+  gap: calc(3px * var(--escala));
+  margin-left: auto;
+  margin-right: calc(8px * var(--escala));
+}
+
+.marca > span {
+  width: calc(4px * var(--escala));
+  height: calc(6px * var(--escala));
+  border: 1px solid var(--tinta-fraca);
+}
+
+.marca > .furado {
+  background: var(--tinta);
+}
