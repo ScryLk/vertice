@@ -67,3 +67,188 @@ sha256 = "e9875b988570079d6a0e262a288b3d651cdbc9b9fb74664b757118657ca7e888"
 slug = "brasa-dupla"
 id = 12
 sha256 = "e3b412bbe16e65095ba3ffd38c9d35911f6fbd9f4855dc5d2d8959bbfe6853ca"
+
+[[card]]
+slug = "patio-das-assinaturas"
+id = 13
+sha256 = "fbe7e994542bcb3ed5df439951bbd24c1cd3bb2b865f330fad47947f03c261f9"
+
+[[card]]
+slug = "anfiteatro-rachado"
+id = 14
+sha256 = "482a383372023e65f297bc476104243b57e8eabf2e1b7c407035f108ccfbe494"
+
+[[card]]
+slug = "ala-norte"
+id = 15
+sha256 = "01ccfb863f42bf7721fa8c45f34601ce23cdd84caf19dc118057fa8bd5ccf775"
+
+[[card]]
+slug = "marco-de-cruzilha"
+id = 16
+sha256 = "0e3e60af73c3874b4c488e89f2c4e18c9195794685de209ad2e3d3f4476139c2"
+
+[[card]]
+slug = "calouro-perdido"
+id = 17
+sha256 = "9c0c9a26557207ef16399ab5a67a442733c7036a3f18d5beacb1e21935984413"
+
+[[card]]
+slug = "monitor-de-corredor"
+id = 18
+sha256 = "2dff94e9cbb4fbd6f35aa77ce8d29ff31f1f6486ad649f4fd6f36523e38eff06"
+
+[[card]]
+slug = "alfinete-de-latao"
+id = 19
+sha256 = "ae619769002b7a54314c9226df08dd6676129c1e9006fc9eb9e16b4c299db648"
+
+[[card]]
+slug = "mureta-de-entulho"
+id = 20
+sha256 = "21e7c0b55769a9a7906e45d035576e3278dcb78871c67453de2eab0faa494c38"
+
+[[card]]
+slug = "andorinha-de-beira"
+id = 21
+sha256 = "c0406ad8ab8405a683bb6a66c7311a2cf7ada6295f203d4d20c64a82bcff8edf"
+
+[[card]]
+slug = "estivador-do-cais"
+id = 22
+sha256 = "d7d9688667b38a5fe43666c2859dce9c1a68b1cbac205c903225a52b99369823"
+
+[[card]]
+slug = "barreira-de-sebo"
+id = 23
+sha256 = "f66a94250f58431ed68b745e6049396b21c08cc6bf915458e7021bba6735b1cf"
+
+[[card]]
+slug = "cao-de-guarda-velho"
+id = 24
+sha256 = "6d812dd2b538ab7f2dd5c3a6e383d1c05e14366a03e2aad9eac832289a4b2ec2"
+
+[[card]]
+slug = "besouro-de-arquivo"
+id = 25
+sha256 = "0ae9a6165ad9c262a582d84ee1ad434855ecdd7bda47dff6622656e44c211a1a"
+
+[[card]]
+slug = "toutinegra-do-sul"
+id = 26
+sha256 = "f969ada9de2e9e73b33ad16cecd6eac587a5c199dc7086f4a359566f074bcfc7"
+
+[[card]]
+slug = "lamina-de-fogueira"
+id = 27
+sha256 = "684f16ca13e29f4d476b44b02b6d35f8e08fe087e32a86a66c45c2c766d04ffa"
+
+[[card]]
+slug = "muralha-de-raiz"
+id = 28
+sha256 = "b926bccc139f35f3ade7f983e0865cb60eb190bd5b47cc0f0e36f9764a398072"
+
+[[card]]
+slug = "coruja-do-campanario"
+id = 29
+sha256 = "c43039321d14c782eef72ea260a6f7abfc7fc6a8b343211eb1a580c7cc22f990"
+
+[[card]]
+slug = "verme-do-sulco"
+id = 30
+sha256 = "2101fdef9a4b426cc17af9339324aa76a49079a88936557503275532fc3d8f5a"
+
+[[card]]
+slug = "carcereiro-de-baluarte"
+id = 31
+sha256 = "87f1bb782e6c80962a811db2bc61736d875b31f08de867937f77f095997a22f5"
+
+[[card]]
+slug = "urso-do-desfiladeiro"
+id = 32
+sha256 = "90338d39230f684fb630b6b5c378b7db9696d1e331d148499f7acb4ee129795d"
+
+[[card]]
+slug = "guindaste-do-cais"
+id = 33
+sha256 = "52e6a82979549795d1fec69e4403747d19cc9427eab96e56333ef8f5a316b2bc"
+
+[[card]]
+slug = "torre-de-vigia"
+id = 34
+sha256 = "6632c4cfa5c747c19efdf6c3c7aaa9f80c6a8e1868a97e18a4481e21c17689c3"
+
+[[card]]
+slug = "aguia-do-no"
+id = 35
+sha256 = "6a6d5f2eb0d4c191b284d3745000324baf9f8335a9b8e399676569d6d15cd30f"
+
+[[card]]
+slug = "carrasco-de-fogueira"
+id = 36
+sha256 = "79ade9dedf5bb15f21082298877dca107fefa0c1737a8cab8a2f368d46d05e14"
+
+[[card]]
+slug = "colosso-de-pedra-seca"
+id = 37
+sha256 = "4d73f2bab88fb492d16a0034c0b1f6465cfd78a77670809bef9ad82953fb1fae"
+
+[[card]]
+slug = "vigia-do-vertice"
+id = 38
+sha256 = "5250d01203f8c83126868bbd878e6bbdbca3a4f71f089d0311724d855ba5ce51"
+
+[[card]]
+slug = "tita-do-arquivo"
+id = 39
+sha256 = "425ca51b8bcf419c65f046d4fd75214781ef71c29f8f602172177d1fadc6e50e"
+
+[[card]]
+slug = "faisca-curta"
+id = 40
+sha256 = "20aa7f910c708aab8266e3bdb9a36a9be538ad0d088dfa6a19e92d6a321528ef"
+
+[[card]]
+slug = "chama-de-colheita"
+id = 41
+sha256 = "a149ae192b4c84187d6f774f4e9b4b7f069e12c9ca31bdce0e3b69c70b795522"
+
+[[card]]
+slug = "chamuscar"
+id = 42
+sha256 = "581f8faece26d2713a57eec1ab43b9978de4a65ddba2dc5f317957081c04236a"
+
+[[card]]
+slug = "fulminar"
+id = 43
+sha256 = "3c9b804fc34670cea260d2d2f6669e8e606082600f8f31e40905ad6230e0150e"
+
+[[card]]
+slug = "anotacao"
+id = 44
+sha256 = "2fcd70d3b5d1fae2dd7980388e59f0ca156a01fa2193349547e6b0ad616973ad"
+
+[[card]]
+slug = "levantamento"
+id = 45
+sha256 = "89d1b718d0edb2c0a2870c3bce6daf34be4f420901b76a8ad081612ef99e5d91"
+
+[[card]]
+slug = "gesto-de-forca"
+id = 46
+sha256 = "b02783de05eb021a0a3f934d890a26a1fd6920c3c705c6333e20724206007843"
+
+[[card]]
+slug = "reforco-de-baluarte"
+id = 47
+sha256 = "87aad673b727e38dd7ebb925cfcc495897f91493f2d7f4c06ba06ec304208613"
+
+[[card]]
+slug = "peso-de-chumbo"
+id = 48
+sha256 = "8e2a03581a9507612c6219dc12b9e4d9cc98c9a87ad66c19948ba84de4818b09"
+
+[[card]]
+slug = "mingua"
+id = 49
+sha256 = "478a2fcfaa1354d0d3d42aac41f3989719345839fd4a40775e763ea8b72583ab"

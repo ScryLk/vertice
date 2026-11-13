@@ -78,6 +78,27 @@ describe('Ficha', () => {
     expect(distintas.size).toBe(8);
   });
 
+  it('a magnitude do pump muda o glifo', () => {
+    // O sigilo desenhava o *sinal* do pump e ignorava a magnitude: +2/+2 e
+    // +4/+4 saíam idênticos, e -1/-1 com -3/-3 também. Descoberto olhando o
+    // acervo com 50 cartas.
+    const glifo = (power: number) => {
+      const { container } = render(
+        <Ficha
+          carta={carta({ kind: 'spell', effect: { kind: 'pump', power, toughness: power } })}
+        />,
+      );
+      const tracos = [...container.querySelectorAll('.sigilo path')];
+      const marca = tracos[tracos.length - 1]?.getAttribute('d');
+      cleanup();
+      return marca;
+    };
+
+    expect(glifo(2)).not.toBe(glifo(4));
+    expect(glifo(-1)).not.toBe(glifo(-3));
+    expect(glifo(2)).not.toBe(glifo(-2));
+  });
+
   it('o efeito vira texto legível', () => {
     const { container } = render(
       <Ficha carta={carta({ kind: 'spell', effect: { kind: 'deal_damage', amount: 3 } })} />,

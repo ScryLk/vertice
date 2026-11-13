@@ -1,0 +1,5 @@
+slug = "mingua"
+name = "Míngua"
+cost = 2
+type = "spell"
+effect = { kind = "pump", power = -3, toughness = -3 }

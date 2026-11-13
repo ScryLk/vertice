@@ -1,0 +1,8 @@
+slug = "besouro-de-arquivo"
+name = "Besouro de Arquivo"
+cost = 2
+type = "creature"
+power = 1
+toughness = 1
+keywords = ["flying", "vigilance"]
+effect = { kind = "none" }

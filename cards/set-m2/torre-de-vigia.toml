@@ -1,0 +1,7 @@
+slug = "torre-de-vigia"
+name = "Torre de Vigia"
+cost = 4
+type = "creature"
+power = 3
+toughness = 5
+effect = { kind = "none" }

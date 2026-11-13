@@ -1,0 +1,5 @@
+slug = "levantamento"
+name = "Levantamento"
+cost = 3
+type = "spell"
+effect = { kind = "draw", amount = 3 }

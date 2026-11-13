@@ -121,6 +121,8 @@ A DSL cobre os casos comuns: custo, tipo, palavras-chave, efeito composto de pri
 
 O escape pra cartas esquisitas é **script WASM por carta**, carregado no servidor. Custa mais e é mais lento, então é exceção — se 20% das cartas precisam de WASM, sua DSL está fraca.
 
+**Onde o pool parou, e por quê (M2).** O conjunto tem 50 cartas. Com três palavras-chave e três efeitos, essa é aproximadamente a fronteira em que cada carta ainda é distinguível — passar daqui produz duplicata com outro nome. Chegar às 200–250 abaixo exige **primitivas novas** na DSL (destruir, criar ficha, modificar característica), que é trabalho de motor e uma decisão de regra, não de catálogo. O validador não impede crescer; a distinção é que impede.
+
 **Tamanho de pool.** Isto é o orçamento real de conteúdo, e ele é maior do que você imagina:
 
 - 200–250 cartas: mínimo pra decks-padrão por eco funcionarem (que é como o jogo começa, e é o que a lore já te dá de graça — o eco entrega a lista canônica).

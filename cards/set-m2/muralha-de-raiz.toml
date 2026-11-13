@@ -1,0 +1,7 @@
+slug = "muralha-de-raiz"
+name = "Muralha de Raiz"
+cost = 3
+type = "creature"
+power = 2
+toughness = 4
+effect = { kind = "none" }

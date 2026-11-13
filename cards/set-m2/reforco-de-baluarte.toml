@@ -1,0 +1,5 @@
+slug = "reforco-de-baluarte"
+name = "Reforço de Baluarte"
+cost = 2
+type = "spell"
+effect = { kind = "pump", power = 4, toughness = 4 }

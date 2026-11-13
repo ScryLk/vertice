@@ -1,0 +1,5 @@
+slug = "faisca-curta"
+name = "Faísca Curta"
+cost = 1
+type = "spell"
+effect = { kind = "deal_damage", amount = 1 }

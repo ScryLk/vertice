@@ -1,0 +1,5 @@
+slug = "chamuscar"
+name = "Chamuscar"
+cost = 3
+type = "spell"
+effect = { kind = "deal_damage", amount = 5 }

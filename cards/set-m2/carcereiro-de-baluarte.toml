@@ -1,0 +1,8 @@
+slug = "carcereiro-de-baluarte"
+name = "Carcereiro de Baluarte"
+cost = 3
+type = "creature"
+power = 3
+toughness = 3
+keywords = ["vigilance"]
+effect = { kind = "none" }

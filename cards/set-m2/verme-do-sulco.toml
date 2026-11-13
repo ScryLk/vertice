@@ -1,0 +1,8 @@
+slug = "verme-do-sulco"
+name = "Verme do Sulco"
+cost = 3
+type = "creature"
+power = 2
+toughness = 2
+keywords = ["deathtouch"]
+effect = { kind = "none" }

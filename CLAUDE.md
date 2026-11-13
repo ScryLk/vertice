@@ -326,6 +326,16 @@ jogável, porque nada nele carrega informação. A entrada do duelo (as leylines
 abrindo em ~1,1s) é o encaixe onde a transição do overworld vai plugar quando
 o overworld existir, no M4.
 
+**Pool cresceu para 50.** 37 cartas novas em `cards/set-m2/`, ids 13..49,
+`next_id = 50`, `CARD_SET_VERSION = "m2.1"`. O validador aceitou todas de
+primeira — a curva estava certa antes de o dado existir.
+
+**O teto do pool não é de conteúdo, é de DSL.** Com três palavras-chave e três
+efeitos, ~50 cartas é onde a distinção acaba: daqui para cima o que se produz é
+duplicata com outro nome. Chegar às 200–250 que a `arquitetura.md` §6 pede
+exige **primitivas novas** — destruir, criar ficha, modificar característica —,
+e isso é trabalho de motor, não de catálogo. É a próxima decisão de verdade.
+
 Falta do M2: **chibi e a transição a partir do overworld** — as duas dependem
 de arte que não é procedural, e a segunda depende de uma cena que só existe no
 M4. Ilustração de comandante e transição de cena continuam sendo o orçamento

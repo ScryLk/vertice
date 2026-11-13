@@ -1,0 +1,7 @@
+slug = "barreira-de-sebo"
+name = "Barreira de Sebo"
+cost = 2
+type = "creature"
+power = 1
+toughness = 3
+effect = { kind = "none" }

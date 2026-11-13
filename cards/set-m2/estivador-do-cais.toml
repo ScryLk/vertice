@@ -1,0 +1,7 @@
+slug = "estivador-do-cais"
+name = "Estivador do Cais"
+cost = 2
+type = "creature"
+power = 3
+toughness = 1
+effect = { kind = "none" }

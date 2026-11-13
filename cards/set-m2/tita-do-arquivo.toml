@@ -1,0 +1,7 @@
+slug = "tita-do-arquivo"
+name = "Titã do Arquivo"
+cost = 5
+type = "creature"
+power = 6
+toughness = 4
+effect = { kind = "none" }

@@ -51,6 +51,8 @@ function numeroDeCatalogo(id: number): string {
  */
 function Sigilo({ carta }: { carta: CardDefDto }) {
   const tracos = carta.cost;
+  const magnitude = carta.effect.kind === 'pump' ? Math.abs(carta.effect.power) : 0;
+  const forcaDoPump = Math.min(26, 8 + magnitude * 5);
   const moldura =
     carta.kind === 'land'
       ? 'M20 20 H80 V80 H20 Z'
@@ -89,8 +91,15 @@ function Sigilo({ carta }: { carta: CardDefDto }) {
           <circle key={indice} cx={42 + indice * 16} cy={50} r="5" fill="none" stroke="currentColor" strokeWidth="2" />
         ))}
       {carta.effect.kind === 'pump' && (
+        // O comprimento do traço carrega a magnitude. Sem isso, +2/+2 e +4/+4
+        // ficam com o mesmo glifo — visível no acervo real, e o sigilo deixa
+        // de dizer o que a carta faz.
         <path
-          d={carta.effect.power < 0 ? 'M38 50 H62' : 'M50 36 V64 M38 50 H62'}
+          d={
+            carta.effect.power < 0
+              ? `M${50 - forcaDoPump} 50 H${50 + forcaDoPump}`
+              : `M50 ${50 - forcaDoPump} V${50 + forcaDoPump} M${50 - forcaDoPump} 50 H${50 + forcaDoPump}`
+          }
           stroke="currentColor"
           strokeWidth="3"
           fill="none"

@@ -126,7 +126,16 @@ Chibi, cenário e interface continuam terceirizáveis por peça.
 
 ## Quando revisar
 
-O sistema foi julgado com 13 cartas. **Revisar quando o pool passar de ~60**,
-olhando o acervo inteiro de uma vez: se fichas diferentes começarem a se
-parecer demais, o ajuste é na gramática do sigilo (mais um eixo), não em
-desenhar carta por carta.
+**Revisado com 50 cartas**, olhando o acervo inteiro em `?cartas`. O sistema
+aguentou, e encontrou um defeito: o sigilo desenhava o *sinal* do pump e
+ignorava a magnitude, então +2/+2 e +4/+4 saíam idênticos — e −1/−1 com −3/−3
+também. Corrigido fazendo o comprimento do traço carregar a magnitude, com
+teste cobrindo.
+
+A lição vale para os próximos eixos: **um glifo tem que ser função de tudo o
+que distingue a carta**, não só do que a nomeia. Se um número muda o
+comportamento, ele tem que mudar o desenho.
+
+**Revisar de novo quando o pool passar de ~80**, ou quando a DSL ganhar
+primitivas novas — nesse momento entram tipos de efeito que o sigilo ainda não
+sabe desenhar.

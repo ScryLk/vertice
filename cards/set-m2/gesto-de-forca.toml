@@ -1,0 +1,5 @@
+slug = "gesto-de-forca"
+name = "Gesto de Força"
+cost = 1
+type = "spell"
+effect = { kind = "pump", power = 2, toughness = 2 }

@@ -1,0 +1,8 @@
+slug = "aguia-do-no"
+name = "Águia do Nó"
+cost = 4
+type = "creature"
+power = 4
+toughness = 4
+keywords = ["flying"]
+effect = { kind = "none" }

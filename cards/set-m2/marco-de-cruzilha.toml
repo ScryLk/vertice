@@ -1,0 +1,5 @@
+slug = "marco-de-cruzilha"
+name = "Marco de Cruzilha"
+cost = 0
+type = "land"
+effect = { kind = "none" }

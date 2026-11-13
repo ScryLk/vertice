@@ -1,0 +1,5 @@
+slug = "peso-de-chumbo"
+name = "Peso de Chumbo"
+cost = 1
+type = "spell"
+effect = { kind = "pump", power = -1, toughness = -1 }

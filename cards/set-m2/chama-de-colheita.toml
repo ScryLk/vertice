@@ -1,0 +1,5 @@
+slug = "chama-de-colheita"
+name = "Chama de Colheita"
+cost = 2
+type = "spell"
+effect = { kind = "deal_damage", amount = 4 }

@@ -1,0 +1,8 @@
+slug = "monitor-de-corredor"
+name = "Monitor de Corredor"
+cost = 1
+type = "creature"
+power = 1
+toughness = 1
+keywords = ["vigilance"]
+effect = { kind = "none" }

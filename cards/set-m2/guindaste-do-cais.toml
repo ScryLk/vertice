@@ -1,0 +1,7 @@
+slug = "guindaste-do-cais"
+name = "Guindaste do Cais"
+cost = 4
+type = "creature"
+power = 5
+toughness = 3
+effect = { kind = "none" }

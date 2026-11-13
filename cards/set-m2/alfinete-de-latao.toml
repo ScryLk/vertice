@@ -1,0 +1,8 @@
+slug = "alfinete-de-latao"
+name = "Alfinete de Latão"
+cost = 1
+type = "creature"
+power = 1
+toughness = 1
+keywords = ["deathtouch"]
+effect = { kind = "none" }

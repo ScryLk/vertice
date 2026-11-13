@@ -1,0 +1,8 @@
+slug = "vigia-do-vertice"
+name = "Vigia do Vértice"
+cost = 5
+type = "creature"
+power = 5
+toughness = 5
+keywords = ["vigilance"]
+effect = { kind = "none" }

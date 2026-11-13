@@ -11,7 +11,7 @@
 # Ele SÓ SOBE. Ao publicar carta nova, some 1 nele e dê o id antigo à carta.
 # Apagar carta não baixa `next_id` — é justamente isso que faz a deleção
 # aparecer como erro em vez de sumir calada.
-next_id = 13
+next_id = 50
 
 [cards]
 # Terrenos
@@ -32,3 +32,42 @@ faisca = 9
 censo = 10
 peso-morto = 11
 brasa-dupla = 12
+
+# Conjunto M2 — o pool cresce; nada acima muda de id.
+patio-das-assinaturas = 13
+anfiteatro-rachado = 14
+ala-norte = 15
+marco-de-cruzilha = 16
+calouro-perdido = 17
+monitor-de-corredor = 18
+alfinete-de-latao = 19
+mureta-de-entulho = 20
+andorinha-de-beira = 21
+estivador-do-cais = 22
+barreira-de-sebo = 23
+cao-de-guarda-velho = 24
+besouro-de-arquivo = 25
+toutinegra-do-sul = 26
+lamina-de-fogueira = 27
+muralha-de-raiz = 28
+coruja-do-campanario = 29
+verme-do-sulco = 30
+carcereiro-de-baluarte = 31
+urso-do-desfiladeiro = 32
+guindaste-do-cais = 33
+torre-de-vigia = 34
+aguia-do-no = 35
+carrasco-de-fogueira = 36
+colosso-de-pedra-seca = 37
+vigia-do-vertice = 38
+tita-do-arquivo = 39
+faisca-curta = 40
+chama-de-colheita = 41
+chamuscar = 42
+fulminar = 43
+anotacao = 44
+levantamento = 45
+gesto-de-forca = 46
+reforco-de-baluarte = 47
+peso-de-chumbo = 48
+mingua = 49

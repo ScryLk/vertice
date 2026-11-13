@@ -1,0 +1,7 @@
+slug = "calouro-perdido"
+name = "Calouro Perdido"
+cost = 1
+type = "creature"
+power = 1
+toughness = 1
+effect = { kind = "none" }

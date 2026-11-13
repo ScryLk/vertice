@@ -1,0 +1,8 @@
+slug = "andorinha-de-beira"
+name = "Andorinha de Beira"
+cost = 1
+type = "creature"
+power = 1
+toughness = 1
+keywords = ["flying"]
+effect = { kind = "none" }

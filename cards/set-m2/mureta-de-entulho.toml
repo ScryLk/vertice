@@ -1,0 +1,7 @@
+slug = "mureta-de-entulho"
+name = "Mureta de Entulho"
+cost = 1
+type = "creature"
+power = 1
+toughness = 2
+effect = { kind = "none" }

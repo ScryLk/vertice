@@ -1,0 +1,8 @@
+slug = "carrasco-de-fogueira"
+name = "Carrasco de Fogueira"
+cost = 4
+type = "creature"
+power = 3
+toughness = 3
+keywords = ["deathtouch"]
+effect = { kind = "none" }

@@ -1,0 +1,5 @@
+slug = "anfiteatro-rachado"
+name = "Anfiteatro Rachado"
+cost = 0
+type = "land"
+effect = { kind = "none" }

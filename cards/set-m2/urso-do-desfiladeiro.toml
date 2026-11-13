@@ -1,0 +1,7 @@
+slug = "urso-do-desfiladeiro"
+name = "Urso do Desfiladeiro"
+cost = 4
+type = "creature"
+power = 4
+toughness = 4
+effect = { kind = "none" }

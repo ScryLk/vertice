@@ -1,0 +1,7 @@
+slug = "toutinegra-do-sul"
+name = "Toutinegra do Sul"
+cost = 3
+type = "creature"
+power = 3
+toughness = 3
+effect = { kind = "none" }

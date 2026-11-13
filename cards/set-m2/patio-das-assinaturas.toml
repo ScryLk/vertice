@@ -1,0 +1,5 @@
+slug = "patio-das-assinaturas"
+name = "Pátio das Assinaturas"
+cost = 0
+type = "land"
+effect = { kind = "none" }

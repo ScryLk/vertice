@@ -1,0 +1,8 @@
+slug = "coruja-do-campanario"
+name = "Coruja do Campanário"
+cost = 3
+type = "creature"
+power = 2
+toughness = 2
+keywords = ["flying"]
+effect = { kind = "none" }

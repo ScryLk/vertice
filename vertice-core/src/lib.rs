@@ -37,7 +37,7 @@ pub use view::{view, PlayerView};
 /// passa a fazer parte do estado. Um `MatchRecord` da 0.1.0 não significa a
 /// mesma coisa, então a versão tinha que dizer isso.
 pub const ENGINE_VERSION: &str = "0.2.0";
-pub const CARD_SET_VERSION: &str = "m0.1";
+pub const CARD_SET_VERSION: &str = "m2.1";
 
 /// Vida inicial. Comandante usa 40.
 pub const STARTING_LIFE: i32 = 40;

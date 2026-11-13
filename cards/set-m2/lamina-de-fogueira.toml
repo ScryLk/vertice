@@ -1,0 +1,7 @@
+slug = "lamina-de-fogueira"
+name = "Lâmina de Fogueira"
+cost = 3
+type = "creature"
+power = 4
+toughness = 2
+effect = { kind = "none" }
